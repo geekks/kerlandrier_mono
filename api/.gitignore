@@ -1,0 +1,12 @@
+.env
+secret_token.json
+__pycache__
+.venv
+.vscode
+
+# Auth DB
+auth.db
+*.db
+
+# Logs
+*.log

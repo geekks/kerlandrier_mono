@@ -1,0 +1,7 @@
+secret_token.json
+.venv
+.vscode
+__pycache__
+.env
+README.md
+auth.db
