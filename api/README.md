@@ -15,7 +15,7 @@ docker run -d --name kerlandrierapi -p 8001:8001 --env-file .env kerlandrierapi:
 docker compose up --build --detach
 ```
 
-> API should serve at http://127.0.0.1:8001 
+> API should serve at http://localhost:8001 (http://127.0.0.1:8001 )
 
 ## Local dev without Docker
 

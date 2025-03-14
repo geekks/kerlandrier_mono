@@ -23,6 +23,8 @@ docker run -d --name kerlandrierfront -p 8090:5173 --env-file .env kerlandrierfr
 docker compose up --build --detach
 ```
 
+> Available at http://localhost:8090 (http://127.0.0.1:8090)
+
 ## Local dev (without Docker)
 
 node version >= 20 
@@ -33,5 +35,3 @@ yarn dev # launch server on port 5173
 ```
 
 _Hot reload by default_
-
-> Available at http://localhost:8090

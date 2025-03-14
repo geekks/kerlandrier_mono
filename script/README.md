@@ -1,6 +1,6 @@
 # Kerlandrier scripts
 
-_Fourre-tout des outils utilisés pour mise à jour backoffice du OpenAgenda Kerlandrier._
+_Fourre-tout des outils utilisés pour mise à jour du OpenAgenda Kerlandrier._
 
 ## Outils du dépôt
 
@@ -12,8 +12,8 @@ _Fourre-tout des outils utilisés pour mise à jour backoffice du OpenAgenda Ker
 
 *   Importer les événements d'un csv
 *   Pour la création du csv :
-    +   Option 1 : Créer à la main pour shunter le formulaire OpenAgenda (parce qu'un jour on créera notre solution open-source mais pas aujourd'hui)
-    +   Option 2 : Créer via web-scraping 
+    +   Option 1 : A la main i.e. ne pas passer par le formulaire OpenAgenda
+    +   Option 2 : Scraping
         - ([Extension Chrome](https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah?pli=1))
         - Scripting JS ou via lib python type `BeautifulSoup`
 * Stockage des csv :
@@ -29,6 +29,8 @@ _Fourre-tout des outils utilisés pour mise à jour backoffice du OpenAgenda Ker
     + Ca fait professionnel.
 
 ## Installation
+
+> TODO: Documenter les migration des scripts en python (notamment import facebook).
 
 ### Installer les librairies
 ```shell 
