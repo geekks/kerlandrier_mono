@@ -1,0 +1,152 @@
+/* TABLE SECTION */
+table {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.3rem;
+  color:#008080;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+  margin: 25px auto;
+  background-color: #fffff0;
+  table-layout: auto;
+}
+table tbody tr {
+  border-bottom: 1px solid #ccc;
+}
+
+table tbody tr:nth-of-type(even) {
+  background-color: #fffff0;
+}
+
+td {
+  text-align: left;
+  padding: 8px 10px;
+}
+
+th {
+  text-align: center;
+  padding: 8px 10px;
+}
+
+table tbody tr:last-of-type {
+  border-bottom: 2px solid #4bbd7f;
+}
+
+table td:first-child, table td:nth-child(2), table td:nth-child(3) {
+  font-size: 10px;
+  font-family:'Lucida Sans', sans-serif;
+  max-width: 100px;
+  word-break: break-all;
+}
+
+table td:nth-child(4) input {
+  width: 400px; 
+}
+
+
+/* STANDARD INPUT SECTION */
+table input {
+  font-family: "Barlow Condensed", sans-serif;
+  color:#008080;
+  font-size: 1.3rem;
+  border: 1px solid var(--rs-border-primary);
+  transition: border-color .15s ease-in-out;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+table input:focus-visible {
+  outline: 1px solid #00808099;
+}
+
+input[disabled] {
+  background-color: #dddddd;
+}
+
+/* TAG INPUT SECTION */
+.rs-picker {
+  width: 100%;
+}
+
+table .rs-tag {
+color:#fffff0;
+  background-color: #008080;
+}
+.rs-tag-icon-close > .rs-icon {
+  fill: #fffff0
+}
+
+.rs-picker-clean > .rs-icon {
+  fill: #008080
+}
+
+table .rs-tag-text {
+  font-family: "Barlow Condensed", sans-serif;
+  color:#fffff0;
+  background-color: #008080;
+  font-size: 1.3rem;
+  padding: 10px 10px 10px 10px;
+  text-transform:uppercase;
+
+}
+
+
+.rs-picker > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > input:nth-child(1),
+.rs-picker-focused > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > input:nth-child(1) {
+  font-family: "Barlow Condensed", sans-serif;
+  color:#008080;
+  font-size: 1.3rem;
+  height: 100%;
+  padding: 0px 15px 0px 0px;
+  text-transform:uppercase;
+}
+
+button#patch {
+  cursor: pointer;
+  display:block;
+  margin: 0 5px 0 0;
+  padding: 5px 10px;
+  font-size: 1.3rem;
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform:uppercase;
+  color:#008080;
+  background-color: #fffff0;
+  border: 1px solid #008080;
+  border-radius: 6px;
+}
+
+button#patch[disabled] {
+  cursor: not-allowed;
+  background-color: #dddddd;
+}
+
+.edito-table-description {
+  width: 400px;
+}
+
+.edito-table-dateRange {
+  font-size: 14px;
+  width: 200px;
+}
+
+.edito-table-firstTimingDate > input, .edito-table-firstTimingTimeEnd > input, .edito-table-firstTimingTimeStart > input {
+  width: 100px;
+}
+
+.edito-table-hasChanged {
+  width: 50px;
+  font-size: 10px;
+  text-align: center;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+#load-spinner {
+  animation: spin 1s linear infinite;
+  vertical-align: middle;
+}

@@ -1,0 +1,704 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+        --main-color: teal;
+        --lite-bkg: beige;
+    }
+
+body {
+    background-color: white;
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    word-spacing: -0.1rem;
+}
+
+
+
+h1,
+h2,
+h3,
+h4 {
+  font-style: normal;
+
+}
+
+h1 {
+    font-weight: 800;
+}
+
+h2 {
+    font-weight: 700;
+}
+
+h3 {
+    font-weight: 500;
+}
+
+h4 {
+  font-weight: 400;
+}
+
+
+a,
+a:visited {
+    color: var(--main-color);
+}
+
+
+.dateAndEvents{
+  break-inside: avoid;
+}
+
+.date-header {
+    text-align:right;
+    position: sticky;
+    top: 0;
+    font-family: "League Gothic", sans-serif;
+    text-transform:uppercase;
+}
+.sticky-date {
+    position: sticky;
+    top: 0px;
+}
+
+
+
+.tag {
+    margin-right: 2px;
+    margin-bottom: 2px;
+    padding: 0 8px;
+    background-color: var(--main-color);
+    border-radius: 4px;
+    display: inline-block;
+    color: var(--lite-bkg);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.time-tag {
+    margin-right: 2px;
+    margin-bottom: 2px;
+    padding: 0 8px;
+    background-color: var(--lite-bkg);
+    border-radius: 4px;
+    border-color: var(--main-color);
+    border: solid 1px;
+    display: inline-block;
+    color: var(--main-color);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+
+ul, ol {list-style-position: inside;}
+
+#contribution, #abonnement{
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.5rem;
+}
+
+
+#infos-link {
+    font-size:1.5rem;
+    line-height:1rem;
+}
+
+#infos-link a{
+    font-style: italic;
+    text-decoration-thickness: 1px;
+}
+
+#contribution,#abonnement{
+    ul {
+        list-style-type: none;
+    }
+}
+
+footer {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid var(--main-color);
+    text-align: center;
+}
+
+#print-button {
+    cursor: pointer;
+}
+
+
+
+#filters-container {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+#monthSelect {
+    color: var(--main-color);
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px;
+    background-color: var(--lite-bkg);
+    border: 1px solid var(--main-color);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 200px;
+    height: 70px;
+    margin: 0 auto;
+}
+
+.filter {
+    font-family: "Barlow Condensed", sans-serif;
+    color: var(--main-color);
+    font-weight: 400;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px;
+    background-color: var(--lite-bkg);
+    border-radius: 10px;
+    border: 1px solid var(--main-color);
+    margin: 2px;
+    cursor: pointer ;
+}
+
+.selected {
+    background-color: var(--main-color);
+    color: var(--lite-bkg);
+    border: 1px solid var(--lite-bkg);
+}
+#qr-container {
+    display: none;
+}
+
+#area-1 {
+    position: absolute;
+    z-index: 10000;
+    width: 50px;
+    height: 50px;
+    left: 5px;
+    bottom: 0;
+}
+
+#area-2 {
+    position: absolute;
+    text-align: right;
+    z-index: 5000;
+    width: 135px;
+    height: 60px;
+    left: 0;
+    bottom: 0;
+}
+
+#area-3 {
+    position: absolute;
+    text-align: right;
+    z-index: 1000;
+    width: 200px;
+    height: 70px;
+    left: 0;
+    bottom: 0;
+}
+
+
+
+/* #aven {
+} */
+
+#cornouaille {
+    position: relative;
+    left: 5px;
+}
+
+#bretagne {
+    position: relative;
+    left: 4px;
+}
+
+.hidden-link {
+    text-decoration: none;
+    cursor:default;
+}
+
+.annule > a {
+    text-decoration: line-through
+}
+
+#exposection {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    font-style: bold;
+}
+
+#expoadvert {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    font-size: 30px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-style: italic;
+    text-align: center;
+}
+.icon-link-ical {
+    width: 34px;
+    height: 20px
+}
+.icon-link-rss {
+    width: 20px;
+    height: 20px
+}
+
+#icon-ical {
+    height: 20px;
+        width: 34px;
+        overflow: hidden;
+        margin: 0 auto;
+    background: url("/ical.png");
+    background-position: 0px;
+    background-size: 34px 20px;
+}
+#icon-rss {
+    height: 20px;
+        width: 20px;
+        overflow: hidden;
+        margin: 0 auto;
+    background: url("/rss.png");
+    background-position: 0px;
+    background-size: 20px 20px;
+}
+
+#join-us {
+    display: block;
+    margin: 0 auto;
+}
+/* MEDIA QUERIES --- pour la lecture sur ordinateur, mobile et papier  */
+@media only screen and (max-width: 799px) /*HANDHELD*/ {
+    body {
+        margin: 10px 20px;
+        background-color: var(--lite-bkg);
+        color: var(--main-color);
+    }
+
+    header {
+        margin-bottom: 40px;
+    }
+
+    h1 {
+        font-size: 60px;
+    }
+
+    #description {
+        font-size: 24px;
+        line-height: 100%;
+    }
+
+    .dateAndEvents{
+      margin-bottom: 30px;
+    }
+
+    .date-header {
+        width: 100%;
+        background-color: var(--lite-bkg);
+    }
+    .date-header p{font-size: 0.8rem;}
+
+    
+    .evenements {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 1.5rem;
+
+    }
+
+    .tag{
+      font-size: 1.3rem;
+    }
+
+    .time-tag{
+      font-size: 1.3rem;
+    }
+
+    h2 {
+        margin: 3px 0 7px;
+        font-size: 32px;
+        line-height: 80%;
+    }
+
+    h3 {
+        font-size: 28px;
+        line-height: 100%;
+    }
+
+    h4 {
+        font-size: 2.2rem;
+        line-height: 100%;
+    }
+
+    #title {
+        display: inline-block;
+    }
+
+    #filters-container {
+        margin-top: 15px;
+    }
+
+    #expoadvert {
+        font-size: 25px;
+        padding: 15px;
+        text-align: center;
+    }
+}
+
+
+@media screen and (min-width: 800px) /*DESKTOP*/ {
+    
+
+    body {
+        margin: 15px 20px;
+        background-color: var(--lite-bkg);
+        color: var(--main-color);
+    }
+
+    header {
+        margin-bottom: 50px;
+    }
+
+    #title {
+        display: flex;
+        justify-content: space-between;
+
+    }
+
+    h1 {
+        font-size: 6rem;
+        line-height: 100%;
+    }
+
+    #description {
+        max-width: 1080px;
+        font-size: 2.6rem;
+        line-height: 100%;
+    }
+
+    #filters-container {
+        margin-top: 15px;
+
+    }
+
+    .dateAndEvents{
+      margin-bottom: 30px;
+        display: flex;
+        gap:1.5rem;
+    }
+
+
+    .evenements {
+        flex:auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 400px);
+        grid-gap: 1.5rem;
+
+    }
+
+    /* .card-title {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    } */
+
+    .date-header {
+        width: 320px;
+        position: sticky;
+        top: 0px;
+    }
+
+    .date-header p{font-size: 2.2rem;}
+
+    .tag{
+      font-size: 1.3rem;
+    }
+
+    .time-tag{
+      font-size: 1.3rem;
+    }
+
+    h2 {
+        margin: 3px 0 7px;
+        font-size: 36px;
+        line-height: 100%;
+    }
+
+    h3 {
+        font-size: 28px;
+        line-height: 100%;
+    }
+
+    h4 {
+        font-size: 3rem;
+        line-height: 100%;
+    }
+}
+
+
+
+@media print /*PRINT*/ {
+    :root {
+        --main-color: black;
+        --lite-bkg: white;
+    }
+
+    @page{margin:7mm;}
+
+
+
+    body {
+      max-width: 21cm;
+    }
+
+    header {
+        margin-bottom: 10mm;
+        width: 100%;
+    }
+
+    #title {
+        display: flex;
+    }
+
+    h1 {
+      margin-bottom: 3mm;
+        font-size: 86pt;
+        line-height: 70%;
+    }
+
+    #description {
+        font-size: 31pt;
+        line-height: 100%;
+    }
+
+    #qr-container {
+      flex:auto;
+        display: block;
+        text-align: right;
+        font-size:9pt;
+        word-spacing: normal;
+      }
+
+    #qr {
+        max-width: 16mm;
+    }
+
+    #contribution {
+        break-inside: avoid;
+    }
+
+    .dateAndEvents{
+      margin-bottom:5mm;
+      display: flex;
+      gap:4mm;
+    }
+
+    .date-header {
+      width: 6cm;
+    }
+    .date-header p{font-size: 18pt;}
+
+
+    .evenements {
+      flex:auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, 6.2cm);
+      grid-gap: 3mm;
+      line-height: 100%;
+    }
+
+
+
+    .tag{
+        font-size: 10pt;
+    }
+
+    .time-tag{
+        font-size: 10pt;
+    }
+
+    h2 {
+        margin: 3px 0 4px;
+        font-size: 1.4rem;
+        line-height: 80%;
+    }
+
+    h3 {
+        font-size: 1rem;
+        line-height: 100%;
+        margin-bottom: 2px;
+    }
+
+    h4 {
+        font-size: 2rem;
+        line-height: 100%;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+
+    #print-button, #filters, #infos-link a ,
+    #monthSelect, .filter, #abonnement, #other-events,
+    #expoadvert {
+        display: none;
+    }
+
+}
+
+/* Local Google fonts */
+
+/* barlow-condensed-200 - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 200;
+    src: url('/fonts/barlow-condensed-v12-latin-200.woff2') format('woff2');
+  }
+  /* barlow-condensed-200italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 200;
+      src: url('/fonts/barlow-condensed-v12-latin-200italic.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-300 - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: normal;
+      font-weight: 300;
+      src: url('/fonts/barlow-condensed-v12-latin-300.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-300italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 300;
+      src: url('/fonts/barlow-condensed-v12-latin-300italic.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-regular - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/barlow-condensed-v12-latin-regular.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 400;
+      src: url('/fonts/barlow-condensed-v12-latin-italic.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-500 - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: normal;
+      font-weight: 500;
+      src: url('/fonts/barlow-condensed-v12-latin-500.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-500italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 500;
+      src: url('/fonts/barlow-condensed-v12-latin-500italic.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-600 - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: normal;
+      font-weight: 600;
+      src: url('/fonts/barlow-condensed-v12-latin-600.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-600italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 600;
+      src: url('/fonts/barlow-condensed-v12-latin-600italic.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-700 - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: normal;
+      font-weight: 700;
+      src: url('/fonts/barlow-condensed-v12-latin-700.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-700italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 700;
+      src: url('/fonts/barlow-condensed-v12-latin-700italic.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-800 - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: normal;
+      font-weight: 800;
+      src: url('/fonts/barlow-condensed-v12-latin-800.woff2') format('woff2');
+  }
+
+  /* barlow-condensed-800italic - latin */
+  @font-face {
+      font-display: swap;
+      font-family: 'Barlow Condensed';
+      font-style: italic;
+      font-weight: 800;
+      src: url('/fonts/barlow-condensed-v12-latin-800italic.woff2') format('woff2');
+  }
+
+  @font-face {
+      font-display: swap;
+      font-family: 'League Gothic';
+      font-style: normal;
+      font-weight: 400;
+      src: url('/fonts/LeagueGothic-Regular-VariableFont_wdth.ttf') format('truetype');
+  }
