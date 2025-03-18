@@ -32,7 +32,7 @@ const csvToJson = async () => {
 
     // Use a promise to handle the asynchronous nature of the stream
     const csvStream = new Promise((resolve, reject) => {
-        fs.createReadStream(`csv\\${filename}`)
+        fs.createReadStream(`csv/${filename}`)
             .pipe(csv({separator: ';'}))
             .on('data', (data) => results.push(data))
             .on('end', () => resolve(results))
