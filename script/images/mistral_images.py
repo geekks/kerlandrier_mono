@@ -35,11 +35,12 @@ except:
 from utils import get_end_date, showDiff,encodeImage64
 from HttpRequests import create_event, retrieve_access_token
 from getOaLocation import get_or_create_oa_location
-from  dateparser import parse
 
+from configuration import config
 
-MISTRAL_PRIVATE_API_KEY = os.getenv("MISTRAL_PRIVATE_API_KEY")
-SECRET_KEY = os.getenv("OA_SECRET_KEY")
+# Main Program
+MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
+SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
 
 # Define a class to contain the Mistral answer to a formatted JSON
 class Event(BaseModel):

@@ -11,12 +11,14 @@ import time, pytz, dateparser
 from utils import encodeImage64
 
 # Chargement des variables d'environnement
-OA_PUBLIC_KEY = os.getenv('OA_PUBLIC_KEY')
-OA_SECRET_KEY = os.getenv('OA_SECRET_KEY')
-ACCESS_TOKEN_URL = os.getenv('ACCESS_TOKEN_URL')
-AGENDA_UID = os.getenv('AGENDA_UID')
+from configuration import config
+
+OA_PUBLIC_KEY = config.OA_PUBLIC_KEY
+OA_SECRET_KEY = config.OA_SECRET_KEY
+ACCESS_TOKEN_URL = config.ACCESS_TOKEN_URL
+AGENDA_UID = config.AGENDA_UID
 TOKEN_FILE_NAME = 'secret_token.json'
-TBD_LOCATION_UID = os.getenv('TBD_LOCATION_UID')
+TBD_LOCATION_UID = config.TBD_LOCATION_UID
 
 
 def get_nonce():

@@ -19,8 +19,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Environment variables
-TBD_LOCATION_UID = os.getenv("TBD_LOCATION_UID")
-
+from configuration import config
+TBD_LOCATION_UID = config.TBD_LOCATION_UID
+SECRET_KEY = config.OA_SECRET_KEY
 
 def get_or_create_oa_location(searched_location:str, access_token: str, debug:bool=False)->str:
     """
@@ -131,7 +132,6 @@ locations_examples = [
 ]
 
 def test_locations(location_array):
-    SECRET_KEY = os.getenv("OA_SECRET_KEY")
     access_token = retrieve_access_token(SECRET_KEY)
     allLocationsOA = get_locations(access_token)
     allLocationsOA_by_uid = {item['uid']: item for item in allLocationsOA}

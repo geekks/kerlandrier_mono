@@ -2,13 +2,6 @@
 Main Function to get incoming events from FB private calendar
 """
 
-import sys,os
-from git import Repo
-
-# Ajoute le dossier "ressources" au sys.path
-git_root = Repo(search_parent_directories=True).working_tree_dir
-sys.path.insert(0,   os.path.abspath(  os.path.join(  git_root,'resources/python' ) ) )
-
 import requests
 import icalendar
 from datetime import datetime, timedelta, date

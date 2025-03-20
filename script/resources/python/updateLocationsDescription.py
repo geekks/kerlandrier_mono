@@ -9,21 +9,14 @@ Les maigres sources:
 - https://fr.wikipedia.org/wiki/Pays_de_Bretagne#/media/Fichier:Pays_Bretagne_map.jpg
 -  http://www.heritaj.bzh/website/image/ir.attachment/4925_2e00c37/datas
 """
-import sys,os
-from git import Repo
-
-# Ajoute le dossier "ressources" au sys.path
-git_root = Repo(search_parent_directories=True).working_tree_dir
-sys.path.insert(0,   os.path.abspath(  os.path.join(  git_root,'resources/python' ) ) )
-
 import json
 from HttpRequests import( 
         retrieve_access_token,
         get_locations,
         patch_location,
         )
-
-SECRET_KEY = os.getenv("OA_SECRET_KEY")
+from configuration import config
+SECRET_KEY = config.OA_SECRET_KEY
 
 aven_cities = [
     "Bannalec", "Beg-Meil", "Concarneau", "Elliant", "LaForêt-Fouesnant", "Pleuven",

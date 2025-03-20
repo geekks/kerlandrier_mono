@@ -22,12 +22,13 @@ from HttpRequests import(
         )
 import argparse
 
-PUBLIC_KEY = os.getenv("OA_PUBLIC_KEY")
-SECRET_KEY = os.getenv("OA_SECRET_KEY")
-ICS_PRIVATE_URL_KLR_FB = os.getenv("ICS_PRIVATE_URL_KLR_FB")
-URL_AGENDA_ATELIERS_KAL = os.getenv("URL_AGENDA_ATELIERS_KAL")
-KAL_LOCATION_UID = os.getenv("KAL_LOCATION_UID")
-TBD_LOCATION_UID='11634941'
+from configuration import config
+PUBLIC_KEY = config.OA_PUBLIC_KEY
+SECRET_KEY = config.OA_SECRET_KEY
+ICS_PRIVATE_URL_KLR_FB = config.ICS_PRIVATE_URL_KLR_FB
+URL_AGENDA_ATELIERS_KAL = config.URL_AGENDA_ATELIERS_KAL
+KAL_LOCATION_UID = config.KAL_LOCATION_UID
+TBD_LOCATION_UID=config.TBD_LOCATION_UID
 
 now=datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 

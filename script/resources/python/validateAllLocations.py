@@ -1,19 +1,14 @@
-
-import pprint
-import sys,os
-from git import Repo
-
-# Ajoute le dossier "ressources" au sys.path
-git_root = Repo(search_parent_directories=True).working_tree_dir
-sys.path.insert(0,   os.path.abspath(  os.path.join(  git_root,'resources/python' ) ) )
+"""_summary_
+Valide tous les lieux ('location') d'OpenAgenda ("state": 1 )
+"""
 
 from HttpRequests import (  retrieve_access_token,
                             get_locations,
                             patch_location)
 
-AGENDA_UID = os.getenv('AGENDA_UID')
-BASE_URL = "https://api.openagenda.com/v2/"
-OA_SECRET_KEY = os.getenv('OA_SECRET_KEY')
+from configuration import config
+AGENDA_UID = config.AGENDA_UID
+OA_SECRET_KEY = config.OA_SECRET_KEY
 
 def validate_locations():
     accessToken = retrieve_access_token(OA_SECRET_KEY)
