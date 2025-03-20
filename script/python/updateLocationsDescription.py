@@ -10,7 +10,7 @@ Les maigres sources:
 -  http://www.heritaj.bzh/website/image/ir.attachment/4925_2e00c37/datas
 """
 import json
-from HttpRequests import( 
+from libs.HttpRequests import( 
         retrieve_access_token,
         get_locations,
         patch_location,

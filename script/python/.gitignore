@@ -1,0 +1,5 @@
+*cookies.json
+images/*
+!images/.gitkeep
+# Image test file
+!images/TEST_temps_foret.jpg

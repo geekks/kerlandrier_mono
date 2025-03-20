@@ -2,7 +2,7 @@
 Valide tous les lieux ('location') d'OpenAgenda ("state": 1 )
 """
 
-from HttpRequests import (  retrieve_access_token,
+from libs.HttpRequests import (  retrieve_access_token,
                             get_locations,
                             patch_location)
 

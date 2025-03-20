@@ -1,5 +1,5 @@
 """_summary_
-Function to interact with OpenAgenda API
+Functions to interact with OpenAgenda API
 """
 
 import os

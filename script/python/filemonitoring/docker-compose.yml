@@ -6,7 +6,7 @@ services:
       dockerfile: images/Dockerfile
     env_file: "../.env"
     volumes:
-      - ${PWD}/sources:/code/sources
+      - ${PWD}/../images:/code/images
     develop:
       watch:
         - action: rebuild

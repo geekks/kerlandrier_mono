@@ -1,3 +1,8 @@
+"""_summary_
+WIP:
+Permet de récupérer les infos des événements Facebook en scrapant les pages à l'aide de Playwright
+"""
+
 import json, re, os
 from playwright.sync_api import sync_playwright
 import time
@@ -14,7 +19,6 @@ dir_file_path = os.path.dirname(os.path.abspath(__file__))
 
 with open( os.path.join( dir_file_path, 'facebook.cookies.json'), 'r') as file:
     cookies = json.load(file).get("cookies")
-
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=False)

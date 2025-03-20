@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 # Chemin absolu vers le .env à la racine du projet
 dir_file_path = os.path.dirname(os.path.abspath(__file__))
-env_path= os.path.join(dir_file_path,os.pardir, os.pardir, '.env' ) 
+env_path= os.path.join(dir_file_path,os.pardir, '.env' ) 
 
 class Configuration(BaseSettings):
     # Common

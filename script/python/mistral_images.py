@@ -6,8 +6,7 @@ python mistral_images.py --file TEST_temps_foret.jpg
 python mistral_images.py --test
 """
 
-import sys,os
-
+import os
 from mistralai import Mistral
 from pydantic import BaseModel
 from pprint import pprint
@@ -21,22 +20,10 @@ from PIL import Image
 from wasabi import color,msg
 from dateparser import parse
 
-# Ajoute le dossier "ressources" au sys.path
-dir_file_path = os.path.dirname(os.path.abspath(__file__))
-resources_path= os.path.join(dir_file_path,os.pardir, 'resources/python' ) 
-print(f"Adding {resources_path} to sys.path")
-try:
-    sys.path.insert(0,resources_path )
-except:
-    print(f"Resouces not in parent directory/ Must be in Docker container. Adding  {dir_file_path} to sys.path")
-    try:
-        sys.path.insert(0,   dir_file_path )
-    except Exception as e:
-        msg.fail(f"An unexpected error occurred: {e}")
     
-from utils import get_end_date, showDiff,encodeImage64
-from HttpRequests import create_event, retrieve_access_token
-from getOaLocation import get_or_create_oa_location
+from libs.utils import get_end_date, showDiff,encodeImage64
+from libs.HttpRequests import create_event, retrieve_access_token
+from libs.getOaLocation import get_or_create_oa_location
 
 from configuration import config
 
@@ -61,7 +48,7 @@ def getMistralImageEvent(image_path:str=None, url:str = None)->Event:
         # Parse the URL to remove query parameters
         parsed_url = urlparse(url)
         clean_url = urlunparse(parsed_url._replace(query=""))
-        file_name = os.path.join(dir_file_path, "sources", os.path.basename(clean_url))
+        file_name = os.path.join(os.path.dirname(__file__) , "images", os.path.basename(clean_url))
         response = requests.get(url)
         if response.status_code == 200:
             with open(file_name, 'wb') as file:
@@ -163,7 +150,7 @@ if __name__ == "__main__":
     args=parser.parse_args()
     
     if args.fileName:
-        image_path = os.path.join(dir_file_path, "sources", args.fileName )
+        image_path = os.path.join(os.path.dirname(__file__) , "images", args.fileName )
         if not os.path.isfile(image_path):
             raise argparse.ArgumentTypeError(f"Given image path ({image_path}) is not valid")
         response_mistral=getMistralImageEvent(image_path)
@@ -204,7 +191,7 @@ if __name__ == "__main__":
                             "lieu": "Cinéville de CONCARNEAU",
                             "titre": "Le Temps des forêts"}
         msg.info(f"Testing with {TEST_FILE_NAME}")
-        image_path = os.path.join(dir_file_path, "sources", TEST_FILE_NAME)
+        image_path = os.path.join(os.path.dirname(__file__) , "sources", TEST_FILE_NAME)
         response=getMistralImageEvent(image_path)
         response_json = response.model_dump(mode='json')
         error=0
