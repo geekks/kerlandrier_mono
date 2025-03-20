@@ -12,6 +12,12 @@ from thefuzz import fuzz
 from thefuzz import process
 import re
 
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Environment variables
 TBD_LOCATION_UID = os.getenv("TBD_LOCATION_UID")
 
@@ -21,17 +27,17 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
     Tries to find a matching OpenAgenda location for the given searched location.
     Returns an OALocation UID (found, created or default one.)
     """
-    print("- searching location for : '"+ searched_location +"'")
+    logger.info(f"- searching location for : '{searched_location}'")
     if (searched_location == None ) or (searched_location.lower() in ( "" , "none", "null")):
-        print("InputLocation is null or empty. Returning default Location")
+        logger.warning("InputLocation is null or empty. Returning default Location")
         return TBD_LOCATION_UID
     allOaLocations = get_locations(access_token)
     if not searched_location or not allOaLocations:
-        print("[ERROR] inputLocation is null or OA Locations list is empty")
+        logger.error("[ERROR] inputLocation is null or OA Locations list is empty")
         return None
     
     # 0) Use optimized searched, removing false positives and misleadings patterns
-    locationPatterneRemoved=re.sub(r'\b(?:concarneau|(?:29|56)\d{3}|officiel|quimperl(?:e|é)|france |spectacles)\b',
+    locationPatterneRemoved=re.sub(r'\b(?:concarneau|officiel|france |spectacles)\b',
                                             '',
                                             searched_location,
                                             flags=re.IGNORECASE
@@ -41,8 +47,11 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
                                             locationPatterneRemoved,
                                             flags=re.IGNORECASE
                                             )
+    locationPatternToSpace.replace("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé")
+    locationPatternToSpace.replace("ZA de Colguen Rue Aimé Césaire , 29900 Concarneau", "Brasserie Tri Martolod Concarneau")
+    locationPatternToSpace.replace("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc")
     optimized_searched_location = locationPatternToSpace
-    if debug : print(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
+    logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
     OaLocationsIndex = {}
     for location in allOaLocations:
@@ -50,13 +59,13 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
     # returns a list of tuples (name adress , score , OAuid)
     results = process.extract(optimized_searched_location, OaLocationsIndex, scorer=fuzz.token_set_ratio) or []
     if results[0] and results[0][1] > 85:  # Best matching score >85
-        print(f"- 🎯 Location found in OA: {results[0] }")
+        logger.info(f"- 🎯 Location found in OA: {results[0] }")
         return results[0][2]
 
     # 2) Try to create an OALocation
     response = post_location(access_token, searched_location, searched_location)
     if not response or not response.get('location', {}).get('uid'):
-        print("-> ❔ Returning location 'To be defined' (Could not create location on OpenAgenda)")
+        logger.warning("-> ❔ Returning location 'To be defined' (Could not create location on OpenAgenda)")
         return TBD_LOCATION_UID
 
     # Stay in rectangle covering Breizh
@@ -67,11 +76,11 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         and 47 < float(lat) < 49
         and -5.5 < float(long) < -1 
         ):
-        print(f"-> '\U0001f195' New OA location created : {new_oa_location['name']}, {new_oa_location['address']}, {"https://openagenda.com/kerlandrier/admin/locations/" + str(new_oa_location['uid'])}")
+        logger.info(f"-> '\U0001f195' New OA location created : {new_oa_location['name']}, {new_oa_location['address']}, {"https://openagenda.com/kerlandrier/admin/locations/" + str(new_oa_location['uid'])}")
         return new_oa_location['uid']
     else:
         delete_location(access_token, new_oa_location['uid'])
-        print(f"-> ❔ Location not in Breizh: returning 'To be defined' location")
+        logger.warning(f"-> ❔ Location not in Breizh: returning 'To be defined' location")
         return TBD_LOCATION_UID
 
 def get_locations_list(searched_location:str, access_token: str)->list:
@@ -80,7 +89,7 @@ def get_locations_list(searched_location:str, access_token: str)->list:
     """
     allOaLocations = get_locations(access_token)
     if not searched_location or not allOaLocations:
-        print("[ERROR] inputLocation is null or OA Locations list is empty")
+        logger.warning("[ERROR] inputLocation is null or OA Locations list is empty")
         return None
     
     # 1) Try to find an existing OALocation
