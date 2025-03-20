@@ -27,7 +27,7 @@ def get_nonce():
 
 def retrieve_access_token(oa_secret_key):
     # Vérifier si le jeton existe déjà
-    token_file_path = os.path.join(git_root,TOKEN_FILE_NAME)
+    token_file_path = os.path.abspath(TOKEN_FILE_NAME)
     if os.path.exists(token_file_path):
         with open(token_file_path, 'r', encoding='utf8') as token_file:
             token_data = json.load(token_file)
