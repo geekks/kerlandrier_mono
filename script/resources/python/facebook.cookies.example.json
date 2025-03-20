@@ -1,0 +1,64 @@
+{
+    "cookies": [
+        {
+            "name": "datr",
+            "value": "__GMxxxxxxxxxxxx",
+            "domain": "www.facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "sb",
+            "value": "xxxxxxxxxxxxx",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "c_user",
+            "value": "00000000000",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "oo",
+            "value": "v1",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "datr",
+            "value": "xxxxxxxxxxxx",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "i_user",
+            "value": "000000000000",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "ar_debug",
+            "value": "1",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "xs",
+            "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "fr",
+            "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "domain": ".facebook.com",
+            "path": "/"
+        },
+        {
+            "name": "wd",
+            "value": "1920x150",
+            "domain": ".facebook.com",
+            "path": "/"
+        }
+    ]
+}
