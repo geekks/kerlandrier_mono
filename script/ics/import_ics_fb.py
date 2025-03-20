@@ -2,14 +2,21 @@
 Script to import events from a private Facebook calendar (ICS file)
 """
 import sys,os
-from git import Repo
 import json
+from wasabi import msg
 
 # Ajoute le dossier "ressources" au sys.path
 dir_file_path = os.path.dirname(os.path.abspath(__file__))
 resources_path= os.path.join(dir_file_path,os.pardir, 'resources/python' ) 
-print(f"Adding {resources_path} to sys.path")
-
+try:
+    sys.path.insert(0,resources_path )
+except:
+    print(f"Resouces not in parent directory/ Must be in Docker container. Adding  {dir_file_path} to sys.path")
+    try:
+        sys.path.insert(0,   dir_file_path )
+    except Exception as e:
+        msg.fail(f"An unexpected error occurred: {e}")
+        
 import datetime
 from pprint import pprint
 from ICS_utils import pull_upcoming_ics_events
@@ -17,7 +24,6 @@ from getOaLocation import get_or_create_oa_location
 from HttpRequests import get_events
 from HttpRequests import( 
         retrieve_access_token,
-        get_uid_from_name_date,
         create_event
         )
 import argparse
