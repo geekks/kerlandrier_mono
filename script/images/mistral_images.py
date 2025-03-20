@@ -13,6 +13,8 @@ from pydantic import BaseModel
 from pprint import pprint
 import pytz
 from datetime import datetime
+import requests
+from urllib.parse import urlparse, urlunparse
 from slugify import slugify
 import argparse
 from PIL import Image
@@ -53,7 +55,23 @@ class Event(BaseModel):
     description_courte: str
     fiabilite: int
 
-def getMistralImageEvent(image_path:str)->Event:
+def getMistralImageEvent(image_path:str=None, url:str = None)->Event:
+
+    if url:
+        # Parse the URL to remove query parameters
+        parsed_url = urlparse(url)
+        clean_url = urlunparse(parsed_url._replace(query=""))
+        file_name = os.path.join(dir_file_path, "sources", os.path.basename(clean_url))
+        response = requests.get(url)
+        if response.status_code == 200:
+            with open(file_name, 'wb') as file:
+                file.write(response.content)
+            image_path = file_name
+            print(f"Image downloaded and saved to {file_name}")
+        else:
+            print(f"Failed to download image. Status code: {response.status_code}")
+            print(response.text)
+            exit(1)
 
     try:
         Image.open(image_path).verify()
@@ -92,15 +110,15 @@ def getMistralImageEvent(image_path:str)->Event:
             ]
         }
     ]
-    with msg.loading("sending image to Mistral with image path: " + image_path):
-        chat_response = client.chat.parse(
-            model=model,
-            messages=messages,
-            response_format=Event
-        )
+    msg.info("sending image to Mistral with image path: " + image_path)
+    chat_response = client.chat.parse(
+        model=model,
+        messages=messages,
+        response_format=Event
+    )
     return chat_response.choices[0].message.parsed
 
-def postMistralEventToOa(event: Event, image_path: str = None):
+def postMistralEventToOa(event: Event, image_url: str = None):
     
     access_token = retrieve_access_token(SECRET_KEY)
     OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
@@ -113,7 +131,7 @@ def postMistralEventToOa(event: Event, image_path: str = None):
                 "title": { "fr": event.titre } ,
                 "description": { "fr": event.description_courte},
                 "locationUid": OaLocationUid,
-                "longDescription": event.description, 
+                "longDescription": event.description,
                 "timings": [
                         {
                         "begin": localizedDateDeb,
@@ -121,9 +139,11 @@ def postMistralEventToOa(event: Event, image_path: str = None):
                         },
                         ]
             }
+    if image_url:
+        eventOA["image"] = {"url": image_url}
     try:
         with msg.loading("Sending event to OpenAgenda"):
-            response = create_event(access_token, eventOA, image_path)
+            response = create_event(access_token, eventOA)
         if response['event']['uid']:
                 msg.good("Event created !")
                 msg.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
@@ -132,12 +152,13 @@ def postMistralEventToOa(event: Event, image_path: str = None):
             msg.fail( f"Response: {response}" )
     except Exception as e:
         msg.fail(f"Error sending event to OpenAgenda from Mistral analysis")
-        msg.text( f"File: {image_path}. Event title '{response.titre}'")
+        msg.text( f"File: {image_path}. Event title '{event.titre}'")
         pprint(f"Error: {e}")
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
+    parser.add_argument( "--url", "--URL", "--Url",help="URL of the image to analyse")
     parser.add_argument( "--test",nargs='?', const=True,help="Test command with {TEST_FILE_NAME}")
     args=parser.parse_args()
     
@@ -145,12 +166,32 @@ if __name__ == "__main__":
         image_path = os.path.join(dir_file_path, "sources", args.fileName )
         if not os.path.isfile(image_path):
             raise argparse.ArgumentTypeError(f"Given image path ({image_path}) is not valid")
-        response=getMistralImageEvent(image_path)
+        response_mistral=getMistralImageEvent(image_path)
+        response_mistral_json = response_mistral.model_dump(mode='json')
+        print("Mistral answer:")
+        pprint(response_mistral_json)
+        try:
+            paylod={
+                "expiration": 600,
+                "key": config.IMGBB_API_TOKEN.get_secret_value(),
+                "name": args.fileName,
+                "image": encodeImage64(image_path)
+            }
+            response_imgbb = requests.post(config.IMGBB_API_URL, data=paylod)
+            image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
+        except Exception as e:
+            print("Error while uploading image to imgbb")
+            print(e)
+
+        postMistralEventToOa(response_mistral, image_url)
+    
+    elif args.url:
+        response=getMistralImageEvent(url=args.url)
         response_json = response.model_dump(mode='json')
         print("Mistral answer:")
         pprint(response_json)
-        postMistralEventToOa(response, image_path)
-        
+        postMistralEventToOa(response, args.url)
+    
     elif args.test:
         # Test Part of the Program
         TEST_FILE_NAME = "TEST_temps_foret.jpg"
@@ -194,7 +235,7 @@ if __name__ == "__main__":
             msg.warn(f"Test failed for {error} of {len(TEST_FILE_ANSWER) + len(TEST_FILE_ANSWER.get("description")) - 1} keys")
         
     else:
-        msg.fail(f"Please give a valid file name")
+        msg.fail(f"Please give a valid file name. --help for more informations")
         exit(1)
 
     exit(0)

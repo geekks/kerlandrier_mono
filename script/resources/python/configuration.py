@@ -36,7 +36,8 @@ class Configuration(BaseSettings):
 
     # API Key mistral for image analysis
     MISTRAL_PRIVATE_API_KEY: SecretStr = Field(description="Mistral API key for image analysis")
-
+    IMGBB_API_URL: str = Field(description="Temp web image upload service URL", default="https://api.imgbb.com/1/upload")
+    IMGBB_API_TOKEN: SecretStr = Field(description="Temp web image upload service API token")
     ## EXAMPLE: load, and compute values
     #
     # raw_filtered_cities: str | None = Field(
