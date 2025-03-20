@@ -8,6 +8,8 @@ import math, random
 import requests, json
 import time, pytz, dateparser
 
+from utils import encodeImage64
+
 # Chargement des variables d'environnement
 OA_PUBLIC_KEY = os.getenv('OA_PUBLIC_KEY')
 OA_SECRET_KEY = os.getenv('OA_SECRET_KEY')
@@ -217,23 +219,28 @@ def create_event(access_token, event, image_path=None):
     }
     body = event
     url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/events"
-    # files = None
-    # if image_path:
-    #     with open(image_path, 'rb') as img_file:
-    #         files = {'image': img_file}
     try:
         event_creation_response = requests.post(url, json=body , headers=headers)
-        
         if event_creation_response.status_code != 200:
             print(f"Error creating event {event.get('title').get('fr')}: Status Code {event_creation_response.status_code}")
             print(f"Response:")
             print(json.dumps(event_creation_response.json(), indent=4))
             return None
+        
+        if image_path:
+            headers = {
+            "Content-Type": "multipart/form-data",
+            "access-token": access_token,
+            "nonce": get_nonce(),
+            }
+            eventUid = event_creation_response.json().get('event').get('uid')
+            image64 = encodeImage64(image_path)
+            event_updated_response = requests.patch(f"{url}/{str(eventUid)}", headers=headers, data={'image': image64})
+            event_creation_response = event_updated_response
+        
         createdEvent= json.loads(event_creation_response.text)['event']
         print('event "'+ event['title']['fr'] + '" created with uid: ' + str(createdEvent['uid']) )
-        # Print OA URL if location is set to DEFAULT to post manually correct it
-        if str(createdEvent['location']['uid']) == TBD_LOCATION_UID:
-            print("OA event URL: "+ "https://openagenda.com/kerlandrier/contribute/event/"+str(createdEvent['uid']))
+        print("and OA event URL: "+ "https://openagenda.com/kerlandrier/contribute/event/"+str(createdEvent['uid']))
         
         return  event_creation_response.json()
 
