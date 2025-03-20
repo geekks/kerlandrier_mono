@@ -59,7 +59,7 @@ def import_ics(ics_url:str):
         try:
             event_title = ics_event.get('title').get('fr')
             uidExterneIcsEvent = ics_event.get("uid-externe")
-            if len(ics_event.get('description').get('fr')) ==  0: ics_event['description']['fr'] = event_title
+            if len(ics_event.get('description').get('fr')) <  3: ics_event['description']['fr'] = event_title
             # create event log in case of error
             eventLog = {
                     "ics-id": i,
