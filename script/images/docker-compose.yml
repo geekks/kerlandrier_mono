@@ -1,0 +1,14 @@
+services:
+  filemonitoring:
+    image: filemonitoring
+    build:
+      context: ../.
+      dockerfile: images/Dockerfile
+    env_file: "../.env"
+    volumes:
+      - ${PWD}/sources:/code/sources
+    develop:
+      watch:
+        - action: rebuild
+          path: ${PWD}
+          target: /code/

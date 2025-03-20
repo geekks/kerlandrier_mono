@@ -2,19 +2,14 @@
 Functions used in different scripts for scraping or interact with OpenAgenda APi
 """
 
-import sys,os
-from git import Repo
-
-# Ajoute le dossier "ressources" au sys.path
-git_root = Repo(search_parent_directories=True).working_tree_dir
-sys.path.insert(0,   os.path.abspath(  os.path.join(  git_root,'resources/python' ) ) )
-
 from datetime import datetime, timedelta, date
 import json, csv
 import re
 
 import dateparser
 import pytz
+
+from base64 import b64encode
 
 from difflib import SequenceMatcher
 from wasabi import color
@@ -110,3 +105,16 @@ def convertDate(date_obj:date|datetime, period:str)->datetime:
             raise ValueError(f"period parameter \'{period}\' is not valid or must be defined")
     else:
         raise ValueError(f"date_obj {date_obj} is not a date or datetime object")
+    
+# Encode the image to post on mistral
+def encodeImage64(image_path):
+    """Encode the image to base64."""
+    try:
+        with open(image_path, "rb") as image_file:
+            return b64encode(image_file.read()).decode('utf-8')
+    except FileNotFoundError:
+        print(f"Error: The file {image_path} was not found.")
+        return None
+    except Exception as e:  # Added general exception handling
+        print(f"Error: {e}")
+        return None
