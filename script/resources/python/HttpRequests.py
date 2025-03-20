@@ -2,12 +2,7 @@
 Function to interact with OpenAgenda API
 """
 
-import sys,os
-from git import Repo
-
-# Ajoute le dossier "ressources" au sys.path
-git_root = Repo(search_parent_directories=True).working_tree_dir
-sys.path.insert(0,   os.path.abspath(  os.path.join(  git_root,'resources/python' ) ) )
+import os
 
 import math, random
 import requests, json
