@@ -1,0 +1,12 @@
+# Common local files & secret
+.DS_Store
+node_modules
+.env*
+!.env.example
+*.log
+secret_token.json
+*.key
+
+# Vscode config example to be copied and adpated
+.vscode/*
+!.vscode/*.example

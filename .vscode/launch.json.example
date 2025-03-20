@@ -1,0 +1,52 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "${command:pickArgs}"
+            ]
+        },
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger:Mistral image Test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "script/images/mistral_images.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--file=TEST_temps_foret.jpg"
+            ]
+        },
+        {
+            "name": "Python Debugger:Import KAL",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "script/ics/import_ics_fb.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-u=kal"
+            ]
+        },
+        {
+            "name": "Python Debugger:Import Facebook KerL",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "script/ics/import_ics_fb.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-u=fb"
+            ]
+        }
+    ]
+}
