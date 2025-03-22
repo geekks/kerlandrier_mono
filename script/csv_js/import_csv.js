@@ -5,9 +5,9 @@ const TIMEZONE = 'Europe/Paris';
 const axios = require("axios"); // for http requests
 const csv = require('csv-parser');
 
-const { slugify, updateOaEvent } = require('../utils');
+const { slugify, updateOaEvent } = require('./utils');
 
-const { createOaEvent } = require("../utils");
+const { createOaEvent } = require("./utils");
 const { getCorrespondingOaLocation, matchOaLocations } = require("../resources/getOaLocation")
 
 require('dotenv').config()
