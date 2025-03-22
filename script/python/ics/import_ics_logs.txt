@@ -1,0 +1,65 @@
+20250322-130802
+{
+  "ics-id": 8,
+  "uid-externe": "e3977361439199565@facebook.com",
+  "title": "Inauguration de La gomme à soucis, fanfare et jeux de sociétés",
+  "url": "https://www.facebook.com/events/3977361439199565/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/inauguration-de-la-gomme-a-soucis-fanfare-et-jeux-de-societes"
+}{
+  "ics-id": 32,
+  "uid-externe": "e1062101985937950@facebook.com",
+  "title": " La Guinguette du 1er Mai ",
+  "url": "https://www.facebook.com/events/1062101985937950/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/la-guinguette-du-1er-mai"
+}{
+  "ics-id": 46,
+  "uid-externe": "e634047736144240@facebook.com",
+  "title": "Après midi jeux de société à La Loco avec Lucky Lude et Ti ar vro",
+  "url": "https://www.facebook.com/events/634047736144240/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/apres-midi-jeux-de-societe-a-la-loco-avec-lucky-lude-et-ti-ar-vro"
+}{
+  "ics-id": 49,
+  "uid-externe": "e1823924058441499@facebook.com",
+  "title": "NOT THE END !! LE Retour !!! et La grosse Annonce du Patron ! 🧨✨️🎇🎆🎉🎉🎉",
+  "url": "https://www.facebook.com/events/1823924058441499/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/not-the-end-le-retour-et-la-grosse-annonce-du-patron"
+}{
+  "ics-id": 57,
+  "uid-externe": "e1191022126356220@facebook.com",
+  "title": "Les beaux dimanches - The Digger Trio, vernissage Fanny Poussier",
+  "url": "https://www.facebook.com/events/1191022126356220/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/les-beaux-dimanches-the-digger-trio-vernissage-fanny-poussier"
+}{
+  "ics-id": 64,
+  "uid-externe": "e633201479329441@facebook.com",
+  "title": "Breizh Rétro gaming à La Loco ",
+  "url": "https://www.facebook.com/events/633201479329441/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/breizh-retro-gaming-a-la-loco"
+}{
+  "ics-id": 72,
+  "uid-externe": "e515575968006107@facebook.com",
+  "title": "Concert du duo Delioù",
+  "url": "https://www.facebook.com/events/515575968006107/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/concert-du-duo-deliou"
+}{
+  "ics-id": 81,
+  "uid-externe": "e642370658442432@facebook.com",
+  "title": "Carnaval de Lorient - édition 2025",
+  "url": "https://www.facebook.com/events/642370658442432/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/carnaval-de-lorient-edition-2025"
+}{
+  "ics-id": 89,
+  "uid-externe": "e583881867996645@facebook.com",
+  "title": "Soon n’Reg en concert ",
+  "url": "https://www.facebook.com/events/583881867996645/",
+  "import_status": "New event",
+  "OaUrl": "https://openagenda.com/fr/kerlandrier/events/soon-nreg-en-concert"
+}20250322-133120

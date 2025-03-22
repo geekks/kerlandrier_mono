@@ -8,7 +8,7 @@ import math, random
 import requests, json
 import time, pytz, dateparser
 
-from utils import encodeImage64
+from .utils import encodeImage64
 
 # Chargement des variables d'environnement
 from configuration import config

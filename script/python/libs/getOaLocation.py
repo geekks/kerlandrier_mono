@@ -4,9 +4,9 @@ Functions to manage locations with OA API
 
 import os
 
-from utils import *
-from scraping_utils import *
-from HttpRequests import post_location, retrieve_access_token, delete_location, get_locations
+from .utils import *
+from .scraping_utils import *
+from .HttpRequests import post_location, retrieve_access_token, delete_location, get_locations
 
 from thefuzz import fuzz
 from thefuzz import process

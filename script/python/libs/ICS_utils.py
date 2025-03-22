@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, date
 from slugify import slugify
 import re
 import unicodedata
-from utils import convertDate
+from .utils import convertDate
 
 class IcsEvent:
     def __init__(self,
