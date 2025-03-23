@@ -18,9 +18,7 @@ from configuration import config
 import os
 PUBLIC_KEY = config.OA_PUBLIC_KEY
 SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
-print(SECRET_KEY)
 ICS_PRIVATE_URL_KLR_FB = config.ICS_PRIVATE_URL_KLR_FB.get_secret_value()
-print(ICS_PRIVATE_URL_KLR_FB)
 URL_AGENDA_ATELIERS_KAL = config.URL_AGENDA_ATELIERS_KAL
 KAL_LOCATION_UID = config.KAL_LOCATION_UID
 TBD_LOCATION_UID=config.TBD_LOCATION_UID
@@ -104,7 +102,6 @@ def import_ics(ics_url:str):
 
         if "import_status" in eventLog : logContent.append( eventLog)
         
-    print(f"Current working directory: {os.getcwd()}")
     with open(f"ics/import_ics_logs.txt", "a") as log_file:
         log_file.write(now + "\n")
         for dic in logContent:

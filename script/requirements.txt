@@ -17,3 +17,5 @@ Pillow==11.*
 playwright>=1.5
 wasabi
 pydantic_settings
+dateparser
+slugify
