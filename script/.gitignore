@@ -20,4 +20,4 @@ __pycache__
 .venv
 
 # Google Cloud Console auth
-association-concarneau-3f7ff63d5314.json
+association-concarneau*.json
