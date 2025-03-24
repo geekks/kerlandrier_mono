@@ -8,4 +8,9 @@ services:
     ports:
       - 8001:8001
     volumes:
-      - ./auth.db:/code/auth.db
+      - ${PWD}/db/:/code/db/ 
+    develop: 
+      watch: 
+        - action: rebuild 
+          path: ${PWD} 
+          target: /code/
