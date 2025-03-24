@@ -1,29 +1,32 @@
-import os
+import os, sys
 import time
 import json
 import requests
-from dotenv import load_dotenv
+
 import jwt
 import sqlite3
 import bcrypt
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import pytz
 import logging
+from api.types import  OpenAgendaEvent
+
+from api.configuration import config
+
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
-load_dotenv()
-
 OA_TOKEN_FILE_NAME = "secret_token.json"
-AGENDA_UID = os.getenv("AGENDA_UID")
-OA_ACCESS_TOKEN_URL = os.getenv("ACCESS_TOKEN_URL")
-OA_BASE_URL = os.getenv("OA_BASE_URL")
-OA_PUBLIC_KEY = os.getenv("OA_PUBLIC_KEY")
-OA_SECRET_KEY = os.getenv("OA_SECRET_KEY")
-JWT_SECRET = "xxxxx"
+AGENDA_UID = config.AGENDA_UID
+OA_ACCESS_TOKEN_URL = config.ACCESS_TOKEN_URL
+OA_BASE_URL = config.OA_BASE_URL
+OA_PUBLIC_KEY = config.OA_PUBLIC_KEY
+OA_SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
+JWT_SECRET = config.JWT_SECRET.get_secret_value()
 JWT_ALGORITHM = "HS256"
+KAL_LOCATION_UID = config.KAL_LOCATION_UID
+TBD_LOCATION_UID=config.TBD_LOCATION_UID
 
 db = sqlite3.connect("auth.db")
 
@@ -85,11 +88,16 @@ async def get_event_keywords(event_uid: str | int):
         response = requests.get(url)
         if response.status_code >= 200 and response.status_code <= 299:
             data = response.json()
-            keywords =  data.get('event', {}).get('keywords', {}).get('fr', None)
-            if keywords is not None:
-                return keywords
-            else:
+            event: OpenAgendaEvent | None = data.get('event')
+            if event:
+                keywords: dict = event.get('keywords')
+                if keywords:
+                    fr_keywords: list[str]= keywords.get('fr')
+                    if fr_keywords:
+                        return fr_keywords
+                    return []
                 return []
+            return []
     except requests.RequestException as exc:
         print("Error getting event:", exc)
         if exc.response:
