@@ -2,7 +2,6 @@
 Functions to manage locations with OA API
 """
 
-import os
 
 from .utils import *
 from .scraping_utils import *
