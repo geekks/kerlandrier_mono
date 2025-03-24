@@ -1,9 +1,19 @@
 from typing import Optional, Union
 
-from utils import retrieve_OA_access_token, get_event_keywords, patch_event, generate_token, verify_token, db, get_user_by_username, verify_password
+import os
+from .api_utils import retrieve_OA_access_token, get_event_keywords, patch_event, generate_token, verify_token, db, get_user_by_username, verify_password
+from .db import initialize_database, db_path
 from fastapi import FastAPI, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import List
+
+# Check if the database file exists and initialize it if not
+
+if not os.path.exists(db_path):
+    initialize_database(db_path)
+    print("Database initialized.")
+else:
+    print("Database already exists.")
 
 app = FastAPI()
 
@@ -126,3 +136,5 @@ async def update_events(request: PatchRequest, current_user: dict = Depends(get_
     else:
         return {"success": True, "message": "No update"}
 
+
+    

@@ -8,9 +8,11 @@ services:
     ports:
       - 8001:8001
     volumes:
-      - ${PWD}/db/:/code/db/ 
+      - db:/code/db/ 
     develop: 
       watch: 
         - action: rebuild 
           path: ${PWD} 
           target: /code/
+volumes:
+  db:

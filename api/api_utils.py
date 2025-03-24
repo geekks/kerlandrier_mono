@@ -9,10 +9,10 @@ import bcrypt
 from datetime import datetime, timedelta
 import pytz
 import logging
-from api.types import  OpenAgendaEvent
+from .api_types import  OpenAgendaEvent
 
-from api.configuration import config
-
+from .configuration import config
+from .db import db_path
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -28,7 +28,7 @@ JWT_ALGORITHM = "HS256"
 KAL_LOCATION_UID = config.KAL_LOCATION_UID
 TBD_LOCATION_UID=config.TBD_LOCATION_UID
 
-db = sqlite3.connect("auth.db")
+db: sqlite3.Connection = sqlite3.connect(db_path)
 
 def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
@@ -150,7 +150,7 @@ def verify_token(token: str) -> dict:
         logging.error("Invalid token")
         return None
     
-def get_user_by_username(db, username):
+def get_user_by_username(db: sqlite3.Connection, username:str):
     cursor = db.cursor()
     cursor.execute("SELECT id, password FROM users WHERE username = ?", (username,))
     return cursor.fetchone()
