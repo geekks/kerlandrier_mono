@@ -29,18 +29,41 @@ class Event(BaseModel):
 class PatchRequest(BaseModel):
     events: List[Event]
 
-def get_token_header(authorization: str = Header(None)):
+class OaToken(BaseModel):
+    success: bool
+    access_token: str = None
+    message: str = None
+
+class AuthResponse(BaseModel):
+    success: bool
+    access_token: str = "xxxxx"
+    token_type: str = "Bearer"
+
+def get_token_header(authorization: str 
+                        = Header(   default=None,
+                                    title="Kerlandrier Token",
+                                    description='Bearer token setted in headers: "Bearer TOKEN"',)
+                    ):
     if authorization is None or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid authorization header")
     return authorization.split(" ")[1]
 
-def get_current_user(token: str = Depends(get_token_header)):
+def get_current_user(token: str 
+                        = Depends(get_token_header)):
     payload = verify_token(token)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     return payload
 
-@app.get("/auth")
+@app.get("/", status_code=404)
+async def read_root():
+    return {"success": False, "message": "RTFM"}
+
+@app.post("/auth",
+        summary="Get Bearer Token for Kerlandrier app",
+        description="This endpoint generates a Bearer token for Kerlandrier API.\
+            Requires a from manually added users in api DB.",
+        response_model=AuthResponse)
 async def authenticate(request: AuthRequest):
     username = request.username
     password = request.password
@@ -52,10 +75,15 @@ async def authenticate(request: AuthRequest):
 
     user_id = result[0]
     token = generate_token(user_id)
-    return {"access_token": token, "token_type": "bearer"}
+    return {"success": True, "access_token": token, "token_type": "Bearer"}
 
-@app.get("/")
-async def read_root(current_user: dict = Depends(get_current_user)):
+@app.get("/auth/oatoken", 
+        summary="Retrieve OpenAgenda Auth Token",
+        description="This endpoint returns an OpenAgenda token, using the OA_SECRET_KEY on serverfor\
+            Requires a manually added users in Kerlandrier API DB.",
+        response_model=OaToken)
+async def generates_token(current_user: dict 
+                        = Depends(get_current_user)):
     print(current_user)
     try:
         access_token = await retrieve_OA_access_token()
@@ -67,24 +95,26 @@ async def read_root(current_user: dict = Depends(get_current_user)):
         return {"success": False, "message": str(e)}
     
 
-@app.patch("/events/keywords")
-async def update_events(request: PatchRequest):
-    print(request)
+@app.patch("/events/keywords",
+            summary="Update events keywords",
+            description="This endpoint updates the keywords for a list of OA events.\
+                It returns a list of updated OA events.",
+            response_model=list[dict])
+async def update_events(request: PatchRequest, current_user: dict = Depends(get_current_user) ):
     try:
         access_token = await retrieve_OA_access_token()
     except Exception as e:
         return {"success": False, "message": str(e)}
-    
+
     updated_events = []
-    print(request.events)
     for event in request.events:
         print(event)
         try:
-            test = await get_event_keywords(event.uid)
-            if test != event.keywords:
+            existingKeywords = await get_event_keywords(event.uid)
+            if existingKeywords is None or existingKeywords != event.keywords:
                 patched = await patch_event(access_token, event.uid, event.keywords)
                 updated_events.append(patched['event']['slug'])
-                print(f"{test} >>>> {event.keywords}")
+                print(f"{existingKeywords} >>>> {event.keywords}")
             else:
                 print("Keywords haven't changed")
         except Exception as e:
