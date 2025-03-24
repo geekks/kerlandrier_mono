@@ -4,20 +4,13 @@ from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
 # Chemin absolu vers le .env à la racine du projet
-dir_file_path = os.path.dirname(os.path.abspath(__file__))
-print(os.pardir)
-env_path= os.path.join(dir_file_path,os.pardir, '.env' ) 
+# dir_file_path = os.path.dirname(os.path.abspath(__file__))
+# print(os.pardir)
+# env_path= os.path.join(dir_file_path,os.pardir, '.env' ) 
 
 class Configuration(BaseSettings):
     # Common
     environment: Literal[ "dev", "preprod", "prod"] = Field(description="Execution environment", default="prod")
-
-    # Emails
-    sender_email: str = Field(description="Mail account used to send email")
-    sender_email_password: SecretStr = Field(description="Mail account password used to send email")
-    receiver_email: str = Field(description="Email account used to receive email")
-    mail_server_port: int = Field(description="Mail server port", default=465)
-    smtp_server:str = Field(description="Mail server", default="ssl0.ovh.net")
 
     # Open Agenda
     OA_PUBLIC_KEY: str = Field(description="Open Agenda public key")
@@ -31,4 +24,4 @@ class Configuration(BaseSettings):
     # Fast Api
     JWT_SECRET: SecretStr = Field(description="JWT secret key")
 
-config = Configuration(_env_file=env_path)
+config = Configuration(_env_file=".env")
