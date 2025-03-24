@@ -47,9 +47,12 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
                                             locationPatterneRemoved,
                                             flags=re.IGNORECASE
                                             )
+    # TO DO: add this specific cases to a config file
     locationPatternToSpace.replace("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé")
     locationPatternToSpace.replace("ZA de Colguen Rue Aimé Césaire , 29900 Concarneau", "Brasserie Tri Martolod Concarneau")
     locationPatternToSpace.replace("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc")
+    locationPatternToSpace.replace("Brasserie de Bretagne, Le Bek", "Le Bek")
+    
     optimized_searched_location = locationPatternToSpace
     logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
