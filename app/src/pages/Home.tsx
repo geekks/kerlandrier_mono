@@ -116,12 +116,10 @@ const Home = () => {
 
 					<div id="qr-container">
 						<img id="qr" src="/qr_diwar-benn.svg" alt="Kerlandrier QR code" />
-						<br />
-						<span>
-							Contribution
-							<br /> et infos sur le site
-							<br /> kerlandrier.cc
-						</span>
+						<div>
+							<span>Retrouvez-nous</span>
+							<span> en ligne</span>
+						</div>
 					</div>
 					<div id="filters-container">
 						<SelectDate handleDateChange={handleDateChange} />
