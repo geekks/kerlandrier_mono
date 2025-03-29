@@ -9,6 +9,7 @@ import type {
 import { EventsList } from "../components/EventsList";
 import { SelectDate } from "../SelectDate";
 import { SelectAreas } from "../SelectAreas";
+import { Link } from "react-router-dom";
 
 const loadEvents = async (): Promise<OpenAgendaEventsReponse> => {
 	const response: OpenAgendaEventsReponse = await ky(defaultQuery).json();
@@ -108,9 +109,9 @@ const Home = () => {
 						</p>
 						<span id="infos-link">
 							{" "}
-							<a href="/diwarbenn">
+							<Link to="/diwarbenn">
 								Ajoutez un événement ou en savoir plus
-							</a>{" "}
+							</Link>{" "}
 						</span>
 					</div>
 
@@ -141,7 +142,7 @@ const Home = () => {
 				longEvents={false}
 				events={getEvents({ longEvents: false })}
 			/>
-			<h1 id="exposection">Expositions</h1>
+			<h1 id="exposection">Expositions / Festivals</h1>
 			<EventsList longEvents={true} events={getEvents({ longEvents: true })} />
 		</div>
 	);
