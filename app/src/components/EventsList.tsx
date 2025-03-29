@@ -95,7 +95,9 @@ export const EventsList = ({ events, longEvents }: EventsListProps) => {
 								key={event.slug}
 								title={event.longDescription ?? event.description}
 							>
-								{nextTiming} {keywords}
+								<div className="tag-container">
+									{nextTiming} {keywords}
+								</div>
 								{title}
 								{location}
 							</span>
