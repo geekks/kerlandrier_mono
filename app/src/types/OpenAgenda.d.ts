@@ -4,6 +4,7 @@ type timing = {
 }
 export type OpenAgendaEvent = {
   uid: string;
+  "uid-externe": string;
   slug: string;
   title: string;
   onlineAccessLink: string;

@@ -64,6 +64,7 @@ const Home = () => {
 	}: getEventsOptions): OpenAgendaEvent[] => {
 		if (oaEventsResponse) {
 			return oaEventsResponse
+				.filter((d) => d["uid-externe"] !== "DUPLICATE")
 				.filter((d) =>
 					longEvents ? d.dateRange.includes("-") : !d.dateRange.includes("-"),
 				)
