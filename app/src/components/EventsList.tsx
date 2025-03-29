@@ -1,7 +1,7 @@
 // import type React from "react";
 import type { OpenAgendaEvent } from "../types/OpenAgenda";
 import { OA_SLUG } from "../config";
-
+import "../utils/toTitleCase";
 interface EventsListProps {
 	events: OpenAgendaEvent[];
 	longEvents: boolean;
@@ -53,7 +53,7 @@ export const EventsList = ({ events, longEvents }: EventsListProps) => {
 			<h2 className={`card-title ${status}`}>
 				{status ? <span>[{status}]</span> : null}
 				<a href={redirectLink} target="_blank" rel="noreferrer">
-					{event.title}
+					{event.title.toLowerCase().toTitleCase()}
 				</a>
 			</h2>
 		);
