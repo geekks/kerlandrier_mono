@@ -10,6 +10,7 @@ import { EventsList } from "../components/EventsList";
 import { SelectDate } from "../SelectDate";
 import { SelectAreas } from "../SelectAreas";
 import { Link } from "react-router-dom";
+import { DateTime } from "luxon";
 
 const loadEvents = async (): Promise<OpenAgendaEventsReponse> => {
 	const response: OpenAgendaEventsReponse = await ky(defaultQuery).json();
@@ -57,18 +58,16 @@ const Home = () => {
 	};
 
 	type getEventsOptions = {
-		longEvents: boolean;
+		isLongEvents: boolean;
 	};
 
 	const getEvents = ({
-		longEvents = false,
+		isLongEvents = false,
 	}: getEventsOptions): OpenAgendaEvent[] => {
 		if (oaEventsResponse) {
-			return oaEventsResponse
+			const longEvents = oaEventsResponse
 				.filter((d) => d["uid-externe"] !== "DUPLICATE")
-				.filter((d) =>
-					longEvents ? d.dateRange.includes("-") : !d.dateRange.includes("-"),
-				)
+				.filter((d) => d.dateRange.includes("-"))
 				.filter((d) => {
 					if (selectedAreas.length === 0) return true;
 					return d.location.description.fr
@@ -82,6 +81,46 @@ const Home = () => {
 						selectedEndDate >= new Date(d.firstTiming.begin)
 					);
 				});
+
+			if (isLongEvents) return longEvents;
+
+			let shortEvents = oaEventsResponse
+				.filter((d) => d["uid-externe"] !== "DUPLICATE")
+				.filter((d) => !d.dateRange.includes("-"))
+				.filter((d) => {
+					if (selectedAreas.length === 0) return true;
+					return d.location.description.fr
+						? selectedAreas.includes(d.location.description.fr.toLowerCase())
+						: true;
+				})
+				.filter((d) => {
+					if (!selectedStartDate || !selectedEndDate) return true;
+					return (
+						selectedStartDate <= new Date(d.lastTiming.end) &&
+						selectedEndDate >= new Date(d.firstTiming.begin)
+					);
+				});
+
+			const longEventsNextTiming = longEvents.map((d) => {
+				let newDateRange = DateTime.fromISO(d.nextTiming.begin, {
+					zone: "Europe/Paris",
+				})
+					.setLocale("fr")
+					.toFormat("cccc d LLLL");
+				newDateRange =
+					newDateRange.charAt(0).toUpperCase() + newDateRange.slice(1);
+				return { ...d, dateRange: newDateRange };
+			});
+
+			shortEvents.push(...longEventsNextTiming);
+			shortEvents = shortEvents.sort(
+				(a: OpenAgendaEvent, b: OpenAgendaEvent) => {
+					const dateA = new Date(a.nextTiming.begin);
+					const dateB = new Date(b.nextTiming.begin);
+					return dateA.getTime() - dateB.getTime();
+				},
+			);
+			return shortEvents;
 		}
 		return [];
 	};
@@ -140,10 +179,13 @@ const Home = () => {
 			</header>
 			<EventsList
 				longEvents={false}
-				events={getEvents({ longEvents: false })}
+				events={getEvents({ isLongEvents: false })}
 			/>
 			<h1 id="exposection">Expositions / Festivals</h1>
-			<EventsList longEvents={true} events={getEvents({ longEvents: true })} />
+			<EventsList
+				longEvents={true}
+				events={getEvents({ isLongEvents: true })}
+			/>
 		</div>
 	);
 };
