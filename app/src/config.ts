@@ -12,7 +12,7 @@ const OA_BASE_URL = `https://api.openagenda.com/v2/agendas/${OA_UID}/events`
 const MAX_EVENTS = 400
 export const AREA_FILTERS = ["aven", "cornouaille", "bretagne"];
 
-const includeFields = ["uid", "uid-externe", "slug", "title", "onlineAccessLink", "status", "keywords", "dateRange", "location.description", "firstTiming", "nextTiming", "lastTiming", "longDescription", "description", "location.name", "location.city", "keywords", "timings"];
+const includeFields = ["uid", "uid-externe", "slug", "title", "onlineAccessLink", "registration", "status", "keywords", "dateRange", "location.description", "firstTiming", "nextTiming", "lastTiming", "longDescription", "description", "location.name", "location.city", "keywords", "timings"];
 const fieldsParam = includeFields.map(field => `includeFields[]=${field}`).join("&")
 const DEFAULT_PARAMS = {
   detailed: "0",

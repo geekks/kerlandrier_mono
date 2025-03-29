@@ -23,7 +23,9 @@ export const EventsList = ({ events, longEvents }: EventsListProps) => {
 		const oaLink = `https://openagenda.com/fr/${OA_SLUG}/contribute/event/${event.uid}`;
 		const redirectLink = event.onlineAccessLink
 			? event.onlineAccessLink
-			: oaLink;
+			: event.registration
+				? event.registration
+				: oaLink;
 		const nextTiming = event.nextTiming ? (
 			<div className="time-tag">
 				<a

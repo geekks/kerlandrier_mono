@@ -8,6 +8,7 @@ export type OpenAgendaEvent = {
   slug: string;
   title: string;
   onlineAccessLink: string;
+  registration: string;
   status: number;
   keywords: string[];
   dateRange: string;
@@ -43,4 +44,14 @@ export type OpenAgendaEventsReponse = {
 export type OpenAgendaEditoResponse = {
   total: number;
   events: OpenAgendaEditoItem[]
+}
+
+// TODO: Right values
+export enum OpenAgendaStatus {
+  FULL = 5,
+  CANCELLED = 6
+}
+
+export enum HiddenStatus {
+  "DUPLICATE" = "DUPLICATE",
 }
