@@ -70,11 +70,10 @@ a:visited {
 
 
 .tag {
-    margin-right: 2px;
-    margin-bottom: 2px;
-    padding: 0 8px;
+    padding: 0 5px;
     background-color: var(--main-color);
     border-radius: 4px;
+    border: solid 1px var(--main-color);
     display: inline-block;
     color: var(--lite-bkg);
     text-transform: uppercase;
@@ -82,9 +81,7 @@ a:visited {
 }
 
 .time-tag {
-    margin-right: 2px;
-    margin-bottom: 2px;
-    padding: 0 8px;
+    padding: 0 5px;
     background-color: var(--lite-bkg);
     border-radius: 4px;
     border-color: var(--main-color);
@@ -464,12 +461,14 @@ footer {
         --lite-bkg: white;
     }
 
-    @page{margin:7mm;}
+    @page{margin:5mm;}
 
 
 
     body {
       max-width: 21cm;
+      font-size: 12pt;
+      line-height: 12pt;
     }
 
     header {
@@ -488,8 +487,8 @@ footer {
     }
 
     #description {
-        font-size: 31pt;
-        line-height: 100%;
+        font-size: 24pt;
+        line-height: 120%;
     }
 
     #qr-container {
@@ -509,49 +508,57 @@ footer {
     }
 
     .dateAndEvents{
-      margin-bottom:5mm;
+      margin-bottom:4mm;
       display: flex;
-      gap:4mm;
+      gap:3mm;
     }
 
     .date-header {
-      width: 6cm;
+      width: 4.7cm;
+        font-size: 12pt;
+        line-height: 14pt;
     }
-    .date-header p{font-size: 18pt;}
+    /* .date-header p{font-size: 18pt;} */
 
 
     .evenements {
       flex:auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, 6.2cm);
-      grid-gap: 3mm;
+      grid-template-columns: repeat(auto-fit, 4.8cm);
+      grid-gap: 1mm;
       line-height: 100%;
     }
 
-
-
-    .tag{
-        font-size: 10pt;
+    .evenement {
+        line-height: 6pt;
     }
 
-    .time-tag{
-        font-size: 10pt;
+    .tag-container {
+        overflow: hidden;
+        max-height: 1.56rem;
+    }
+    .tag,
+    .time-tag {
+        margin-right: 1px;
+        margin-bottom: 0;
+        font-size: 7pt;
+        line-height: 7pt;
     }
 
-    h2 {
-        margin: 3px 0 4px;
-        font-size: 1.4rem;
-        line-height: 80%;
+   h2 {
+        margin: 1px 0 4px;
+        font-size: 12pt;
+        line-height: 10pt;
     }
 
     h3 {
-        font-size: 1rem;
-        line-height: 100%;
+        font-size: 10pt;
+        line-height: 9pt;
         margin-bottom: 2px;
     }
 
     h4 {
-        font-size: 2rem;
+        font-size: 16pt;
         line-height: 100%;
     }
 
@@ -566,6 +573,9 @@ footer {
         display: none;
     }
 
+    #title-text {
+        font-size: 12vw;
+    }
 }
 
 /* Local Google fonts */
