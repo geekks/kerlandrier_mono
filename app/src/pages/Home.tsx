@@ -148,8 +148,8 @@ const Home = () => {
 						</p>
 						<span id="infos-link">
 							{" "}
-							<Link to="/diwarbenn">
-								Ajoutez un événement ou en savoir plus
+							<Link to="/diwarbenn" className="underline">
+								Ajouter un évènement manquant ou en savoir plus
 							</Link>{" "}
 						</span>
 					</div>

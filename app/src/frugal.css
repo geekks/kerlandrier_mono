@@ -1,14 +1,12 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    line-height: 1.2rem;
 }
-
-:root {
-        --main-color: teal;
-        --lite-bkg: beige;
-    }
 
 body {
     background-color: white;
@@ -19,12 +17,11 @@ body {
 }
 
 
-
 h1,
 h2,
 h3,
 h4 {
-  font-style: normal;
+    font-style: normal;
 
 }
 
@@ -41,7 +38,7 @@ h3 {
 }
 
 h4 {
-  font-weight: 400;
+    font-weight: 400;
 }
 
 
@@ -51,17 +48,18 @@ a:visited {
 }
 
 
-.dateAndEvents{
-  break-inside: avoid;
+.dateAndEvents {
+    break-inside: avoid;
 }
 
 .date-header {
-    text-align:right;
+    text-align: right;
     position: sticky;
     top: 0;
     font-family: "League Gothic", sans-serif;
-    text-transform:uppercase;
+    text-transform: uppercase;
 }
+
 .sticky-date {
     position: sticky;
     top: 0px;
@@ -93,26 +91,41 @@ a:visited {
 }
 
 
-ul, ol {list-style-position: inside;}
+ul,
+ol {
+    list-style-position: inside;
+}
 
-#contribution, #abonnement{
+#contribution,
+#abonnement {
     text-align: center;
     margin-top: 50px;
-    font-size: 1.5rem;
+
+    h3 {
+        font-size: 1.9rem;
+    }
+
+    p,
+    ul,
+    li {
+        font-size: 1.3rem;
+        line-height: 1.8rem;
+    }
 }
 
 
 #infos-link {
-    font-size:1.5rem;
-    line-height:1rem;
+    font-size: 1.5rem;
+    line-height: 1rem;
 }
 
-#infos-link a{
+#infos-link a {
     font-style: italic;
     text-decoration-thickness: 1px;
 }
 
-#contribution,#abonnement{
+#contribution,
+#abonnement {
     ul {
         list-style-type: none;
     }
@@ -173,7 +186,7 @@ footer {
     border-radius: 10px;
     border: 1px solid var(--main-color);
     margin: 2px;
-    cursor: pointer ;
+    cursor: pointer;
 }
 
 .selected {
@@ -181,6 +194,7 @@ footer {
     color: var(--lite-bkg);
     border: 1px solid var(--lite-bkg);
 }
+
 #qr-container {
     display: none;
 }
@@ -231,10 +245,10 @@ footer {
 
 .hidden-link {
     text-decoration: none;
-    cursor:default;
+    cursor: default;
 }
 
-.annule > a {
+.annule>a {
     text-decoration: line-through
 }
 
@@ -253,10 +267,12 @@ footer {
     font-style: italic;
     text-align: center;
 }
+
 .icon-link-ical {
     width: 34px;
     height: 20px
 }
+
 .icon-link-rss {
     width: 20px;
     height: 20px
@@ -264,18 +280,19 @@ footer {
 
 #icon-ical {
     height: 20px;
-        width: 34px;
-        overflow: hidden;
-        margin: 0 auto;
+    width: 34px;
+    overflow: hidden;
+    margin: 0 auto;
     background: url("/ical.png");
     background-position: 0px;
     background-size: 34px 20px;
 }
+
 #icon-rss {
     height: 20px;
-        width: 20px;
-        overflow: hidden;
-        margin: 0 auto;
+    width: 20px;
+    overflow: hidden;
+    margin: 0 auto;
     background: url("/rss.png");
     background-position: 0px;
     background-size: 20px 20px;
@@ -284,10 +301,30 @@ footer {
 #join-us {
     display: block;
     margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
 }
+
 /* MEDIA QUERIES --- pour la lecture sur ordinateur, mobile et papier  */
-@media only screen and (max-width: 799px) /*HANDHELD*/ {
-    body {
+@media only screen and (max-width: 799px)
+/*HANDHELD*/
+    {
+    #easter-egg {
+        font-family: "Almonte", sans-serif;
+        font-size: 30px;
+        position: absolute;
+        left: 250px;
+        top: 20px;
+        transform: rotate(20deg);
+        white-space: nowrap;
+    }
+    
+        :root {
+        --main-color: #008080;
+        --lite-bkg: beige;
+    }
+    
+        body {
         margin: 10px 20px;
         background-color: var(--lite-bkg);
         color: var(--main-color);
@@ -303,20 +340,41 @@ footer {
 
     #description {
         font-size: 24px;
-        line-height: 100%;
+        line-height: 90%;
+        margin-bottom: 15px;
     }
 
-    .dateAndEvents{
-      margin-bottom: 30px;
+    #info-container {
+        p {
+            margin-right: 4rem;
+        }
+
+        #infos-link {
+            display: block;
+            width: 70%;
+            line-height: 1.3rem;
+        }
+
+    }
+
+    #monthSelect {
+        width: 70%;
+    }
+
+    .dateAndEvents {
+        margin-bottom: 30px;
     }
 
     .date-header {
         width: 100%;
         background-color: var(--lite-bkg);
     }
-    .date-header p{font-size: 0.8rem;}
 
-    
+    .date-header p {
+        font-size: 0.8rem;
+    }
+
+
     .evenements {
         display: grid;
         grid-template-columns: 1fr;
@@ -324,12 +382,16 @@ footer {
 
     }
 
-    .tag{
-      font-size: 1.3rem;
+    .tag {
+        margin-right: 2px;
+        margin-bottom: 2px;
+        font-size: 1.3rem;
     }
 
-    .time-tag{
-      font-size: 1.3rem;
+    .time-tag {
+        margin-right: 2px;
+        margin-bottom: 2px;
+        font-size: 1.3rem;
     }
 
     h2 {
@@ -353,7 +415,8 @@ footer {
     }
 
     #filters-container {
-        margin-top: 15px;
+        margin-top: 30px;
+        align-items: center;
     }
 
     #expoadvert {
@@ -361,11 +424,29 @@ footer {
         padding: 15px;
         text-align: center;
     }
+
+    #title-text {
+        font-size: 12vw;
+    }
 }
 
 
-@media screen and (min-width: 800px) /*DESKTOP*/ {
-    
+@media screen and (min-width: 800px)
+/*DESKTOP*/
+    {
+    #easter-egg {
+        font-family: "Almonte", sans-serif;
+        font-size: 40px;
+        position: absolute;
+        left: 400px;
+        top: 30px;
+        transform: rotate(20deg);
+    }
+
+    :root {
+        --main-color: teal;
+        --lite-bkg: beige;
+    }
 
     body {
         margin: 15px 20px;
@@ -392,6 +473,7 @@ footer {
         max-width: 1080px;
         font-size: 2.6rem;
         line-height: 100%;
+        margin-bottom: 20px;
     }
 
     #filters-container {
@@ -399,15 +481,15 @@ footer {
 
     }
 
-    .dateAndEvents{
-      margin-bottom: 30px;
+    .dateAndEvents {
+        margin-bottom: 30px;
         display: flex;
-        gap:1.5rem;
+        gap: 1.5rem;
     }
 
 
     .evenements {
-        flex:auto;
+        flex: auto;
         display: grid;
         grid-template-columns: repeat(auto-fit, 400px);
         grid-gap: 1.5rem;
@@ -426,14 +508,20 @@ footer {
         top: 0px;
     }
 
-    .date-header p{font-size: 2.2rem;}
-
-    .tag{
-      font-size: 1.3rem;
+    .date-header p {
+        font-size: 2rem;
     }
 
-    .time-tag{
-      font-size: 1.3rem;
+    .tag {
+        margin-right: 2px;
+        margin-bottom: 2px;
+        font-size: 1.3rem;
+    }
+
+    .time-tag {
+        margin-right: 2px;
+        margin-bottom: 2px;
+        font-size: 1.3rem;
     }
 
     h2 {
@@ -448,27 +536,42 @@ footer {
     }
 
     h4 {
-        font-size: 3rem;
+        font-size: 42px;
         line-height: 100%;
+    }
+
+    #title-text {
+        font-size: 7vw;
     }
 }
 
 
 
-@media print /*PRINT*/ {
+@media print
+/*PRINT*/
+    {
+    #easter-egg {
+        font-family: "Almonte", sans-serif;
+        font-size: 40px;
+        position: absolute;
+        left: 480px;
+        top: 25px;
+        transform: rotate(20deg);
+    }
+
     :root {
         --main-color: black;
         --lite-bkg: white;
     }
 
-    @page{margin:5mm;}
-
-
+    @page {
+        margin: 5mm;
+    }
 
     body {
-      max-width: 21cm;
-      font-size: 12pt;
-      line-height: 12pt;
+        max-width: 21cm;
+        font-size: 12pt;
+        line-height: 12pt;
     }
 
     header {
@@ -481,7 +584,7 @@ footer {
     }
 
     h1 {
-      margin-bottom: 3mm;
+        margin-bottom: 3mm;
         font-size: 86pt;
         line-height: 70%;
     }
@@ -492,12 +595,12 @@ footer {
     }
 
     #qr-container {
-      flex:auto;
+        flex: auto;
         display: block;
         text-align: right;
-        font-size:9pt;
+        font-size: 9pt;
         word-spacing: normal;
-      }
+    }
 
     #qr {
         max-width: 16mm;
@@ -507,26 +610,24 @@ footer {
         break-inside: avoid;
     }
 
-    .dateAndEvents{
-      margin-bottom:4mm;
-      display: flex;
-      gap:3mm;
+    .dateAndEvents {
+        margin-bottom: 4mm;
+        display: flex;
+        gap: 3mm;
     }
 
     .date-header {
-      width: 4.7cm;
+        width: 4.7cm;
         font-size: 12pt;
         line-height: 14pt;
     }
-    /* .date-header p{font-size: 18pt;} */
-
 
     .evenements {
-      flex:auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, 4.8cm);
-      grid-gap: 1mm;
-      line-height: 100%;
+        flex: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 4.8cm);
+        grid-gap: 1mm;
+        line-height: 100%;
     }
 
     .evenement {
@@ -537,6 +638,7 @@ footer {
         overflow: hidden;
         max-height: 1.56rem;
     }
+
     .tag,
     .time-tag {
         margin-right: 1px;
@@ -545,7 +647,8 @@ footer {
         line-height: 7pt;
     }
 
-   h2 {
+
+    h2 {
         margin: 1px 0 4px;
         font-size: 12pt;
         line-height: 10pt;
@@ -567,8 +670,13 @@ footer {
     }
 
 
-    #print-button, #filters, #infos-link a ,
-    #monthSelect, .filter, #abonnement, #other-events,
+    #print-button,
+    #filters,
+    #infos-link a,
+    #monthSelect,
+    .filter,
+    #abonnement,
+    #other-events,
     #expoadvert {
         display: none;
     }
@@ -579,6 +687,10 @@ footer {
 }
 
 /* Local Google fonts */
+@font-face {
+    font-family: Almonte;
+    src: url("/fonts/Almonte\ Snow.otf") format("opentype");
+}
 
 /* barlow-condensed-200 - latin */
 @font-face {
@@ -587,128 +699,129 @@ footer {
     font-style: normal;
     font-weight: 200;
     src: url('/fonts/barlow-condensed-v12-latin-200.woff2') format('woff2');
-  }
-  /* barlow-condensed-200italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 200;
-      src: url('/fonts/barlow-condensed-v12-latin-200italic.woff2') format('woff2');
-  }
+}
 
-  /* barlow-condensed-300 - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: normal;
-      font-weight: 300;
-      src: url('/fonts/barlow-condensed-v12-latin-300.woff2') format('woff2');
-  }
+/* barlow-condensed-200italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 200;
+    src: url('/fonts/barlow-condensed-v12-latin-200italic.woff2') format('woff2');
+}
 
-  /* barlow-condensed-300italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 300;
-      src: url('/fonts/barlow-condensed-v12-latin-300italic.woff2') format('woff2');
-  }
+/* barlow-condensed-300 - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 300;
+    src: url('/fonts/barlow-condensed-v12-latin-300.woff2') format('woff2');
+}
 
-  /* barlow-condensed-regular - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: normal;
-      font-weight: 400;
-      src: url('/fonts/barlow-condensed-v12-latin-regular.woff2') format('woff2');
-  }
+/* barlow-condensed-300italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 300;
+    src: url('/fonts/barlow-condensed-v12-latin-300italic.woff2') format('woff2');
+}
 
-  /* barlow-condensed-italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 400;
-      src: url('/fonts/barlow-condensed-v12-latin-italic.woff2') format('woff2');
-  }
+/* barlow-condensed-regular - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/barlow-condensed-v12-latin-regular.woff2') format('woff2');
+}
 
-  /* barlow-condensed-500 - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: normal;
-      font-weight: 500;
-      src: url('/fonts/barlow-condensed-v12-latin-500.woff2') format('woff2');
-  }
+/* barlow-condensed-italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 400;
+    src: url('/fonts/barlow-condensed-v12-latin-italic.woff2') format('woff2');
+}
 
-  /* barlow-condensed-500italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 500;
-      src: url('/fonts/barlow-condensed-v12-latin-500italic.woff2') format('woff2');
-  }
+/* barlow-condensed-500 - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 500;
+    src: url('/fonts/barlow-condensed-v12-latin-500.woff2') format('woff2');
+}
 
-  /* barlow-condensed-600 - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: normal;
-      font-weight: 600;
-      src: url('/fonts/barlow-condensed-v12-latin-600.woff2') format('woff2');
-  }
+/* barlow-condensed-500italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 500;
+    src: url('/fonts/barlow-condensed-v12-latin-500italic.woff2') format('woff2');
+}
 
-  /* barlow-condensed-600italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 600;
-      src: url('/fonts/barlow-condensed-v12-latin-600italic.woff2') format('woff2');
-  }
+/* barlow-condensed-600 - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 600;
+    src: url('/fonts/barlow-condensed-v12-latin-600.woff2') format('woff2');
+}
 
-  /* barlow-condensed-700 - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: normal;
-      font-weight: 700;
-      src: url('/fonts/barlow-condensed-v12-latin-700.woff2') format('woff2');
-  }
+/* barlow-condensed-600italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 600;
+    src: url('/fonts/barlow-condensed-v12-latin-600italic.woff2') format('woff2');
+}
 
-  /* barlow-condensed-700italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 700;
-      src: url('/fonts/barlow-condensed-v12-latin-700italic.woff2') format('woff2');
-  }
+/* barlow-condensed-700 - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 700;
+    src: url('/fonts/barlow-condensed-v12-latin-700.woff2') format('woff2');
+}
 
-  /* barlow-condensed-800 - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: normal;
-      font-weight: 800;
-      src: url('/fonts/barlow-condensed-v12-latin-800.woff2') format('woff2');
-  }
+/* barlow-condensed-700italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 700;
+    src: url('/fonts/barlow-condensed-v12-latin-700italic.woff2') format('woff2');
+}
 
-  /* barlow-condensed-800italic - latin */
-  @font-face {
-      font-display: swap;
-      font-family: 'Barlow Condensed';
-      font-style: italic;
-      font-weight: 800;
-      src: url('/fonts/barlow-condensed-v12-latin-800italic.woff2') format('woff2');
-  }
+/* barlow-condensed-800 - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: 800;
+    src: url('/fonts/barlow-condensed-v12-latin-800.woff2') format('woff2');
+}
 
-  @font-face {
-      font-display: swap;
-      font-family: 'League Gothic';
-      font-style: normal;
-      font-weight: 400;
-      src: url('/fonts/LeagueGothic-Regular-VariableFont_wdth.ttf') format('truetype');
-  }
+/* barlow-condensed-800italic - latin */
+@font-face {
+    font-display: swap;
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: 800;
+    src: url('/fonts/barlow-condensed-v12-latin-800italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'League Gothic';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/LeagueGothic-Regular-VariableFont_wdth.ttf') format('truetype');
+}
