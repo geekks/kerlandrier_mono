@@ -39,6 +39,10 @@ class Event(BaseModel):
 class PatchRequest(BaseModel):
     events: List[Event]
 
+class PatchKeywordRequest(BaseModel):
+    uid: str | int
+    keywords: List[str]
+
 class OaToken(BaseModel):
     success: bool
     access_token: str = None
@@ -105,16 +109,45 @@ async def generates_token(current_user: dict
         return {"success": False, "message": str(e)}
     
 
+@app.patch("/event/keywords",
+            summary="Update event keywords",
+            description="This endpoint updates the keywords for on OA event\
+                It returns the updated OA event",
+            response_model=dict)
+# TODO: Implement auth
+# async def update_event(request: PatchKeywordRequest, current_user: dict = Depends(get_current_user)):
+async def update_event(request: PatchKeywordRequest):
+    try:
+        access_token = await retrieve_OA_access_token()
+        print("access_token", access_token)
+    except Exception as e:
+        return {"success": False, "data": [], "message": str(e)}
+    event = request
+    try:
+        existingKeywords = await get_event_keywords(event.uid)
+        if existingKeywords is None or existingKeywords != event.keywords:
+            patched = await patch_event(access_token, event.uid, event.keywords)
+            print(f"{existingKeywords} >>>> {event.keywords}")
+            return {"success": True, "data": patched, "message": "Event successfully updated"}
+        else:
+            print("Keywords haven't changed")
+            return {"success": True, "data": [], "message": "No update"}
+    except Exception as e:
+        print(e)
+        return {"success": False, "data": [], "message": str(e)}
+
 @app.patch("/events/keywords",
             summary="Update events keywords",
             description="This endpoint updates the keywords for a list of OA events.\
                 It returns a list of updated OA events.",
-            response_model=list[dict])
-async def update_events(request: PatchRequest, current_user: dict = Depends(get_current_user) ):
+            response_model=dict)
+# async def update_events(request: PatchRequest, current_user: dict = Depends(get_current_user)):
+async def update_events(request: PatchRequest):
     try:
         access_token = await retrieve_OA_access_token()
+        print("access_token", access_token)
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        return {"success": False, "data": [], "message": str(e)}
 
     updated_events = []
     for event in request.events:
@@ -123,18 +156,18 @@ async def update_events(request: PatchRequest, current_user: dict = Depends(get_
             existingKeywords = await get_event_keywords(event.uid)
             if existingKeywords is None or existingKeywords != event.keywords:
                 patched = await patch_event(access_token, event.uid, event.keywords)
-                updated_events.append(patched['event']['slug'])
+                updated_events.append({"uid": event.uid, "slug": patched['event']['slug']})
                 print(f"{existingKeywords} >>>> {event.keywords}")
             else:
                 print("Keywords haven't changed")
         except Exception as e:
             print(e)
-            return {"success": False, "message": str(e)}
+            return {"success": False, "data": [], "message": str(e)}
 
     if len(updated_events) > 0:
-        return {"success": True, "message": f"{len(updated_events)} events updated successfully", "updated_events": updated_events}
+        return {"success": True, "data": updated_events, "message": f"{len(updated_events)} events updated successfully"}
     else:
-        return {"success": True, "message": "No update"}
+        return {"success": True, "data": [], "message": "No update"}
 
 
     

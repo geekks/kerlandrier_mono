@@ -28,9 +28,10 @@ def initialize_database(db_path: str):
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-def create_user(db:sqlite3.Connection, username:str, password:str) -> bool:
+def create_user(db_path:str, username:str, password:str) -> bool:
     try :
         hashed_password = hash_password(password)
+        db=sqlite3.connect(db_path)
         cursor = db.cursor()
         cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
         db.commit()
