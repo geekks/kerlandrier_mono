@@ -8,7 +8,7 @@ export type OpenAgendaEvent = {
   slug: string;
   title: string;
   onlineAccessLink: string;
-  registration: {[key:  string]: { value: string }}[];
+  registration: { type: string, value: string }[];
   status: number;
   keywords: string[];
   dateRange: string;
