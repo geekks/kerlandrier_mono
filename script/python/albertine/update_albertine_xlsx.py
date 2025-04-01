@@ -5,7 +5,7 @@ import sys
 from pprint import pprint
 sys.path.append(os.pardir) # Make sure local module imports work
 import datetime
-from libs.HttpRequests import retrieve_access_token
+from libs.HttpRequests import retrieve_OA_access_token
 from libs.HttpRequests import create_event
 from configuration import config
 SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
@@ -67,7 +67,7 @@ def parse_excel_file():
   log_content = []
   now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   try:
-    access_token = retrieve_access_token(SECRET_KEY)
+    access_token = retrieve_OA_access_token(SECRET_KEY)
   except Exception as e:
     print(f"Error retrieving the access token: {e}")
   

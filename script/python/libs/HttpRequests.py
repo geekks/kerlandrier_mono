@@ -27,7 +27,7 @@ def get_nonce():
     return nonce
     
 
-def retrieve_access_token(oa_secret_key):
+def retrieve_OA_access_token(OA_SECRET_KEY:str = OA_SECRET_KEY) -> str:
     # Vérifier si le jeton existe déjà
     token_file_path = os.path.abspath(TOKEN_FILE_NAME)
     if os.path.exists(token_file_path):
@@ -48,7 +48,7 @@ def retrieve_access_token(oa_secret_key):
     }
     body = {
         "grant_type": "client_credentials",
-        "code": OA_SECRET_KEY.get_secret_value(),
+        "code": OA_SECRET_KEY,
     }
 
     try:
@@ -69,7 +69,7 @@ def retrieve_access_token(oa_secret_key):
         print(f"Error retrieving access token: {exc}")
         return None
 
-def get_locations(access_token):
+def get_locations(access_token: str):
 
     url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/locations"
     after =0
@@ -96,7 +96,7 @@ def post_location(access_token, name, adresse):
     """
     Create a new location in OpenAgenda, using OA Geocoder with 'name' and 'address' as search parameters
     Args:
-        access_token (str): The access token obtained by calling `retrieve_access_token`
+        access_token (str): The access token obtained by calling `retrieve_OA_access_token`
         name (str): The name of the new location
         adresse (str): The address of the new location
     Returns:
@@ -132,7 +132,7 @@ def patch_location(access_token:str, location_uid: str, body: dict):
     """
     Modify an  OpenAgenda location using a PATCH call. Only modified parameters are needed.
     Args:
-        access_token (str): The access token obtained by calling `retrieve_access_token`
+        access_token (str): The access token obtained by calling `retrieve_OA_access_token`
         location_uid (str): The uid of the location
         body (dict): parameters to be updated. 
                 {"uid"="aaa",{"description":{"fr":"AVEN"}}}
@@ -177,7 +177,7 @@ def delete_location(access_token, location_uid):
         return None
 
 
-def get_events( params: dict):
+def get_events( params: dict) -> list:
     """
     Retrieve events from OpenAgenda API with given parameters.
     Args:
@@ -188,7 +188,7 @@ def get_events( params: dict):
                     'detailed': 1,
                     'monolingual': 'fr'}
     Returns:
-        A list of events, or None if an error occurs.
+        A list of OA events.
     """
     headers = {
         "Content-Type": 'application/json',

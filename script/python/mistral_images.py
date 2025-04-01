@@ -108,7 +108,7 @@ def getMistralImageEvent(image_path:str=None, url:str = None)->Event:
 
 def postMistralEventToOa(event: Event, image_url: str = None):
     
-    access_token = retrieve_access_token(SECRET_KEY)
+    access_token = retrieve_OA_access_token(SECRET_KEY)
     OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
 
     # Fixe la timezone à Paris pour prendre en compte l'heure d'été/hivert

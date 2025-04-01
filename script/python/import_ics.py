@@ -11,7 +11,7 @@ from libs.ICS_utils import pull_upcoming_ics_events
 from libs.getOaLocation import get_or_create_oa_location
 from libs.HttpRequests import get_events
 from libs.HttpRequests import( 
-        retrieve_access_token,
+        retrieve_OA_access_token,
         create_event
         )
 import argparse
@@ -48,7 +48,7 @@ def import_ics(ics_url:str):
     
     new_events_nbr=0
     logContent=[]
-    access_token = retrieve_access_token(SECRET_KEY)
+    access_token = retrieve_OA_access_token(SECRET_KEY)
     for i, ics_event in enumerate(ics_events):
         try:
             event_title = ics_event.get('title').get('fr')

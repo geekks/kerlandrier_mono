@@ -5,7 +5,7 @@ Functions to manage locations with OA API
 
 from .utils import *
 from .scraping_utils import *
-from .HttpRequests import post_location, retrieve_access_token, delete_location, get_locations
+from .HttpRequests import post_location, retrieve_OA_access_token, delete_location, get_locations
 
 from thefuzz import fuzz
 from thefuzz import process
@@ -134,7 +134,7 @@ locations_examples = [
 ]
 
 def test_locations(location_array):
-    access_token = retrieve_access_token(SECRET_KEY)
+    access_token = retrieve_OA_access_token(SECRET_KEY)
     allLocationsOA = get_locations(access_token)
     allLocationsOA_by_uid = {item['uid']: item for item in allLocationsOA}
     nbr_locations= len(allLocationsOA)

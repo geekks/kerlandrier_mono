@@ -11,7 +11,7 @@ Les maigres sources:
 """
 import json
 from libs.HttpRequests import( 
-        retrieve_access_token,
+        retrieve_OA_access_token,
         get_locations,
         patch_location,
         )
@@ -35,7 +35,7 @@ cornouaille_cities = [
 
 breizh_postal = ['29', '56', '22', '35', '44']  # Postal codes of Bretagne and more
 
-access_token = retrieve_access_token(SECRET_KEY)
+access_token = retrieve_OA_access_token(SECRET_KEY)
 locations = get_locations(access_token)
 
 print(f"Nombre total de lieux: {len(locations)}")
