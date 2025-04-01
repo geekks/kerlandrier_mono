@@ -12,8 +12,6 @@ from typing import List
 if not os.path.exists(db_path):
     initialize_database(db_path)
     print("Database initialized.")
-else:
-    print("Database already exists.")
 
 app = FastAPI()
 
@@ -64,7 +62,7 @@ def get_token_header(authorization: str
 
 def get_current_user(token: str 
                         = Depends(get_token_header)):
-    payload = verify_token(token)
+    payload = verify_kl_token(token)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     return payload
@@ -88,7 +86,7 @@ async def authenticate(request: AuthRequest):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     user_id = result[0]
-    token = generate_token(user_id)
+    token = generate_kl_token(user_id)
     return {"success": True, "access_token": token, "token_type": "Bearer"}
 
 @app.get("/auth/oatoken", 

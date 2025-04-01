@@ -127,7 +127,7 @@ async def patch_event(access_token: str, event_uid: str | int, data: dict):
 
     return None
 
-def generate_token(user_id: int) -> str:
+def generate_kl_token(user_id: int) -> str:
     paris_tz = pytz.timezone('Europe/Paris')
     expiration_time = datetime.now(paris_tz) + timedelta(days=30)
     payload = {
@@ -138,7 +138,7 @@ def generate_token(user_id: int) -> str:
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 
-def verify_token(token: str) -> dict:
+def verify_kl_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         logging.info("Token decoded successfully")
