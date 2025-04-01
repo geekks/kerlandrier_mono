@@ -1,196 +1,167 @@
-import { useQuery } from "@tanstack/react-query";
-import { ImSpinner7 } from "react-icons/im";
-import { editoQuery } from "../config";
+import { API_URL, editoQuery, OA_SLUG } from "../config";
 import { DateTime } from "luxon";
 import "../layout.css";
 import type {
 	OpenAgendaEditoItem,
-	OpenAgendaEditoResponse,
 } from "../types/OpenAgenda";
-import { Autocomplete, Chip, TextField, Tooltip } from "@mui/material";
+import type React from "react";
 import { useCallback } from "react";
-import React from "react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { Chip, Tooltip } from "@mui/material";
 
-const fetchEditoEvents = async (): Promise<OpenAgendaEditoItem[]> => {
+// react-query key for refetch management
+const EVENTS_QUERY_KEY = 'events';
+
+// http GET request to get events used with react-query useQuery
+const fetchEvents = async (): Promise<OpenAgendaEditoItem[]> => {
 	const response = await fetch(editoQuery);
-	if (!response.ok) {
-		throw new Error("Failed to fetch events");
-	}
-	const data: OpenAgendaEditoResponse = await response.json();
-	return data.events;
+	const res = await response.json();
+	return res.events
 };
 
-const EventComponent = React.memo(
-	({
-		event,
-	}: {
-		event: OpenAgendaEditoItem;
-	}) => {
-		const handleKeywordChange = useCallback(
-			(_, newValue: string[]) => {
-				const updatedEvent = {
-					...event,
-					keywords: newValue as string[],
-					hasChanged: true,
-				};
-				console.log("Updated Event:", updatedEvent);
-			},
-			[event],
-		);
-
-		return (
-			<div key={event.uid} className="">
-				<h2 className="mb-0!">{event.title}</h2>
-				<div>
-					{event.nextTiming
-						? DateTime.fromISO(event.nextTiming?.begin).toFormat(
-								"ccc dd LLL HH:mm",
-								{ locale: "fr-FR" },
-							)
-						: null}
-				</div>
-				<h3>⟜ {event.location.name}</h3>
-				<div>
-					{event.keywords?.map((keyword, index) => (
-						<span key={`${event.uid}-keyword-${index}`}>{keyword} </span>
-					))}
-				</div>
-
-				<Autocomplete
-					className="w-full bg-white"
-					multiple
-					freeSolo
-					id="notification_emails"
-					options={[]}
-					defaultValue={event.keywords || []}
-					onChange={handleKeywordChange}
-					renderTags={(value: readonly string[], getTagProps) =>
-						value.map((option: string, index: number) => {
-							const { key, ...tagProps } = getTagProps({ index });
-							return (
-								<Chip
-									color="default"
-									variant="filled"
-									label={option}
-									key={key}
-									{...tagProps}
-								/>
-							);
-						})
-					}
-					renderInput={(params) => <TextField {...params} />}
-				/>
-			</div>
-		);
-	},
-);
-
-const Edito = () => {
-	const {
-		data: events,
-		isLoading,
-		isError,
-		refetch,
-	} = useQuery({
-		queryKey: ["editoEvents"],
-		queryFn: fetchEditoEvents,
-		enabled: false, // Disable automatic fetching
+// http PATCH request to update keywords for one event
+const patchEvent = async ({ id, keywords }: { id: string, keywords: string[] }) => {
+	const response = await fetch(`${API_URL}/event/keywords`, {
+		method: 'PATCH',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ uid: id, keywords }),
 	});
 
-	const handlePatch = async (eventDetails: OpenAgendaEditoItem) => {
-		console.log("Event Details:", eventDetails.keywords);
-		// Add any additional logic you need here
-	};
+	if (!response.ok) {
+		throw new Error('Network response was not ok');
+	}
+
+	return response.json();
+};
+
+// Card of one event
+const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
+	// react-query hook to manipulate GET query data
+	const queryClient = useQueryClient()
+
+	// react-query hook to PATCH data
+	const mutation = useMutation({
+		mutationFn: patchEvent,
+		onSuccess: (updatedEvent) => {
+			console.log("updatedEvent - ", updatedEvent);
+			queryClient.setQueryData([EVENTS_QUERY_KEY], (oldEvents: OpenAgendaEditoItem[]) =>
+				oldEvents.map((event: OpenAgendaEditoItem) =>
+					event.uid === updatedEvent.id ? updatedEvent : event
+				)
+			);
+		},
+		onError: (error) => {
+			console.log(error)
+		}
+	});
+
+	// useCallback to avoird abusive re-render
+	const handleKeywordChange = useCallback((id: string, newKeywords: string[]) => {
+		queryClient.setQueryData([EVENTS_QUERY_KEY], (oldEvents: OpenAgendaEditoItem[]) =>
+			oldEvents.map((event: OpenAgendaEditoItem) =>
+				event.uid === id ? { ...event, keywords: newKeywords } : event
+			)
+		);
+	}, [queryClient]);
+
+
+	// useCallback to avoird abusive re-render
+	const handlePatchEvent = useCallback((event: OpenAgendaEditoItem) => {
+		if (event) {
+			mutation.mutate({ id: event.uid, keywords: event.keywords });
+		}
+	}, [mutation]);
+
+	const oaLink = `https://openagenda.com/fr/${OA_SLUG}/contribute/event/${event.uid}`;
 
 	return (
 		<div>
-			<div className="flex items-center justify-center sticky top-0 z-[1000]">
+			<Tooltip title={event.longDescription ?? event.description} disableInteractive>
+				<a href={oaLink} tabIndex={-1}><h2>{event.title}</h2></a>
+			</Tooltip>
+			<div>
+				{event.nextTiming
+					? DateTime.fromISO(event.nextTiming?.begin).toFormat(
+						"ccc dd LLL HH:mm",
+						{ locale: "fr-FR" },
+					)
+					: null}
+			</div>
+			<h3 className="mb-2">⟜ {event.location.name}</h3>
+			<Autocomplete
+				multiple
+				freeSolo
+				options={[]}
+				value={event.keywords}
+				onChange={(_, value) => handleKeywordChange(event.uid, value)}
+				renderInput={params => <TextField
+					{...params}
+					sx={{
+						'& .MuiOutlinedInput-root': {
+							'& fieldset': {
+								borderColor: 'transparent',
+							},
+							'&:hover fieldset': {
+								borderColor: 'transparent',
+
+							},
+							'&.Mui-focused fieldset': {
+								borderColor: 'transparent',
+
+							},
+						},
+						backgroundColor: 'white',
+						boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+						fontFamily: 'Barlow Condensed !important',
+					}}
+				/>}
+				renderTags={(value, getTagProps) =>
+					value.map((option, index) => {
+						const { key, ...otherProps } = getTagProps({ index });
+						return (
+							<Chip
+								key={key}
+								label={option}
+								{...otherProps}
+								sx={{
+									fontFamily: 'Barlow Condensed',
+									textTransform: 'uppercase'
+								}}
+							/>
+						);
+					})
+				}
+			/>
+			<div className="text-center">
 				<button
-					className="block cursor-pointer my-1 py-2 px-4 text-xl font-barlow uppercase text-teal bg-[#FFFFF0] border border-teal rounded-lg"
+					className="mt-2 px-5 py-2 text-teal-500 border border-teal-500 rounded-sm h-10 font-bold uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
+					onClick={() => handlePatchEvent(event)}
 					type="button"
-					onClick={() => refetch()}
-					disabled={isLoading}
 				>
-					{isLoading ? (
-						<ImSpinner7 className="animate-spin" />
-					) : (
-						"Charger les prochains événements de l'édito"
-					)}
+					Save
 				</button>
 			</div>
-			<div className="grid grid-cols-4 gap-6">
-				{isError ? (
-					<p>Error loading events.</p>
-				) : (
-					events?.map((event) => (
-						<div key={event.uid} className="">
-							<h2 className="mb-0!">{event.title}</h2>
-							<div>
-								{event.nextTiming
-									? DateTime.fromISO(event.nextTiming?.begin).toFormat(
-											"ccc dd LLL HH:mm",
-											{ locale: "fr-FR" },
-										)
-									: null}
-							</div>
-							<h3>⟜ {event.location.name}</h3>
-							<div>
-								{event.keywords?.map((keyword, index) => (
-									<span key={`${event.uid}-keyword-${index}`}>{keyword} </span>
-								))}
-							</div>
+		</div >
+	);
+}
 
-							<EventComponent key={event.uid} event={event} />
+const EventList: React.FC = () => {
+	const { data: events = [] } = useQuery<OpenAgendaEditoItem[]>({
+		queryKey: [EVENTS_QUERY_KEY],
+		queryFn: fetchEvents,
+	});
 
-							{/* <Autocomplete
-								key={`${event.uid}-autocomplete`}
-								className="w-full bg-white"
-								multiple
-								freeSolo
-								id="notification_emails"
-								options={[]}
-								defaultValue={event.keywords || []}
-								onChange={(_, newValue) => {
-									console.log("new value", newValue);
-									event.keywords = newValue as string[];
-									event.hasChanged = true;
-									console.log("event kw", event.keywords);
-								}}
-								renderTags={(value: readonly string[], getTagProps) => {
-									console.log("value renderTags", value);
-									return value.map((option: string, index: number) => {
-										const { key, ...tagProps } = getTagProps({ index });
-										return (
-											<Chip
-												color="default"
-												variant="filled"
-												label={option}
-												key={key}
-												{...tagProps}
-											/>
-										);
-									});
-								}}
-								renderInput={(params) => {
-									console.log("params renderInput", params);
-									return <TextField {...params} />;
-								}}
-							/> */}
+	if (!events) {
+		return <div>Loading...</div>;
+	}
 
-							<button
-								className="block cursor-pointer my-1 py-2 px-4 text-xl font-barlow uppercase text-teal bg-[#FFFFF0] border border-teal rounded-lg"
-								type="button"
-								onClick={() => handlePatch(event)}
-								disabled={isLoading}
-							>
-								{isLoading ? <ImSpinner7 className="animate-spin" /> : "Patch"}
-							</button>
-						</div>
-					))
-				)}
-			</div>
+	return (
+		<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+			{events.map((event) => <EventCard key={event.uid} event={event} />)}
 		</div>
 	);
 };
 
-export default Edito;
+export default EventList;
