@@ -10,12 +10,6 @@
     text-decoration: underline;
   }
 }
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    /* line-height: 1.5rem; */
-}
 
 body {
     background-color: white;
@@ -31,7 +25,6 @@ h2,
 h3,
 h4 {
     font-style: normal;
-
 }
 
 h1 {

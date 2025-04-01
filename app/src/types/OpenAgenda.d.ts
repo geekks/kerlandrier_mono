@@ -44,6 +44,7 @@ export type OpenAgendaEventsReponse = {
 export type OpenAgendaEditoResponse = {
   total: number;
   events: OpenAgendaEditoItem[]
+  after?: string;
 }
 
 // TODO: Right values
