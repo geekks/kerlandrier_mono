@@ -22,10 +22,10 @@ from dateparser import parse
 
     
 from libs.utils import get_end_date, showDiff,encodeImage64
-from libs.HttpRequests import create_event, retrieve_access_token
+from libs.HttpRequests import create_event, retrieve_OA_access_token
 from libs.getOaLocation import get_or_create_oa_location
 
-from script.python.configuration import config_SCRIPT
+from configuration import config_SCRIPT
 
 # Main Program
 MISTRAL_PRIVATE_API_KEY = config_SCRIPT.MISTRAL_PRIVATE_API_KEY.get_secret_value()
