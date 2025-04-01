@@ -4,9 +4,27 @@ node_modules
 .env*
 !.env.example
 *.log
+*.logs
 secret_token.json
 *.key
 
 # Vscode config example to be copied and adpated
 .vscode/*
 !.vscode/*.example
+
+#Python env
+.autoenv.zsh
+.venv
+
+# Python requests cache
+scrap_cache.sqlite
+__pycache__
+*.bak
+*.BAK
+
+# Jupyter notebooks
+.ipynb_checkpoints
+
+# Google Cloud Console auth
+association-concarneau*.json
+.goutputstream-*
