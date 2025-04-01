@@ -30,6 +30,8 @@ from configuration import config_SCRIPT
 # Main Program
 MISTRAL_PRIVATE_API_KEY = config_SCRIPT.MISTRAL_PRIVATE_API_KEY.get_secret_value()
 SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
+IMGBB_PRIVATE_API_KEY=config_SCRIPT.IMGBB_API_TOKEN.get_secret_value()
+IMGBB_API_URL=config_SCRIPT.IMGBB_API_URL
 env= config_SCRIPT.environment
 
 # Define a class to contain the Mistral answer to a formatted JSON
@@ -161,45 +163,62 @@ def postMistralEventToOa(event: mistralEvent, image_url: str = None):
         msg.text( f"File: {image_path}. Event title '{event.titre}'")
         pprint(f"Error: {e}")
         return None
+        
+def postImageToImgbb(image_path: str) -> str|None:
+    """
+    Uploads an image to imgbb and returns the URL of the uploaded image.
+
+    Args:
+        image_path (str): The absolute path to the image file to be uploaded.
+
+    Returns:
+        str|None: The URL of the uploaded image if successful, otherwise None.
+    """
+    if not os.path.isfile(image_path):
+        raise argparse.ArgumentTypeError(f"Given image path ({image_path}) is not valid")
+
+    # DEBUG
+    # response_mistral_json = response_mistral.model_dump(mode='json')
+    # print("Mistral answer:")
+    # pprint(response_mistral_json)
+
+    try:
+        payload = {
+            "expiration": 600,
+            "key": IMGBB_PRIVATE_API_KEY,
+            "name": args.fileName,
+            "image": encodeImage64(image_path)
+        }
+        response_imgbb = requests.post(IMGBB_API_URL, data=payload)
+        image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
+        return image_url
+    except Exception as e:
+        print("Error while uploading image to imgbb")
+        print(e)
+        return None
+
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
-    parser.add_argument( "--url", "--URL", "--Url",help="URL of the image to analyse")
-    parser.add_argument( "--test",nargs='?', const=True,help="Test command with {TEST_FILE_NAME}")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
+    group.add_argument( "--url", "--URL", "--Url",help="URL of the image to analyse")
+    group.add_argument( "--test",nargs='?', const=True,help="Test command with {TEST_FILE_NAME}")
     args=parser.parse_args()
-    
-    if args.fileName:
-        image_path = os.path.join(os.path.dirname(__file__) , "images", args.fileName )
-        if not os.path.isfile(image_path):
-            raise argparse.ArgumentTypeError(f"Given image path ({image_path}) is not valid")
-        response_mistral=getMistralImageEvent(image_path)
-        response_mistral_json = response_mistral.model_dump(mode='json')
-        print("Mistral answer:")
-        pprint(response_mistral_json)
-        try:
-            paylod={
-                "expiration": 600,
-                "key": config.IMGBB_API_TOKEN.get_secret_value(),
-                "name": args.fileName,
-                "image": encodeImage64(image_path)
-            }
-            response_imgbb = requests.post(config.IMGBB_API_URL, data=paylod)
-            image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
-        except Exception as e:
-            print("Error while uploading image to imgbb")
-            print(e)
 
+    if args.fileName: # upload image to imgbb and get url
+        image_url = postImageToImgbb(args.filename)
+        response_mistral = getMistralImageEvent(image_path=args.filename)
+        msg.info(response_mistral)
         postMistralEventToOa(response_mistral, image_url)
-    
     elif args.url:
-        response=getMistralImageEvent(url=args.url)
-        response_json = response.model_dump(mode='json')
-        print("Mistral answer:")
-        pprint(response_json)
-        postMistralEventToOa(response, args.url)
-    
+        image_url=args.url
+        response_mistral=getMistralImageEvent(url=image_url)
+        msg.info(response_mistral)
+        postMistralEventToOa(response_mistral, image_url)
+
+    # Test Part of the Program
+    ## TO DO : move tests to a dedicated test folder
     elif args.test:
-        # Test Part of the Program
         TEST_FILE_NAME = "TEST_temps_foret.jpg"
         TEST_FILE_ANSWER = {"date_debut": "2025-01-31T20:00:00+01:00",
                             "description": ["documentaire","France","forêt",
@@ -211,8 +230,8 @@ if __name__ == "__main__":
                             "titre": "Le Temps des forêts"}
         msg.info(f"Testing with {TEST_FILE_NAME}")
         image_path = os.path.join(os.path.dirname(__file__) , "sources", TEST_FILE_NAME)
-        response=getMistralImageEvent(image_path)
-        response_json = response.model_dump(mode='json')
+        response_mistral=getMistralImageEvent(image_path)
+        response_json = response_mistral.model_dump(mode='json')
         error=0
         for key in response_json:
             testPhrase=TEST_FILE_ANSWER.get(key)
