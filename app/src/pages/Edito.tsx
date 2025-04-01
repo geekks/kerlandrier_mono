@@ -77,7 +77,7 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 	const oaLink = `https://openagenda.com/fr/${OA_SLUG}/contribute/event/${event.uid}`;
 
 	return (
-		<div>
+		<div className="flex flex-col justify-between">
 			<Tooltip title={event.longDescription ?? event.description} disableInteractive>
 				<a href={oaLink} tabIndex={-1}><h2>{event.title}</h2></a>
 			</Tooltip>
