@@ -18,9 +18,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Environment variables
-from configuration import config
-TBD_LOCATION_UID = config.TBD_LOCATION_UID
-SECRET_KEY = config.OA_SECRET_KEY
+from configuration import config_SCRIPT
+TBD_LOCATION_UID = config_SCRIPT.TBD_LOCATION_UID
+SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
 
 def get_or_create_oa_location(searched_location:str, access_token: str, debug:bool=False)->str:
     """

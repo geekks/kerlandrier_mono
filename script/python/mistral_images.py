@@ -25,11 +25,12 @@ from libs.utils import get_end_date, showDiff,encodeImage64
 from libs.HttpRequests import create_event, retrieve_access_token
 from libs.getOaLocation import get_or_create_oa_location
 
-from configuration import config
+from script.python.configuration import config_SCRIPT
 
 # Main Program
-MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
-SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
+MISTRAL_PRIVATE_API_KEY = config_SCRIPT.MISTRAL_PRIVATE_API_KEY.get_secret_value()
+SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
+env= config_SCRIPT.environment
 
 # Define a class to contain the Mistral answer to a formatted JSON
 class Event(BaseModel):
@@ -220,7 +221,7 @@ if __name__ == "__main__":
             msg.good(f"Test passed for all keys !")
         else:
             msg.warn(f"Test failed for {error} of {len(TEST_FILE_ANSWER) + len(TEST_FILE_ANSWER.get("description")) - 1} keys")
-        
+
     else:
         msg.fail(f"Please give a valid file name. --help for more informations")
         exit(1)

@@ -6,9 +6,9 @@ from libs.HttpRequests import (  retrieve_access_token,
                             get_locations,
                             patch_location)
 
-from configuration import config
-AGENDA_UID = config.AGENDA_UID
-OA_SECRET_KEY = config.OA_SECRET_KEY
+from configuration import config_SCRIPT
+AGENDA_UID = config_SCRIPT.AGENDA_UID
+OA_SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
 
 def validate_locations():
     accessToken = retrieve_access_token(OA_SECRET_KEY)

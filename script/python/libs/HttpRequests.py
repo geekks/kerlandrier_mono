@@ -9,14 +9,14 @@ import requests, json
 import time, pytz, dateparser
 
 # Chargement des variables d'environnement
-from configuration import config
+from configuration import config_SCRIPT
 
-OA_PUBLIC_KEY = config.OA_PUBLIC_KEY
-OA_SECRET_KEY = config.OA_SECRET_KEY
-ACCESS_TOKEN_URL = config.ACCESS_TOKEN_URL
-AGENDA_UID = config.AGENDA_UID
+OA_PUBLIC_KEY = config_SCRIPT.OA_PUBLIC_KEY
+OA_SECRET_KEY = config_SCRIPT.OA_SECRET_KEY
+ACCESS_TOKEN_URL = config_SCRIPT.ACCESS_TOKEN_URL
+AGENDA_UID = config_SCRIPT.AGENDA_UID
 TOKEN_FILE_NAME = 'secret_token.json'
-TBD_LOCATION_UID = config.TBD_LOCATION_UID
+TBD_LOCATION_UID = config_SCRIPT.TBD_LOCATION_UID
 
 
 def get_nonce():

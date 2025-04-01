@@ -1,12 +1,12 @@
 from typing import Literal
-import os
+import os,sys
 from pydantic import Field, SecretStr, computed_field
 from pydantic_settings import BaseSettings
 
-# Chemin absolu vers le .env à la racine du projet
-dir_file_path = os.path.dirname(os.path.abspath(__file__))
-print(os.pardir)
-env_path= os.path.join(dir_file_path,os.pardir, '.env' ) 
+# Chemin absolu vers le .env du dosseir "script"
+import os
+SCRIPT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+env_path= os.path.join(SCRIPT_DIR, '.env' ) 
 
 class Configuration(BaseSettings):
     # Common
@@ -52,4 +52,4 @@ class Configuration(BaseSettings):
     # def filtered_cities(self) -> list[str]:
     #     return [x.lower() for x in self.raw_filtered_cities]  if self.raw_filtered_cities is not None else []
 
-config = Configuration(_env_file=env_path)
+config_SCRIPT = Configuration(_env_file=env_path)

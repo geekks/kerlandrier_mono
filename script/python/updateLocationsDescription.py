@@ -15,8 +15,8 @@ from libs.HttpRequests import(
         get_locations,
         patch_location,
         )
-from configuration import config
-SECRET_KEY = config.OA_SECRET_KEY
+from configuration import config_SCRIPT
+SECRET_KEY = config_SCRIPT.OA_SECRET_KEY
 
 aven_cities = [
     "Bannalec", "Beg-Meil", "Concarneau", "Elliant", "LaForêt-Fouesnant", "Pleuven",

@@ -5,6 +5,8 @@ import json
 
 import datetime
 from pprint import pprint
+from configuration import config_SCRIPT
+
 from libs.ICS_utils import pull_upcoming_ics_events
 from libs.getOaLocation import get_or_create_oa_location
 from libs.HttpRequests import get_events
@@ -14,14 +16,12 @@ from libs.HttpRequests import(
         )
 import argparse
 
-from configuration import config
-import os
-PUBLIC_KEY = config.OA_PUBLIC_KEY
-SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
-ICS_PRIVATE_URL_KLR_FB = config.ICS_PRIVATE_URL_KLR_FB.get_secret_value()
-URL_AGENDA_ATELIERS_KAL = config.URL_AGENDA_ATELIERS_KAL
-KAL_LOCATION_UID = config.KAL_LOCATION_UID
-TBD_LOCATION_UID=config.TBD_LOCATION_UID
+PUBLIC_KEY = config_SCRIPT.OA_PUBLIC_KEY
+SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
+ICS_PRIVATE_URL_KLR_FB = config_SCRIPT.ICS_PRIVATE_URL_KLR_FB.get_secret_value()
+URL_AGENDA_ATELIERS_KAL = config_SCRIPT.URL_AGENDA_ATELIERS_KAL
+KAL_LOCATION_UID = config_SCRIPT.KAL_LOCATION_UID
+TBD_LOCATION_UID=config_SCRIPT.TBD_LOCATION_UID
 
 now=datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
