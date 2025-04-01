@@ -33,7 +33,7 @@ SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
 env= config_SCRIPT.environment
 
 # Define a class to contain the Mistral answer to a formatted JSON
-class Event(BaseModel):
+class mistralEvent(BaseModel):
     titre: str
     date_debut: str
     heure_debut: str
@@ -43,8 +43,24 @@ class Event(BaseModel):
     description_courte: str
     fiabilite: int
 
-def getMistralImageEvent(image_path:str=None, url:str = None)->Event:
+def getMistralImageEvent(image_path:str=None, url:str = None)->mistralEvent:
+    """
+    Extracts event information from an image using Mistral AI.
+    
+    Args:
+        image_path (str, optional): The file path of the image. Defaults to None.
+        url (str, optional): The URL of the image. Defaults to None.
+        
+    Note:
+        If both image_path and url are provided, the function will fail.
+    
+    Returns:
+        Event: An mistralEvent object containing the extracted event information.
+    """
 
+    if url is not None and image_path is not None:
+        msg.fail("You can't use both image_path and url")
+        exit(1)
     if url:
         # Parse the URL to remove query parameters
         parsed_url = urlparse(url)
@@ -102,11 +118,11 @@ def getMistralImageEvent(image_path:str=None, url:str = None)->Event:
     chat_response = client.chat.parse(
         model=model,
         messages=messages,
-        response_format=Event
+        response_format=mistralEvent
     )
     return chat_response.choices[0].message.parsed
 
-def postMistralEventToOa(event: Event, image_url: str = None):
+def postMistralEventToOa(event: mistralEvent, image_url: str = None):
     
     access_token = retrieve_OA_access_token(SECRET_KEY)
     OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
@@ -135,14 +151,16 @@ def postMistralEventToOa(event: Event, image_url: str = None):
         if response['event']['uid']:
                 msg.good("Event created !")
                 msg.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
+                return response['event']
         else:
             msg.fail( f"Problem for {event.titre}" )
             msg.fail( f"Response: {response}" )
+            return None
     except Exception as e:
         msg.fail(f"Error sending event to OpenAgenda from Mistral analysis")
         msg.text( f"File: {image_path}. Event title '{event.titre}'")
         pprint(f"Error: {e}")
-
+        return None
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
