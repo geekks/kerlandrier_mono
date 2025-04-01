@@ -116,7 +116,7 @@ def parse_excel_file():
   except Exception as e:
     print(f"Error while creating events: {e}")
   finally:
-    with open(f"ics/import_ics_logs.txt", "a") as log_file:
+    with open(f"import_ics.log", "a") as log_file:
           log_file.write(now + "\n")
           for dic in log_content:
               json.dump(dic, log_file,indent=2, ensure_ascii=False)

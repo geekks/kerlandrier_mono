@@ -102,7 +102,7 @@ def import_ics(ics_url:str):
 
         if "import_status" in eventLog : logContent.append( eventLog)
         
-    with open(f"ics/import_ics_logs.txt", "a") as log_file:
+    with open(f"import_ics.log", "a") as log_file:
         log_file.write(now + "\n")
         for dic in logContent:
             json.dump(dic, log_file,indent=2, ensure_ascii=False)
