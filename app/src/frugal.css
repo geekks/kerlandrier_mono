@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
-
 @layer base {
   html {
     line-height: normal;
@@ -9,12 +8,6 @@
   a {
     text-decoration: underline;
   }
-}
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    /* line-height: 1.5rem; */
 }
 
 body {
@@ -25,13 +18,11 @@ body {
     word-spacing: -0.1rem;
 }
 
-
 h1,
 h2,
 h3,
 h4 {
     font-style: normal;
-
 }
 
 h1 {

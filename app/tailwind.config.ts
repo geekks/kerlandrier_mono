@@ -5,7 +5,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        barlow: ['"Barlow Condensed"', 'sans-serif'],
+        barlow: ['Barlow Condensed', 'sans-serif'],
       },
     },
   },

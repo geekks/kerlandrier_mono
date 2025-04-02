@@ -22,4 +22,4 @@ const DEFAULT_PARAMS = {
 };
 
 export const defaultQuery = `${OA_BASE_URL}?${new URLSearchParams(DEFAULT_PARAMS).toString()}&relative[]=current&relative[]=upcoming&${fieldsParam}`;
-export const editoQuery = `${OA_BASE_URL}?${new URLSearchParams(DEFAULT_PARAMS).toString()}&timings[gte]=${today.toUTC()}&timings[lte]=${today.plus({ days: 5 }).toUTC()}&${fieldsParam}&sort=lastTiming.asc`;
+export const editoQuery = `${OA_BASE_URL}?${new URLSearchParams(DEFAULT_PARAMS).toString()}&timings[gte]=${today.toUTC()}&timings[lte]=${today.plus({ days: 5 }).toUTC()}&${fieldsParam}&sort=timings.asc`;

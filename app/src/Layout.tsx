@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
+import "./layout.css";
 
-// src/components/Layout.tsx
 type LayoutProps = {
 	children: React.ReactNode;
 };
@@ -11,21 +11,11 @@ const Layout = ({ children }: LayoutProps) => {
 			<header>
 				<div id="title">
 					<div id="info-container">
-						<h1>Kerlandrier.cc</h1>
+						<h1 className="font-bar">Kerlandrier.cc</h1>
 						<p id="description">Prenez soin de vos événements</p>
 						<span id="infos-link">
 							{" "}
 							<Link to="/">Retour au Kerlandrier</Link>{" "}
-						</span>
-					</div>
-
-					<div id="qr-container">
-						<img id="qr" src="/kerlandrier_qr.svg" alt="Kerlandrier QR code" />
-						<br />
-						<span>
-							Contribution
-							<br /> et infos sur le site
-							<br /> kerlandrier.cc
 						</span>
 					</div>
 				</div>
