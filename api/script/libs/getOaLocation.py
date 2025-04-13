@@ -137,8 +137,7 @@ locations_examples = [
     
 ]
 
-def test_locations(location_array):
-    access_token = retrieve_OA_access_token(SECRET_KEY)
+def test_locations(location_array, access_token ):
     allLocationsOA = get_locations(access_token)
     allLocationsOA_by_uid = {item['uid']: item for item in allLocationsOA}
     nbr_locations= len(allLocationsOA)

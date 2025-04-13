@@ -21,18 +21,10 @@ from wasabi import color,msg
 from dateparser import parse
 
     
+from libs.oa_types import OpenAgendaEvent
 from libs.utils import get_end_date, showDiff,encodeImage64
 from libs.HttpRequests import create_event, retrieve_OA_access_token
 from libs.getOaLocation import get_or_create_oa_location
-
-from configuration import config,oa
-
-# Main Program
-MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY
-ACCESS_TOKEN = oa.access_token
-IMGBB_PRIVATE_API_KEY=config.IMGBB_PRIVATE_API_KEY
-IMGBB_API_URL=config.IMGBB_API_URL
-ENV= config.ENV_DEV
 
 # Define a class to contain the Mistral answer to a formatted JSON
 class mistralEvent(BaseModel):
@@ -45,7 +37,7 @@ class mistralEvent(BaseModel):
     description_courte: str
     fiabilite: int
 
-def getMistralImageEvent(image_path:str=None, url:str = None)->mistralEvent:
+def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:str = None)->mistralEvent:
     """
     Extracts event information from an image using Mistral AI.
     
@@ -124,7 +116,7 @@ def getMistralImageEvent(image_path:str=None, url:str = None)->mistralEvent:
     )
     return chat_response.choices[0].message.parsed
 
-def postMistralEventToOa(event: mistralEvent,access_token: str = ACCESS_TOKEN,  image_url: str = None):
+def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str = None) -> OpenAgendaEvent|None:
     
     OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
 
@@ -163,7 +155,7 @@ def postMistralEventToOa(event: mistralEvent,access_token: str = ACCESS_TOKEN,  
         pprint(f"Error: {e}")
         return None
         
-def postImageToImgbb(image_path: str, imgbb_api_url: str = IMGBB_API_URL, imgbb_api_key: str = IMGBB_PRIVATE_API_KEY) -> str|None:
+def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) -> str|None:
     """
     Uploads an image to imgbb and returns the URL of the uploaded image.
 

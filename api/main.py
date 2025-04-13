@@ -1,12 +1,13 @@
 from typing import Optional, Union
 
-import os
+import os, pprint
 from api.api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password
 from api.script.libs.HttpRequests import patch_event
-from api.script.configuration import oa
+from api.script.configuration import config, oa
+from api.script.mistral_images import getMistralImageEvent, postImageToImgbb, postMistralEventToOa
 
 from api.db import initialize_database, db_path
-from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi import FastAPI, Depends, HTTPException, Header, File, UploadFile
 from pydantic import BaseModel
 from typing import List
 
@@ -172,5 +173,36 @@ async def update_events(request: PatchRequest):
     else:
         return {"success": True, "data": [], "message": "No update"}
 
+@app.post("/upload/image/",
+        summary="Upload an image file of a poster with event",
+        description="This endpoint allows authenticated users to upload an image file to be anlyze with Mistral to create an OA event.",
+        response_model=dict)
+async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    # Define the directory to save the uploaded file
+    try:
+        upload_dir = "uploads"
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
 
-    
+        # Save the uploaded file to the directory
+        file_path = os.path.join(upload_dir, file.filename)
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
+    except Exception as e:
+        print(e)
+        return {"success": False, "message": "Error while saving image file"}
+
+    try:
+        image_url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY, )
+        response_mistral = getMistralImageEvent(config.MISTRAL_PRIVATE_API_KEY, image_path=file_path)
+        print("Mistral answer:")
+        pprint(response_mistral.model_dump(mode='json'))
+        OAevent = postMistralEventToOa(response_mistral, access_token=oa.access_token, image_url= image_url)
+        if OAevent.uid:
+            event_url= f"https://openagenda.com/fr/{config.AGENDA_SLUG}/events/{OAevent.slug}"
+            print(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
+            return {"success": True, "message": "File uploaded successfully", "OAeventURL": event_url, "OAeventName": OAevent.title.fr}
+    except Exception as e:
+        print(e)
+        return {"success": False, "message": "Error generating event from image file"}
+
