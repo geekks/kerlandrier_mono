@@ -8,16 +8,11 @@ import math, random
 import requests, json
 import time, pytz, dateparser
 
-# Chargement des variables d'environnement
-from configuration import config_SCRIPT
 
-OA_PUBLIC_KEY = config_SCRIPT.OA_PUBLIC_KEY
-OA_SECRET_KEY = config_SCRIPT.OA_SECRET_KEY
-ACCESS_TOKEN_URL = config_SCRIPT.ACCESS_TOKEN_URL
-AGENDA_UID = config_SCRIPT.AGENDA_UID
 TOKEN_FILE_NAME = 'secret_token.json'
-TBD_LOCATION_UID = config_SCRIPT.TBD_LOCATION_UID
-
+ACCESS_TOKEN_URL = "https://api.openagenda.com/v2/requestAccessToken"
+LOCATIONS_API_URL = "https://api.openagenda.com/v2/agendas/44891982/locations"
+EVENTS_API_URL = "https://api.openagenda.com/v2/agendas/44891982/events"
 
 def get_nonce():
     """
@@ -27,7 +22,10 @@ def get_nonce():
     return nonce
     
 
-def retrieve_OA_access_token(OA_SECRET_KEY:str = OA_SECRET_KEY) -> str:
+def retrieve_OA_access_token(OA_SECRET_KEY:str,
+                            TOKEN_FILE_NAME:str = 'secret_token.json',
+                            ACCESS_TOKEN_URL:str = ACCESS_TOKEN_URL
+                            ) -> str:
     # Vérifier si le jeton existe déjà
     token_file_path = os.path.abspath(TOKEN_FILE_NAME)
     if os.path.exists(token_file_path):
@@ -69,9 +67,9 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str = OA_SECRET_KEY) -> str:
         print(f"Error retrieving access token: {exc}")
         return None
 
-def get_locations(access_token: str):
+def get_locations(access_token: str, locations_api_url: str =LOCATIONS_API_URL):
 
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/locations"
+    url = locations_api_url
     after =0
     all_locations=[]
     while after is not None:
@@ -92,7 +90,7 @@ def get_locations(access_token: str):
             return None
     return all_locations
 
-def post_location(access_token, name, adresse):
+def post_location(access_token: str, name: str , adresse: str, locations_api_url: str=LOCATIONS_API_URL ):
     """
     Create a new location in OpenAgenda, using OA Geocoder with 'name' and 'address' as search parameters
     Args:
@@ -113,7 +111,7 @@ def post_location(access_token, name, adresse):
         "countryCode": "FR",
         "state": 0,  # signifie "non vérifié"
     }
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/locations"
+    url = locations_api_url
 
     try:
         response = requests.post(url, json=body, headers=headers)
@@ -128,7 +126,7 @@ def post_location(access_token, name, adresse):
             # print("No existing address found by OA API")
         return None
 
-def patch_location(access_token:str, location_uid: str, body: dict):
+def patch_location(access_token:str, location_uid: str, body: dict, locations_api_url: str =LOCATIONS_API_URL):
     """
     Modify an  OpenAgenda location using a PATCH call. Only modified parameters are needed.
     Args:
@@ -147,7 +145,7 @@ def patch_location(access_token:str, location_uid: str, body: dict):
     }
     if (type(body) is not dict): 
         raise TypeError("body must be a dict")
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/locations/{location_uid}"
+    url = f"{locations_api_url}/{location_uid}"
 
     try:
         response = requests.patch(url, json=body, headers=headers)
@@ -159,13 +157,13 @@ def patch_location(access_token:str, location_uid: str, body: dict):
         return None
 
 
-def delete_location(access_token, location_uid):
+def delete_location(access_token: str, location_uid: str, locations_api_url: str = LOCATIONS_API_URL): 
     headers = {
         "Content-Type": 'application/json',
         "access-token": access_token,
         "nonce": get_nonce(),
     }
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/locations/{location_uid}"
+    url = f"{locations_api_url}/{location_uid}"
 
     try:
         response = requests.delete(url, headers=headers)
@@ -177,7 +175,7 @@ def delete_location(access_token, location_uid):
         return None
 
 
-def get_events( params: dict) -> list:
+def get_events( params: dict, oa_public_key:str, events_api_url: str = EVENTS_API_URL) -> list:
     """
     Retrieve events from OpenAgenda API with given parameters.
     Args:
@@ -194,7 +192,7 @@ def get_events( params: dict) -> list:
         "Content-Type": 'application/json',
         "nonce": get_nonce()
     }
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/events?key={OA_PUBLIC_KEY}"
+    url = f"{events_api_url}?key={oa_public_key}"
     after =0
     all_events=[]
     while after is not None:
@@ -211,14 +209,14 @@ def get_events( params: dict) -> list:
     return all_events
 
 
-def create_event(access_token, event):
+def create_event(access_token:str, event:dict, events_api_url: str = EVENTS_API_URL ):
     headers = {
         "Content-Type": "application/json",
         "access-token": access_token,
         "nonce": get_nonce(),
     }
     body = event
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/events"
+    url = events_api_url
     try:
         event_creation_response = requests.post(url, json=body , headers=headers)
         if event_creation_response.status_code != 200:
@@ -237,14 +235,14 @@ def create_event(access_token, event):
         print(f"Error creating event {event.get('title').get('fr')}: {exc}")
         return None
 
-def patch_event(access_token, eventUid, eventData):
+def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_url: str = EVENTS_API_URL):
     headers = {
         "Content-Type": "application/json",
         "access-token": access_token,
         "nonce": get_nonce(),
     }
     body = eventData
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/events/{eventUid}"
+    url = f"{events_api_url}/{eventUid}"
     try:
         event_creation_response = requests.post(url, json=body , headers=headers)
         
@@ -259,13 +257,13 @@ def patch_event(access_token, eventUid, eventData):
         print(f"Error creating event: {exc}")
         return None
 
-def delete_event(access_token, event_uid):
+def delete_event(access_token:str, event_uid:str|int, events_api_url: str = EVENTS_API_URL):
     headers = {
         "Content-Type": 'application/json',
         "access-token": access_token,
         "nonce": get_nonce(),
     }
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/events/{event_uid}"
+    url = f"{events_api_url}/{event_uid}"
 
     try:
         response = requests.delete(url, headers=headers)
@@ -276,13 +274,13 @@ def delete_event(access_token, event_uid):
         print(f"Error deleting event: {exc}")
         return None
 
-def search_events( pub_key: str, search_string:str, past_events:bool  = False, other_params:dict = None ) -> dict | None:
+def search_events( oa_public_key: str, search_string:str, past_events:bool  = False, other_params:dict = None, events_api_url: str = EVENTS_API_URL ) -> dict | None:
     """
     Search events in the OpenAgenda API by a given search string.
     """
     headers = {
         "Content-Type": 'application/json',
-        "key": pub_key,
+        "key": oa_public_key,
     }
     params = {
         "search": search_string,
@@ -293,7 +291,7 @@ def search_events( pub_key: str, search_string:str, past_events:bool  = False, o
     if other_params is not None: params.update(other_params)
     if past_events is False : params['relative'] = ["current", "upcoming"]
     
-    url = f"https://api.openagenda.com/v2/agendas/{AGENDA_UID}/events"
+    url = events_api_url
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -303,7 +301,7 @@ def search_events( pub_key: str, search_string:str, past_events:bool  = False, o
         print(f"Error getting events: {exc}")
         return None
 
-def get_uid_from_name_date(pub_key: str ,event_name:str, text_date:str = None, uid_externe:bool = False) -> str|None:
+def get_uid_from_name_date(oa_public_key:str ,event_name:str, text_date:str = None, uid_externe:bool = False) -> str|None:
     date = dateparser.parse(text_date)
     paris_zone = pytz.timezone('Europe/Paris')
     if date and date.tzinfo != 'Europe/Paris': date = date.astimezone(paris_zone)
@@ -315,7 +313,7 @@ def get_uid_from_name_date(pub_key: str ,event_name:str, text_date:str = None, u
                         }
                     }
 
-    search_result = search_events( pub_key,  event_name, past_events=True, other_params=params)
+    search_result = search_events( oa_public_key,  event_name, past_events=True, other_params=params)
     if search_result and search_result["events"]: 
         uid= search_result["events"][0].get("uid-externe") if uid_externe else search_result["events"][0].get("id")
         return uid
@@ -344,15 +342,15 @@ searchParamsTests = [
     
 ]
 
-if __name__ == "__main__":
-    for index, paramTest in enumerate(searchParamsTests):
-        print( "--- parmas test n°" + str(index) + "---" )
-        events = get_events(paramTest)
-        print("nombre d'events: ",len(events))
-        if len(events) == 0: continue
-        print("Noms: ")
-        events_title =[]
-        for event in events:
-            events_title.append(event.get('uid-externe') if event.get('uid-externe') else event.get('title'))
-        print(*events_title,  sep="; ")
+# if __name__ == "__main__":
+#     for index, paramTest in enumerate(searchParamsTests):
+#         print( "--- parmas test n°" + str(index) + "---" )
+#         events = get_events(paramTest)
+#         print("nombre d'events: ",len(events))
+#         if len(events) == 0: continue
+#         print("Noms: ")
+#         events_title =[]
+#         for event in events:
+#             events_title.append(event.get('uid-externe') if event.get('uid-externe') else event.get('title'))
+#         print(*events_title,  sep="; ")
             

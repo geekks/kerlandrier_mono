@@ -17,12 +17,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Environment variables
-from configuration import config_SCRIPT
-TBD_LOCATION_UID = config_SCRIPT.TBD_LOCATION_UID
-SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
+TBD_LOCATION_UID="11634941"
 
-def get_or_create_oa_location(searched_location:str, access_token: str, debug:bool=False)->str:
+def get_or_create_oa_location(searched_location:str, access_token: str, debug:bool=False, TBD_LOCATION_UID:str=TBD_LOCATION_UID)->str:
     """
     Tries to find a matching OpenAgenda location for the given searched location.
     Returns an OALocation UID (found, created or default one.)
@@ -48,10 +45,17 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
                                             flags=re.IGNORECASE
                                             )
     # TO DO: add this specific cases to a config file
-    locationPatternToSpace.replace("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé")
-    locationPatternToSpace.replace("ZA de Colguen Rue Aimé Césaire , 29900 Concarneau", "Brasserie Tri Martolod Concarneau")
-    locationPatternToSpace.replace("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc")
-    locationPatternToSpace.replace("Brasserie de Bretagne, Le Bek", "Le Bek")
+    replacement = [
+        ("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé"),
+        ("ZA de Colguen Rue Aimé Césaire", "Brasserie Tri Martolod Concarneau"),
+        ("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc"),
+        ("Brasserie de Bretagne, Le Bek", "Le Bek"),
+        ("Rue de Colguen", "Cinéville, Rue de Colguen"),
+        ("LE CAFE LOCAL", "Le Café Local, Combrit"),
+        ("3e lieu - l'Archipel", "l'Archipel, Fouenant")
+    ]
+    for old, new in replacement:
+        locationPatternToSpace = locationPatternToSpace.replace(old, new)
     
     optimized_searched_location = locationPatternToSpace
     logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
@@ -66,7 +70,7 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         return results[0][2]
 
     # 2) Try to create an OALocation
-    response = post_location(access_token, searched_location, searched_location)
+    response = post_location(access_token,  name = searched_location, adresse=searched_location)
     if not response or not response.get('location', {}).get('uid'):
         logger.warning("-> ❔ Returning location 'To be defined' (Could not create location on OpenAgenda)")
         return TBD_LOCATION_UID

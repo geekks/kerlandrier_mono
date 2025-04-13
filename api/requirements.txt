@@ -40,3 +40,5 @@ bcrypt
 datetime
 pytz
 logging
+gspread
+dateparser

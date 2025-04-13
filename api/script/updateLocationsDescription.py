@@ -9,14 +9,13 @@ Les maigres sources:
 - https://fr.wikipedia.org/wiki/Pays_de_Bretagne#/media/Fichier:Pays_Bretagne_map.jpg
 -  http://www.heritaj.bzh/website/image/ir.attachment/4925_2e00c37/datas
 """
-import json
-from libs.HttpRequests import( 
-        retrieve_OA_access_token,
+import json, os
+from libs.HttpRequests import(
         get_locations,
         patch_location,
         )
-from configuration import config_SCRIPT
-SECRET_KEY = config_SCRIPT.OA_SECRET_KEY
+from .configuration import config, oa
+
 
 aven_cities = [
     "Bannalec", "Beg-Meil", "Concarneau", "Elliant", "LaForêt-Fouesnant", "Pleuven",
@@ -35,7 +34,7 @@ cornouaille_cities = [
 
 breizh_postal = ['29', '56', '22', '35', '44']  # Postal codes of Bretagne and more
 
-access_token = retrieve_OA_access_token(SECRET_KEY)
+access_token = oa.access_token
 locations = get_locations(access_token)
 
 print(f"Nombre total de lieux: {len(locations)}")

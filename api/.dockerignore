@@ -1,7 +1,7 @@
-secret_token.json
-.venv
+**secret_token.json
+**.venv
 .vscode
-__pycache__
-.env
+**__pycache__
+**.env
 README.md
-auth.db
+**auth.db

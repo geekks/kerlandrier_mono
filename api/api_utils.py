@@ -9,21 +9,19 @@ import bcrypt
 from datetime import datetime, timedelta
 import pytz
 import logging
-from .api_types import  OpenAgendaEvent
+from api.script.libs.oa_types import  OpenAgendaEvent
 
-from .configuration import config
-from .db import db_path
+from api.script.configuration import config
+from api.configuration import configAPI
+from api.db import db_path
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-OA_TOKEN_FILE_NAME = "secret_token.json"
 AGENDA_UID = config.AGENDA_UID
-OA_ACCESS_TOKEN_URL = config.ACCESS_TOKEN_URL
 OA_BASE_URL = config.OA_BASE_URL
 OA_PUBLIC_KEY = config.OA_PUBLIC_KEY
-OA_SECRET_KEY = config.OA_SECRET_KEY.get_secret_value()
-JWT_SECRET = config.JWT_SECRET.get_secret_value()
+JWT_SECRET = configAPI.JWT_SECRET.get_secret_value()
 JWT_ALGORITHM = "HS256"
 KAL_LOCATION_UID = config.KAL_LOCATION_UID
 TBD_LOCATION_UID=config.TBD_LOCATION_UID
@@ -33,53 +31,6 @@ db: sqlite3.Connection = sqlite3.connect(db_path)
 def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
-
-async def retrieve_OA_access_token():
-    # Check if token file exists and read it
-    if os.path.exists(OA_TOKEN_FILE_NAME):
-        try:
-            with open(OA_TOKEN_FILE_NAME, "r", encoding='utf8') as token_file:
-                token_data = json.load(token_file)
-                if (
-                    token_data
-                    and token_data.get("access_token")
-                    and token_data.get("endate")
-                    and (token_data["endate"] - round(time.time()*1000)) > 0
-                ):
-                    return token_data["access_token"]
-        except json.JSONDecodeError:
-            print("Error reading token file: Corrupted file")
-
-    # Else, request a new token
-    print("Request a new token and save it in secret_token.json")
-    headers = {
-        "Content-Type": "application/json",
-    }
-    body = {
-        "grant_type": "client_credentials",
-        "code": OA_SECRET_KEY,
-    }
-
-    try:
-        oauth_response = requests.post(OA_ACCESS_TOKEN_URL, json=body, headers=headers)
-        oauth_response.raise_for_status()
-        
-        if oauth_response.status_code >= 200 and oauth_response.status_code <= 299:
-            # Save token to local_storage (simulating a file save)
-            token_data = {
-            "access_token": oauth_response.json().get("access_token"),
-            'endate': int(time.time()) + oauth_response.json()['expires_in'] - 600,  # 50m à partir de maintenant
-            }
-            with open(OA_TOKEN_FILE_NAME, "w") as token_file:
-                json.dump(token_data, token_file)
-                
-            return token_data["access_token"]
-        
-    except requests.RequestException as exc:
-        print("Error retrieving access token:", exc)
-
-    print("[Retrieve accessToken] Error - no access token retrieved")
-    return None
 
 async def get_event_keywords(event_uid: str | int):
     uid = str(event_uid)

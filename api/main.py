@@ -1,8 +1,11 @@
 from typing import Optional, Union
 
 import os
-from .api_utils import retrieve_OA_access_token, get_event_keywords, patch_event, generate_token, verify_token, db, get_user_by_username, verify_password
-from .db import initialize_database, db_path
+from api.api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password
+from api.script.libs.HttpRequests import patch_event
+from api.script.configuration import oa
+
+from api.db import initialize_database, db_path
 from fastapi import FastAPI, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import List
@@ -98,11 +101,13 @@ async def generates_token(current_user: dict
                         = Depends(get_current_user)):
     print(current_user)
     try:
-        access_token = await retrieve_OA_access_token()
+        access_token = oa.access_token
         if (access_token == None):
             return {"success": False, "message": "No access token"}
         else:
-            return {"success": True, "message": "Access token retrieved successfully"}
+            return {"success": True,
+                    "access_token": access_token,
+                    "message": "Access token retrieved successfully"}
     except Exception as e:
         return {"success": False, "message": str(e)}
     
@@ -116,7 +121,7 @@ async def generates_token(current_user: dict
 # async def update_event(request: PatchKeywordRequest, current_user: dict = Depends(get_current_user)):
 async def update_event(request: PatchKeywordRequest):
     try:
-        access_token = await retrieve_OA_access_token()
+        access_token = oa.access_token
         print("access_token", access_token)
     except Exception as e:
         return {"success": False, "data": [], "message": str(e)}
@@ -142,7 +147,7 @@ async def update_event(request: PatchKeywordRequest):
 # async def update_events(request: PatchRequest, current_user: dict = Depends(get_current_user)):
 async def update_events(request: PatchRequest):
     try:
-        access_token = await retrieve_OA_access_token()
+        access_token = await oa.access_token
         print("access_token", access_token)
     except Exception as e:
         return {"success": False, "data": [], "message": str(e)}

@@ -5,23 +5,15 @@ import json
 
 import datetime
 from pprint import pprint
-from configuration import config_SCRIPT
 
-from libs.ICS_utils import pull_upcoming_ics_events
-from libs.getOaLocation import get_or_create_oa_location
-from libs.HttpRequests import get_events
-from libs.HttpRequests import( 
-        retrieve_OA_access_token,
-        create_event
-        )
+from .configuration import config, oa
+
+from .libs.ICS_utils import pull_upcoming_ics_events
+from .libs.getOaLocation import get_or_create_oa_location
+from .libs.HttpRequests import get_events, create_event
+
 import argparse
 
-PUBLIC_KEY = config_SCRIPT.OA_PUBLIC_KEY
-SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
-ICS_PRIVATE_URL_KLR_FB = config_SCRIPT.ICS_PRIVATE_URL_KLR_FB.get_secret_value()
-URL_AGENDA_ATELIERS_KAL = config_SCRIPT.URL_AGENDA_ATELIERS_KAL
-KAL_LOCATION_UID = config_SCRIPT.KAL_LOCATION_UID
-TBD_LOCATION_UID=config_SCRIPT.TBD_LOCATION_UID
 
 now=datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -42,13 +34,15 @@ def import_ics(ics_url:str):
     eventsOa: list=get_events(params={"relative[0]": "upcoming", "relative[1]": "current",
                                     "detailed": 1,
                                     "monolingual": "fr",
-                                    "state[0]":2, "state[1]":1, "state[2]":0, "state[3]":-1}) # get refused/removed events to avoid recreating it
+                                    "state[0]":2, "state[1]":1, "state[2]":0, "state[3]":-1} # get refused/removed events to avoid recreating it,
+                            , oa_public_key=config.OA_PUBLIC_KEY
+                            )
     print(f"Total number of future events on Oa : {len(eventsOa)}\n")
     uidsExterneOa = [event["uid-externe"] for event in eventsOa if "uid-externe" in event]
     
     new_events_nbr=0
     logContent=[]
-    access_token = retrieve_OA_access_token(SECRET_KEY)
+    access_token = oa.access_token
     for i, ics_event in enumerate(ics_events):
         try:
             event_title = ics_event.get('title').get('fr')
@@ -73,8 +67,8 @@ def import_ics(ics_url:str):
             
             # Konk Ar Lab case
             if "konkarlab.bzh" in ics_url:
-                if ics_event.get('locationUid') == TBD_LOCATION_UID:
-                    ics_event.update( {"locationUid": KAL_LOCATION_UID} )
+                if ics_event.get('locationUid') == config.TBD_LOCATION_UID:
+                    ics_event.update( {"locationUid": config.KAL_LOCATION_UID} )
                 ics_event['title']['fr'] = ics_event.get('title').get('fr').replace("[KAL] ", "")
                 if (ics_event["onlineAccessLink"] == None) or ( ics_event["onlineAccessLink"].lower() in ("","none", "null")):
                     ics_event["onlineAccessLink"] = "https://www.konkarlab.bzh/infos-pratiques/agenda/"
@@ -119,12 +113,11 @@ if __name__ == "__main__":
     args=parser.parse_args()
     match args.URL:
         case None | ""|"facebook"|"fb":
-            icsUrl=ICS_PRIVATE_URL_KLR_FB
+            icsUrl=config.ICS_PRIVATE_URL_KLR_FB
         case "kal"|"konkarlab":
-            icsUrl=URL_AGENDA_ATELIERS_KAL
+            icsUrl=config.URL_AGENDA_ATELIERS_KAL
         case str() as url if url.startswith('https://'):
             icsUrl=url
         case _:
             exit(1,"Error with URL argument")
     import_ics(icsUrl)
-exit(0)

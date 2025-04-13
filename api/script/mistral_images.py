@@ -25,14 +25,14 @@ from libs.utils import get_end_date, showDiff,encodeImage64
 from libs.HttpRequests import create_event, retrieve_OA_access_token
 from libs.getOaLocation import get_or_create_oa_location
 
-from configuration import config_SCRIPT
+from configuration import config,oa
 
 # Main Program
-MISTRAL_PRIVATE_API_KEY = config_SCRIPT.MISTRAL_PRIVATE_API_KEY.get_secret_value()
-SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
-IMGBB_PRIVATE_API_KEY=config_SCRIPT.IMGBB_API_TOKEN.get_secret_value()
-IMGBB_API_URL=config_SCRIPT.IMGBB_API_URL
-env= config_SCRIPT.environment
+MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY
+ACCESS_TOKEN = oa.access_token
+IMGBB_PRIVATE_API_KEY=config.IMGBB_PRIVATE_API_KEY
+IMGBB_API_URL=config.IMGBB_API_URL
+ENV= config.ENV_DEV
 
 # Define a class to contain the Mistral answer to a formatted JSON
 class mistralEvent(BaseModel):
@@ -124,9 +124,8 @@ def getMistralImageEvent(image_path:str=None, url:str = None)->mistralEvent:
     )
     return chat_response.choices[0].message.parsed
 
-def postMistralEventToOa(event: mistralEvent, image_url: str = None):
+def postMistralEventToOa(event: mistralEvent,access_token: str = ACCESS_TOKEN,  image_url: str = None):
     
-    access_token = retrieve_OA_access_token(SECRET_KEY)
     OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
 
     # Fixe la timezone à Paris pour prendre en compte l'heure d'été/hivert
@@ -164,7 +163,7 @@ def postMistralEventToOa(event: mistralEvent, image_url: str = None):
         pprint(f"Error: {e}")
         return None
         
-def postImageToImgbb(image_path: str) -> str|None:
+def postImageToImgbb(image_path: str, imgbb_api_url: str = IMGBB_API_URL, imgbb_api_key: str = IMGBB_PRIVATE_API_KEY) -> str|None:
     """
     Uploads an image to imgbb and returns the URL of the uploaded image.
 
@@ -185,11 +184,11 @@ def postImageToImgbb(image_path: str) -> str|None:
     try:
         payload = {
             "expiration": 600,
-            "key": IMGBB_PRIVATE_API_KEY,
+            "key": imgbb_api_key,
             "name": args.fileName,
             "image": encodeImage64(image_path)
         }
-        response_imgbb = requests.post(IMGBB_API_URL, data=payload)
+        response_imgbb = requests.post(imgbb_api_url, data=payload)
         image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
         return image_url
     except Exception as e:

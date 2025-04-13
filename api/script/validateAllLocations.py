@@ -2,16 +2,14 @@
 Valide tous les lieux ('location') d'OpenAgenda ("state": 1 )
 """
 
-from libs.HttpRequests import (  retrieve_OA_access_token,
+from libs.HttpRequests import (  
                             get_locations,
                             patch_location)
 
-from configuration import config_SCRIPT
-AGENDA_UID = config_SCRIPT.AGENDA_UID
-OA_SECRET_KEY = config_SCRIPT.OA_SECRET_KEY.get_secret_value()
+from configuration import  oa
 
 def validate_locations():
-    accessToken = retrieve_OA_access_token(OA_SECRET_KEY)
+    accessToken = oa.access_token
     allLocations= get_locations(accessToken)
 
     if allLocations and len(allLocations) > 0:

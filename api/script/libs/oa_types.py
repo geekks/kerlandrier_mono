@@ -163,8 +163,39 @@ class OpenAgendaEvent:
 
 
 
-
 class OpenAgendaEventsResponse:
-    def __init__(self, total: int, events: List[OpenAgendaEvent]):
+    def __init__(self, 
+                total: int, 
+                events: List[OpenAgendaEvent]):
         self.total = total
         self.events = events
+
+
+
+class OA_Connection:
+    """
+    Represents a connection established with the OpenAgenda API.
+
+    Attributes:
+        public_key (str): The public key for the OpenAgenda API.
+        secret_key (str): The secret key for the OpenAgenda API.
+        access_token_url (str): The URL to obtain the access token.
+        agenda_uid (str): The unique identifier for the agenda.
+        tbd_location_uid (str): The unique identifier for the location "To Be Defined" (TBD), which is a special location used when the exact location of an event is yet to be determined.
+        access_token (str): The access token obtained from secret_key via the OpenAgenda API. Expires after 1 hour.
+        access_token_expiration (datetime): The expiration date of the access token, in  Unix epoch time format (Ex: 1744211274)
+    """
+    def __init__(self,
+                public_key: str,
+                secret_key: str,
+                oa_api_url: str = "https://api.openagenda.com/v2/",
+                agenda_uid: str = "44891982",
+                tbd_location_uid: str = "11634941",
+        ):
+        self.public_key = public_key
+        self.secret_key = secret_key
+        self.oa_api_url = oa_api_url
+        self.agenda_uid = agenda_uid
+        self.tbd_location_uid = tbd_location_uid
+        self.access_token = None
+        self.access_token_expiration = None
