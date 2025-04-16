@@ -144,7 +144,8 @@ def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str
         if response['event']['uid']:
                 msg.good("Event created !")
                 msg.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
-                return response['event']
+                oaEvent = OpenAgendaEvent.from_json(response['event'])
+                return  oaEvent
         else:
             msg.fail( f"Problem for {event.titre}" )
             msg.fail( f"Response: {response}" )
@@ -195,14 +196,19 @@ def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:s
             image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
             response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
             msg.info(response_mistral)
-            postMistralEventToOa(response_mistral, access_token, image_url)
+            OAEvent = postMistralEventToOa(response_mistral, access_token, image_url)
         elif url:
             image_url=url
-            response_mistral=getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
+            response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
             msg.info(response_mistral)
-            postMistralEventToOa(response_mistral, image_url)
+            OAEvent= postMistralEventToOa(response_mistral, image_url)
         else:
             print("Enter a valid image path or url")
+            exit(1)
+        if OAEvent is not None :
+                return OAEvent
+        else:
+            msg.fail( f"Problem with posting to Mistral img file ${image_path} or url ${url}" )
             exit(1)
     
 # if __name__ == "__main__":

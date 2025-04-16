@@ -1,10 +1,12 @@
 from typing import Optional, Union
 
-import os, pprint
-from api.api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password
+import os
+from pprint import pprint
+from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password
 from api.script.libs.HttpRequests import patch_event
 from api.script.configuration import config, oa
-from api.script.mistral_images import getMistralImageEvent, postImageToImgbb, postMistralEventToOa
+from api.script.mistral_images import getMistralImageEvent, postImageToImgbb, postMistralEventToOa, mistralEvent
+from api.script.libs.oa_types import OpenAgendaEvent
 
 from api.db import initialize_database, db_path
 from fastapi import FastAPI, Depends, HTTPException, Header, File, UploadFile
@@ -20,6 +22,7 @@ if not os.path.exists(db_path):
 app = FastAPI()
 
 from fastapi.middleware.cors import CORSMiddleware
+from api.script.libs.oa_types import OpenAgendaEvent
 
 app.add_middleware(
     CORSMiddleware,
@@ -177,10 +180,10 @@ async def update_events(request: PatchRequest):
         summary="Upload an image file of a poster with event",
         description="This endpoint allows authenticated users to upload an image file to be anlyze with Mistral to create an OA event.",
         response_model=dict)
-async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+async def upload_file(file: UploadFile, current_user: dict = Depends(get_current_user)):
     # Define the directory to save the uploaded file
     try:
-        upload_dir = "uploads"
+        upload_dir = "images"
         if not os.path.exists(upload_dir):
             os.makedirs(upload_dir)
 
@@ -193,11 +196,11 @@ async def upload_file(file: UploadFile = File(...), current_user: dict = Depends
         return {"success": False, "message": "Error while saving image file"}
 
     try:
-        image_url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY, )
-        response_mistral = getMistralImageEvent(config.MISTRAL_PRIVATE_API_KEY, image_path=file_path)
+        image_url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
+        response_mistral:mistralEvent = getMistralImageEvent(config.MISTRAL_PRIVATE_API_KEY.get_secret_value(), image_path=file_path)
         print("Mistral answer:")
         pprint(response_mistral.model_dump(mode='json'))
-        OAevent = postMistralEventToOa(response_mistral, access_token=oa.access_token, image_url= image_url)
+        OAevent:OpenAgendaEvent = postMistralEventToOa(response_mistral, access_token=oa.access_token, image_url= image_url)
         if OAevent.uid:
             event_url= f"https://openagenda.com/fr/{config.AGENDA_SLUG}/events/{OAevent.slug}"
             print(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")

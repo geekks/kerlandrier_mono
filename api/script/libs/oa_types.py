@@ -12,10 +12,16 @@ Classes:
 from typing import List, Dict, Optional, TypedDict, Any
 
 class Timing:
+    def __init__(self, begin: str, end: str):
+        self.begin = begin
+        self.end = end
     begin: str
     end: str
 
 class MultilingualEntry(TypedDict, total=False):
+    def __init__(self, fr: str, en: Optional[str]):
+        self.fr = fr
+        self.end = en
     fr: str
     en: Optional[str]
 
@@ -55,8 +61,8 @@ class Location:
     def __init__(self, uid: str, name: str, address: str, access: MultilingualEntry, description: MultilingualEntry,
                 image: dict, imageCredits: str, slug: str, city: str, department: str, region: str,
                 postalCode: str, insee: str, countryCode: str, district: str, latitude: float, longitude: float,
-                updatedAt: str, createdAt: str, website: str, email: str, phone: str, links: List[str],
-                timezone: str, extId: str, state: int):
+                updatedAt: str, createdAt: str, website: str, email: str,  links: List[str],
+                timezone: str, state: int, extId: str= None, phone: str = None):
         self.uid = uid
         self.name = name
         self.address = address
@@ -137,7 +143,7 @@ class OpenAgendaEvent:
                 locationUid: dict,
                 timezone: str,
                 timings: List[Timing]):
-                
+
         self.uid = uid
         self.slug = slug
         self.title = title
@@ -161,9 +167,85 @@ class OpenAgendaEvent:
         self.locationUid = locationUid
         self.timezone = timezone
 
+    @classmethod
+    def from_json(cls, data: dict) -> 'OpenAgendaEvent':
+        location_data = data['location']
+        try:
+            location = Location(
+                uid=location_data['uid'],
+                name=location_data['name'],
+                address=location_data['address'],
+                access=location_data['access'],
+                description=location_data['description'],
+                image=location_data['image'],
+                imageCredits=location_data['imageCredits'],
+                slug=location_data['slug'],
+                city=location_data['city'],
+                department=location_data['department'],
+                region=location_data['region'],
+                postalCode=location_data['postalCode'],
+                insee=location_data['insee'],
+                countryCode=location_data['countryCode'],
+                district=location_data['district'],
+                latitude=location_data['latitude'],
+                longitude=location_data['longitude'],
+                updatedAt=location_data['updatedAt'],
+                createdAt=location_data['createdAt'],
+                website=location_data['website'],
+                email=location_data['email'],
+                phone=location_data['phone'],
+                links=location_data['links'],
+                timezone=location_data['timezone'],
+                state=location_data['state']
+            )
+        except KeyError as e:
+            raise ValueError(
+                f"Missing key in location data: {e}"
+            ) from e
+        except TypeError as e:
+            raise ValueError(
+                f"Invalid type in location data: {e}"
+            ) from e
+        except Exception as e:
+            raise ValueError(
+                f"Error creating Location object: {e}"
+            ) from e
+
+        timings = [Timing(begin=t['begin'], end=t['end']) for t in data['timings']]
+        longDescription = MultilingualEntry( fr= data['longDescription']['fr'], en= data['longDescription'].get('en'))
+        description=MultilingualEntry( fr = data['description']['fr'], en= data['description'].get('en'))
+
+        try:
+            return cls(
+                uid=data['uid'],
+                slug=data['slug'],
+                title=data['title'],
+                onlineAccessLink=data['onlineAccessLink'],
+                attendanceMode=data['attendanceMode'],
+                status=data['status'],
+                keywords=data['keywords'],
+                location=location,
+                firstTiming=timings[0],
+                nextTiming=timings[0],
+                lastTiming=timings[-1],
+                longDescription=longDescription,
+                description=description,
+                image=data['image'],
+                imageCredits=data['imageCredits'],
+                registration=data['registration'],
+                accessibility=data['accessibility'],
+                age=data['age'],
+                locationUid=data['locationUid'],
+                timezone=data['timezone'],
+                timings=timings
+            )
+        except Exception as e:
+            raise ValueError(
+                f"Error creating OpenAgendaEvent object: {e}"
+            ) from e
 
 
-class OpenAgendaEventsResponse:
+class OpenAgendaEvents:
     def __init__(self, 
                 total: int, 
                 events: List[OpenAgendaEvent]):
