@@ -42,3 +42,13 @@ pytz
 logging
 gspread
 dateparser
+icalendar
+inquirer
+python-slugify
+wasabi
+bs4
+thefuzz
+mistralai
+Pillow==11.*
+playwright>=1.5
+pandas==2.*

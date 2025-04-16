@@ -21,10 +21,10 @@ from wasabi import color,msg
 from dateparser import parse
 
     
-from libs.oa_types import OpenAgendaEvent
-from libs.utils import get_end_date, showDiff,encodeImage64
-from libs.HttpRequests import create_event, retrieve_OA_access_token
-from libs.getOaLocation import get_or_create_oa_location
+from .libs.oa_types import OpenAgendaEvent
+from .libs.utils import get_end_date, showDiff,encodeImage64
+from .libs.HttpRequests import create_event, retrieve_OA_access_token
+from .libs.getOaLocation import get_or_create_oa_location
 
 # Define a class to contain the Mistral answer to a formatted JSON
 class mistralEvent(BaseModel):
@@ -151,7 +151,7 @@ def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str
             return None
     except Exception as e:
         msg.fail(f"Error sending event to OpenAgenda from Mistral analysis")
-        msg.text( f"File: {image_path}. Event title '{event.titre}'")
+        msg.text( f"URL: {image_url}. Event title '{event.titre}'")
         pprint(f"Error: {e}")
         return None
         
@@ -177,7 +177,7 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         payload = {
             "expiration": 600,
             "key": imgbb_api_key,
-            "name": args.fileName,
+            "name": os.path.basename(image_path),
             "image": encodeImage64(image_path)
         }
         response_imgbb = requests.post(imgbb_api_url, data=payload)
@@ -188,70 +188,39 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         print(e)
         return None
 
-if __name__ == "__main__":
-    parser=argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
-    group.add_argument( "--url", "--URL", "--Url",help="URL of the image to analyse")
-    group.add_argument( "--test",nargs='?', const=True,help="Test command with {TEST_FILE_NAME}")
-    args=parser.parse_args()
-
-    if args.fileName: # upload image to imgbb and get url
-        image_url = postImageToImgbb(args.filename)
-        response_mistral = getMistralImageEvent(image_path=args.filename)
-        msg.info(response_mistral)
-        postMistralEventToOa(response_mistral, image_url)
-    elif args.url:
-        image_url=args.url
-        response_mistral=getMistralImageEvent(url=image_url)
-        msg.info(response_mistral)
-        postMistralEventToOa(response_mistral, image_url)
-
-    # Test Part of the Program
-    ## TO DO : move tests to a dedicated test folder
-    elif args.test:
-        TEST_FILE_NAME = "TEST_temps_foret.jpg"
-        TEST_FILE_ANSWER = {"date_debut": "2025-01-31T20:00:00+01:00",
-                            "description": ["documentaire","France","forêt",
-                                            "bûcheron","scierie","débat","bois"],
-                            "description_courte": ["Documentaire", "débat", "forêt"],
-                            "duree": "0",
-                            "heure_debut": "20:00",
-                            "lieu": "Cinéville de CONCARNEAU",
-                            "titre": "Le Temps des forêts"}
-        msg.info(f"Testing with {TEST_FILE_NAME}")
-        image_path = os.path.join(os.path.dirname(__file__) , "sources", TEST_FILE_NAME)
-        response_mistral=getMistralImageEvent(image_path)
-        response_json = response_mistral.model_dump(mode='json')
-        error=0
-        for key in response_json:
-            testPhrase=TEST_FILE_ANSWER.get(key)
-            answerPhrase=response_json.get(key)
-            # test value is a string
-            if ( isinstance(testPhrase, str) and testPhrase.lower() not in str(answerPhrase).lower()):
-                msg.fail(f"Test failed for:{key}")
-                msg.info("Differences in answer vs expected:")
-                print( showDiff(str(TEST_FILE_ANSWER.get(key)),
-                                str(response_json.get(key))))
-                error+=1
-            # test values are an array of string (made dor long text like "description")
-            if isinstance(testPhrase, list):
-                for phrase in  TEST_FILE_ANSWER.get(key):
-                    if str(phrase).lower() not in str(response_json.get(key)).lower():
-                        msg.fail(f"Test failed for:{key}")
-                        msg.info(f"Phrase {color(str(phrase), fg=120)} {color("not found in answer:", fg=4)} \
-                                {color(str(response_json.get(key)), fg=80)}",
-                                spaced = False
-                                )
-                        error+=1
-
-        if error == 0:
-            msg.good(f"Test passed for all keys !")
+def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:str=None, url:str = None, imgbb_api_url:str=None, imgbb_api_key:str=None):
+        if (url is not None) and (image_path is not None):
+            exit(1)
+        if image_path: # upload image to imgbb and get url
+            image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
+            response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
+            msg.info(response_mistral)
+            postMistralEventToOa(response_mistral, access_token, image_url)
+        elif url:
+            image_url=url
+            response_mistral=getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
+            msg.info(response_mistral)
+            postMistralEventToOa(response_mistral, image_url)
         else:
-            msg.warn(f"Test failed for {error} of {len(TEST_FILE_ANSWER) + len(TEST_FILE_ANSWER.get("description")) - 1} keys")
+            print("Enter a valid image path or url")
+            exit(1)
+    
+# if __name__ == "__main__":
+#     parser=argparse.ArgumentParser()
+#     group = parser.add_mutually_exclusive_group(required=True)
+#     group.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
+#     group.add_argument( "--url", "--URL", "--Url",help="URL of the image to analyse")
+#     group.add_argument( "--test",nargs='?', const=True,help="Test command with {TEST_FILE_NAME}")
+#     args=parser.parse_args()
 
-    else:
-        msg.fail(f"Please give a valid file name. --help for more informations")
-        exit(1)
+#     if args.fileName: # upload image to imgbb and get url
+#         image_url = postImageToImgbb(args.filename)
+#         response_mistral = getMistralImageEvent(image_path=args.filename)
+#         msg.info(response_mistral)
+#         postMistralEventToOa(response_mistral, image_url)
+#     elif args.url:
+#         image_url=args.url
+#         response_mistral=getMistralImageEvent(url=image_url)
+#         msg.info(response_mistral)
+#         postMistralEventToOa(response_mistral, image_url)
 
-    exit(0)

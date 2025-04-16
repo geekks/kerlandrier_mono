@@ -45,17 +45,21 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
                                             flags=re.IGNORECASE
                                             )
     # TO DO: add this specific cases to a config file
-    replacement = [
+    try:
+        replacement = [
         ("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé"),
         ("ZA de Colguen Rue Aimé Césaire", "Brasserie Tri Martolod Concarneau"),
         ("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc"),
         ("Brasserie de Bretagne, Le Bek", "Le Bek"),
         ("Rue de Colguen", "Cinéville, Rue de Colguen"),
         ("LE CAFE LOCAL", "Le Café Local, Combrit"),
-        ("3e lieu - l'Archipel", "l'Archipel, Fouenant")
+        ("3e lieu - l'Archipel", "l'Archipel, Fouenant"),
+        ('  Finistère  France', "Concarneau (à préciser)")
     ]
-    for old, new in replacement:
-        locationPatternToSpace = locationPatternToSpace.replace(old, new)
+        for old, new in replacement:
+            locationPatternToSpace = locationPatternToSpace.replace(old, new)
+    except Exception as e:
+        logger.error(f"Error in Location replacement: {e}")
     
     optimized_searched_location = locationPatternToSpace
     logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
