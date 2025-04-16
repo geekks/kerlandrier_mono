@@ -1,69 +1,96 @@
-# TO DO: launch differents scripts from this main file with prompt or arguments
-
+# manual_scripts.py
 from script.import_ics import import_ics
 from script.updateLocationsDescription import udpateLocationsDescription
-from script.configuration import config,oa
+from script.configuration import config, oa
 from script.mistral_images import postMistralEvent
 
-
+import argparse
 import inquirer
 
-# import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
-
-# udpateLocationsDescription(oa.access_token)
-
-# fileName="images/sources/TEST_temps_foret.jpg"
-# postMistralEvent(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
-#                 access_token=oa.access_token,
-#                 image_path=fileName,
-#                 imgbb_api_url=config.IMGBB_API_URL,
-#                 imgbb_api_key=config.IMGBB_PRIVATE_API_KEY.get_secret_value()
-#                 )
-
 def main():
-    questions = [
-        inquirer.List('script',
-                    message="Which script would you like to run?",
-                    choices=['import_ics', 'updateLocationsDescription', 'postMistralEvent']),
-        inquirer.List('source',
-                    message="Do you want to send an URL or a local image To Mistral ?",
-                    choices=['URL', 'File'],
-                    ignore=lambda x: x['script'] != 'postMistralEvent' ),
-        inquirer.Path('file',
-                    message="Enter the file path for postMistralEvent",
-                    path_type=inquirer.Path.FILE,
-                    exists=True,
-                    ignore=lambda x: (x['script'] != 'postMistralEvent' or  x['source'] == 'URL')),
-        inquirer.Text('url',
-                    message="Enter the URL for postMistralEvent",
-                    ignore=lambda x:  (x['script'] != 'postMistralEvent' or  x['source'] == 'File'))
-    ]
+    parser = argparse.ArgumentParser(description="Run different scripts with arguments.")
+    parser.add_argument('script', nargs='?', choices=['import_ics', 'updateLocationsDescription', 'postMistralEvent'],
+                        help="The script to run.")
+    parser.add_argument('--file', type=str, help="File path for postMistralEvent if source is File.")
+    parser.add_argument('--url', type=str, help="URL for postMistralEvent if source is URL.")
 
-    answers = inquirer.prompt(questions)
+    args = parser.parse_args()
 
-    if answers['script'] == 'import_ics':
-        import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
-    elif answers['script'] == 'updateLocationsDescription':
-        udpateLocationsDescription(oa.access_token)
-    elif answers['script'] == 'postMistralEvent':
-        MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
-        access_token=oa.access_token
-        IMGBB_API_URL=config.IMGBB_API_URL
-        IMGBB_PRIVATE_API_KEY=config.IMGBB_PRIVATE_API_KEY.get_secret_value()
-        if answers['source'] == 'File':
-            postMistralEvent(
-                MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
-                access_token=access_token,
-                image_path=answers['file'],
-                imgbb_api_url=IMGBB_API_URL,
-                imgbb_api_key=IMGBB_PRIVATE_API_KEY
-            )
-        elif answers['source'] == 'URL':
-            postMistralEvent(
-                MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
-                access_token=access_token,
-                url=answers['url'],
-            )
+    if args.script:
+        # Use argparse for command-line arguments
+        if args.script == 'import_ics':
+            import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
+        elif args.script == 'updateLocationsDescription':
+            udpateLocationsDescription(oa.access_token)
+        elif args.script == 'postMistralEvent':
+            MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
+            access_token = oa.access_token
+            IMGBB_API_URL = config.IMGBB_API_URL
+            IMGBB_PRIVATE_API_KEY = config.IMGBB_PRIVATE_API_KEY.get_secret_value()
+
+            if args.file is not None and args.url is not None:
+                parser.error("Cannot use both --file and --url arguments simultaneously.")
+            if args.file is not None:
+                postMistralEvent(
+                    MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
+                    access_token=access_token,
+                    image_path=args.file,
+                    imgbb_api_url=IMGBB_API_URL,
+                    imgbb_api_key=IMGBB_PRIVATE_API_KEY
+                )
+            elif args.url is not None:
+                postMistralEvent(
+                    MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
+                    access_token=access_token,
+                    url=args.url,
+                )
+            else:
+                parser.error("The --source argument is required for postMistralEvent.")
+    else:
+        # Use inquirer for interactive prompts
+        questions = [
+            inquirer.List('script',
+                        message="Which script would you like to run?",
+                        choices=['import_ics', 'updateLocationsDescription', 'postMistralEvent']),
+            inquirer.List('source',
+                        message="Do you want to send an URL or a local image To Mistral ?",
+                        choices=['URL', 'File'],
+                        ignore=lambda x: x['script'] != 'postMistralEvent' ),
+            inquirer.Path('file',
+                        message="Enter the file path for postMistralEvent",
+                        path_type=inquirer.Path.FILE,
+                        exists=True,
+                        ignore=lambda x: (x['script'] != 'postMistralEvent' or  x['source'] == 'URL')),
+            inquirer.Text('url',
+                        message="Enter the URL for postMistralEvent",
+                        ignore=lambda x:  (x['script'] != 'postMistralEvent' or  x['source'] == 'File'))
+        ]
+
+        answers = inquirer.prompt(questions)
+
+        if answers['script'] == 'import_ics':
+            import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
+        elif answers['script'] == 'updateLocationsDescription':
+            udpateLocationsDescription(oa.access_token)
+        elif answers['script'] == 'postMistralEvent':
+            MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
+            access_token = oa.access_token
+            IMGBB_API_URL = config.IMGBB_API_URL
+            IMGBB_PRIVATE_API_KEY = config.IMGBB_PRIVATE_API_KEY.get_secret_value()
+            if answers['source'] == 'File':
+                postMistralEvent(
+                    MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
+                    access_token=access_token,
+                    image_path=answers['file'],
+                    imgbb_api_url=IMGBB_API_URL,
+                    imgbb_api_key=IMGBB_PRIVATE_API_KEY
+                )
+            elif answers['source'] == 'URL':
+                postMistralEvent(
+                    MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
+                    access_token=access_token,
+                    url=answers['url'],
+                )
 
 if __name__ == "__main__":
     main()
