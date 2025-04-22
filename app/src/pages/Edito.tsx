@@ -10,6 +10,8 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Chip, Tooltip } from "@mui/material";
+import Login from "../components/Login";
+import { CgSpinner } from "react-icons/cg";
 
 // react-query key for refetch management
 const EVENTS_QUERY_KEY = 'events';
@@ -25,7 +27,10 @@ const fetchEvents = async (): Promise<OpenAgendaEditoItem[]> => {
 const patchEvent = async ({ id, keywords }: { id: string, keywords: string[] }) => {
 	const response = await fetch(`${API_URL}/event/keywords`, {
 		method: 'PATCH',
-		headers: { 'Content-Type': 'application/json' },
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+		},
 		body: JSON.stringify({ uid: id, keywords }),
 	});
 
@@ -42,7 +47,7 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 	const queryClient = useQueryClient()
 
 	// react-query hook to PATCH data
-	const mutation = useMutation({
+	const saveKeywordsMutation = useMutation({
 		mutationFn: patchEvent,
 		onSuccess: (updatedEvent) => {
 			console.log("updatedEvent - ", updatedEvent);
@@ -57,22 +62,23 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 		}
 	});
 
-	// useCallback to avoird abusive re-render
+	// useCallback to avoid abusive re-render
 	const handleKeywordChange = useCallback((id: string, newKeywords: string[]) => {
 		queryClient.setQueryData([EVENTS_QUERY_KEY], (oldEvents: OpenAgendaEditoItem[]) =>
 			oldEvents.map((event: OpenAgendaEditoItem) =>
 				event.uid === id ? { ...event, keywords: newKeywords } : event
 			)
 		);
-	}, [queryClient]);
+		saveKeywordsMutation.reset();
+	}, [queryClient, saveKeywordsMutation]);
 
 
 	// useCallback to avoird abusive re-render
 	const handlePatchEvent = useCallback((event: OpenAgendaEditoItem) => {
 		if (event) {
-			mutation.mutate({ id: event.uid, keywords: event.keywords });
+			saveKeywordsMutation.mutate({ id: event.uid, keywords: event.keywords });
 		}
-	}, [mutation]);
+	}, [saveKeywordsMutation]);
 
 	const oaLink = `https://openagenda.com/fr/${OA_SLUG}/contribute/event/${event.uid}`;
 
@@ -136,12 +142,29 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 			/>
 			<div className="text-center">
 				<button
-					className="mt-2 px-5 py-2 text-teal-500 border border-teal-500 rounded-sm h-10 font-bold uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
+					className="m-2 px-5 py-2 text-teal-500 border border-teal-500 rounded-sm h-10 font-bold uppercase focus:outline-none focus:ring-2 focus:ring-teal-500"
 					onClick={() => handlePatchEvent(event)}
 					type="button"
 				>
-					Save
+					{saveKeywordsMutation.isPending ? <CgSpinner className="animate-spin" /> : 'Save'}
+					{saveKeywordsMutation.data && " (OK)"}
 				</button>
+				{saveKeywordsMutation.isError ? (
+					<>
+					<div className="text-red-500 text-sm mt-2">
+						{saveKeywordsMutation.error.message}
+					</div>
+					<div className="text-red-500 text-sm mt-2">
+						You should probably login again
+					</div>
+					<div className="text-red-500 text-sm mt-2">
+						Sorry about that
+					</div>
+					<div className="text-red-500 text-sm mt-2">
+						Really sorry
+					</div>
+					</>
+				) : null}
 			</div>
 		</div >
 	);
@@ -158,8 +181,12 @@ const EventList: React.FC = () => {
 	}
 
 	return (
+		<div className="text-center">
+
+		<Login/>
 		<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 			{events.map((event) => <EventCard key={event.uid} event={event} />)}
+		</div>
 		</div>
 	);
 };
