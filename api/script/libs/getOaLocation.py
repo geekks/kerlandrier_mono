@@ -34,34 +34,43 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         return None
     
     # 0) Use optimized searched, removing false positives and misleadings patterns
-    locationPatterneRemoved=re.sub(r'\b(?:concarneau|officiel|france |spectacles)\b',
+    searched_location=re.sub(r'\b(?:concarneau|finistère|france|officiel|spectacles)\b',
                                             '',
                                             searched_location,
                                             flags=re.IGNORECASE
                                             )
-    locationPatternToSpace=re.sub(r'[-,():]',
-                                            ' ',
-                                            locationPatterneRemoved,
+    searched_location=re.sub(r'[-,():]',' ',
+                                            searched_location,
                                             flags=re.IGNORECASE
                                             )
+    # Postal code Finistere
+    searched_location=re.sub(r'\b29\d{3}\b','',searched_location)
+    # Remove double spaces
+    searched_location=searched_location.strip()
+    searched_location=re.sub(r'  ',     ' ',searched_location)
+    
     # TO DO: add this specific cases to a config file
     try:
         replacement = [
-        ("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé"),
+        ("Boulevard de la Gare Quimperlé", "La Loco Quimperlé"),
         ("ZA de Colguen Rue Aimé Césaire", "Brasserie Tri Martolod Concarneau"),
-        ("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc"),
-        ("Brasserie de Bretagne, Le Bek", "Le Bek"),
+        ("Rue Jacques Prévert Trégunc", "Le Sterenn Trégunc"),
+        ("Brasserie de Bretagne Le Bek", "Le Bek"),
         ("Rue de Colguen", "Cinéville, Rue de Colguen"),
         ("LE CAFE LOCAL", "Le Café Local, Combrit"),
-        ("3e lieu - l'Archipel", "l'Archipel, Fouenant"),
-        ('  Finistère  France', "Concarneau (à préciser)")
+        ("3e lieu l'Archipel", "l'Archipel, Fouenant"),
+        ("1 place Jean Jaures","Le livre & la plume"),
+        ("CAC Scènes", "Le CAC")
     ]
         for old, new in replacement:
-            locationPatternToSpace = locationPatternToSpace.replace(old, new)
+            searched_location = searched_location.replace(old, new)
     except Exception as e:
         logger.error(f"Error in Location replacement: {e}")
+        
+    if searched_location in ["", " ", "  ", "None", "Null", "Concarneau", None]:
+        searched_location = "Concarneau (lieu à préciser)" 
     
-    optimized_searched_location = locationPatternToSpace
+    optimized_searched_location = searched_location
     logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
     OaLocationsIndex = {}
