@@ -1,6 +1,4 @@
-import os, sys
 import time
-import json
 import requests
 
 import jwt
@@ -10,6 +8,8 @@ from datetime import datetime, timedelta
 import pytz
 import logging
 from api.script.libs.oa_types import  OpenAgendaEvent
+from api.script.mistral_images import getMistralImageEvent, postMistralEventToOa, mistralEvent
+
 
 from api.script.configuration import config
 from api.configuration import configAPI
@@ -105,3 +105,33 @@ def get_user_by_username(db: sqlite3.Connection, username:str):
     cursor = db.cursor()
     cursor.execute("SELECT id, password FROM users WHERE username = ?", (username,))
     return cursor.fetchone()
+
+def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str, access_token: str, url: str) -> dict:
+    try:
+        response_mistral:mistralEvent = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY, url=url)
+    except Exception as e:
+        logging.error("Error generating event on Mistral",e)
+        return {"success": False, "message": "Error generating event on Mistral"}
+    logging.info("Mistral answer:",response_mistral.model_dump(mode='json'))
+    try:
+        OAevent:OpenAgendaEvent = postMistralEventToOa(response_mistral, access_token=access_token, image_url= url)
+    except Exception as e:
+        logging.error("Error generating event on OpenAgenda",e)
+        return {"success": False, "message": "Error generating event on OpenAgenda"}
+    try:
+        event_url= f"https://openagenda.com/fr/{config.AGENDA_SLUG}/events/{OAevent.slug}"
+        logging.info(f"OA event created: {OAevent.title} at {OAevent.location.name}")
+        return {"success": True, 
+                "message": "OA event created successfully", 
+                "event":{
+                    "url": event_url,
+                    "name": OAevent.title,
+                    "location": OAevent.location.name,
+                    "description": OAevent.description.fr,
+                    "start": OAevent.firstTiming.begin, 
+                    "end": OAevent.firstTiming.end
+                    }
+                }
+    except:
+        logging.error("Error generating event on OpenAgenda", OAevent)
+        return {"success": False, "message": "Error generating event on OpenAgenda"}
