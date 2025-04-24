@@ -18,7 +18,7 @@ class Timing:
     begin: str
     end: str
 
-class MultilingualEntry(TypedDict, total=False):
+class MultilingualEntry:
     def __init__(self, fr: str, en: Optional[str]):
         self.fr = fr
         self.end = en
@@ -98,7 +98,7 @@ class OpenAgendaEvent:
     Attributes:
         uid (str): The unique identifier of the event.
         slug (str): The slug of the event.
-        title (str): The title of the event.
+        title (MultilingualEntry): The title of the event.
         image (dict): Infos about the main image of the event.
         imageCredits (str): The credits for the image.
         onlineAccessLink (str): The link to access the event online (1=offline, 2=online, 3=hybrid)
@@ -211,6 +211,7 @@ class OpenAgendaEvent:
                 f"Error creating Location object: {e}"
             ) from e
 
+        title= MultilingualEntry( fr = data['title']['fr'], en= data['title'].get('en'))
         timings = [Timing(begin=t['begin'], end=t['end']) for t in data['timings']]
         longDescription = MultilingualEntry( fr= data['longDescription']['fr'], en= data['longDescription'].get('en'))
         description=MultilingualEntry( fr = data['description']['fr'], en= data['description'].get('en'))
@@ -219,7 +220,7 @@ class OpenAgendaEvent:
             return cls(
                 uid=data['uid'],
                 slug=data['slug'],
-                title=data['title'],
+                title=title,
                 onlineAccessLink=data['onlineAccessLink'],
                 attendanceMode=data['attendanceMode'],
                 status=data['status'],
