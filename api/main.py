@@ -12,12 +12,13 @@ from api.db import initialize_database, db_path
 from fastapi import FastAPI, Depends, HTTPException, Header, File, UploadFile
 from pydantic import BaseModel
 from typing import List
+import logging
 
 # Check if the database file exists and initialize it if not
 
 if not os.path.exists(db_path):
     initialize_database(db_path)
-    print("Database initialized.")
+    logging.info("Database initialized.")
 
 app = FastAPI()
 
@@ -103,7 +104,7 @@ async def authenticate(request: AuthRequest):
         response_model=OaToken)
 async def generates_token(current_user: dict 
                         = Depends(get_current_user)):
-    print(current_user)
+    logging.info( f"Token generated for user: ${current_user}")
     try:
         access_token = oa.access_token
         if (access_token == None):
@@ -126,7 +127,7 @@ async def generates_token(current_user: dict
 async def update_event(request: PatchKeywordRequest):
     try:
         access_token = oa.access_token
-        print("access_token", access_token)
+        # print("access_token", access_token)
     except Exception as e:
         return {"success": False, "data": [], "message": str(e)}
     event = request
@@ -134,13 +135,13 @@ async def update_event(request: PatchKeywordRequest):
         existingKeywords = await get_event_keywords(event.uid)
         if existingKeywords is None or existingKeywords != event.keywords:
             patched = await patch_event(access_token, event.uid, event.keywords)
-            print(f"{existingKeywords} >>>> {event.keywords}")
+            logging.info(f"{existingKeywords} >>>> {event.keywords}")
             return {"success": True, "data": patched, "message": "Event successfully updated"}
         else:
-            print("Keywords haven't changed")
+            logging.info("Keywords haven't changed")
             return {"success": True, "data": [], "message": "No update"}
     except Exception as e:
-        print(e)
+        logging.error(e)
         return {"success": False, "data": [], "message": str(e)}
 
 @app.patch("/events/keywords",
@@ -152,23 +153,23 @@ async def update_event(request: PatchKeywordRequest):
 async def update_events(request: PatchRequest):
     try:
         access_token = await oa.access_token
-        print("access_token", access_token)
+        # print("access_token", access_token)
     except Exception as e:
         return {"success": False, "data": [], "message": str(e)}
 
     updated_events = []
     for event in request.events:
-        print(event)
+        logging.info("updated event", event)
         try:
             existingKeywords = await get_event_keywords(event.uid)
             if existingKeywords is None or existingKeywords != event.keywords:
                 patched = await patch_event(access_token, event.uid, event.keywords)
                 updated_events.append({"uid": event.uid, "slug": patched['event']['slug']})
-                print(f"{existingKeywords} >>>> {event.keywords}")
+                logging.info(f"{existingKeywords} >>>> {event.keywords}")
             else:
-                print("Keywords haven't changed")
+                logging.info("Keywords haven't changed")
         except Exception as e:
-            print(e)
+            logging.error(e)
             return {"success": False, "data": [], "message": str(e)}
 
     if len(updated_events) > 0:
@@ -192,7 +193,7 @@ async def upload_file(file: UploadFile, current_user: dict = Depends(get_current
         with open(file_path, "wb") as f:
             f.write(await file.read())
     except Exception as e:
-        print(e)
+        logging.error(e)
         return {"success": False, "message": "Error while saving image file"}
 
     try:
@@ -206,6 +207,5 @@ async def upload_file(file: UploadFile, current_user: dict = Depends(get_current
             print(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
             return {"success": True, "message": "File uploaded successfully", "OAeventURL": event_url, "OAeventName": OAevent.title.fr}
     except Exception as e:
-        print(e)
-        return {"success": False, "message": "Error generating event from image file"}
-
+        logging.error(e)
+        return {"success": False, "message": "Error while sending url to Mistral"}

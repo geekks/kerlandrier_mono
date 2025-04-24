@@ -50,9 +50,9 @@ async def get_event_keywords(event_uid: str | int):
                 return []
             return []
     except requests.RequestException as exc:
-        print("Error getting event:", exc)
+        logging.error("Error getting event:", exc)
         if exc.response:
-            print(exc.response)
+            logging.error("Response:", exc.response)
 
     return None
 
@@ -72,7 +72,7 @@ async def patch_event(access_token: str, event_uid: str | int, data: dict):
         if response.status_code >= 200 and response.status_code <= 299:
             return response.json()
         else:
-            print("Error patching event:", response.json())
+            logging.error("Error patching event:", response.json())
     except requests.RequestException as exc:
         logging.error(f"Error patching event: {exc}")
 
