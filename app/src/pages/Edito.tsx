@@ -50,7 +50,7 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 	const saveKeywordsMutation = useMutation({
 		mutationFn: patchEvent,
 		onSuccess: (updatedEvent) => {
-			console.log("updatedEvent - ", updatedEvent);
+			console.log("updatedEvent - ", updatedEvent.keywords);
 			queryClient.setQueryData([EVENTS_QUERY_KEY], (oldEvents: OpenAgendaEditoItem[]) =>
 				oldEvents.map((event: OpenAgendaEditoItem) =>
 					event.uid === updatedEvent.id ? updatedEvent : event
@@ -100,7 +100,7 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 				multiple
 				freeSolo
 				options={[]}
-				value={event.keywords}
+				value={event.keywords ?? []}
 				onChange={(_, value) => handleKeywordChange(event.uid, value)}
 				renderInput={params => <TextField
 					{...params}
@@ -151,18 +151,18 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 				</button>
 				{saveKeywordsMutation.isError ? (
 					<>
-					<div className="text-red-500 text-sm mt-2">
-						{saveKeywordsMutation.error.message}
-					</div>
-					<div className="text-red-500 text-sm mt-2">
-						You should probably login again
-					</div>
-					<div className="text-red-500 text-sm mt-2">
-						Sorry about that
-					</div>
-					<div className="text-red-500 text-sm mt-2">
-						Really sorry
-					</div>
+						<div className="text-red-500 text-sm mt-2">
+							{saveKeywordsMutation.error.message}
+						</div>
+						<div className="text-red-500 text-sm mt-2">
+							You should probably login again
+						</div>
+						<div className="text-red-500 text-sm mt-2">
+							Sorry about that
+						</div>
+						<div className="text-red-500 text-sm mt-2">
+							Really sorry
+						</div>
 					</>
 				) : null}
 			</div>
@@ -183,10 +183,10 @@ const EventList: React.FC = () => {
 	return (
 		<div className="text-center">
 
-		<Login/>
-		<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-			{events.map((event) => <EventCard key={event.uid} event={event} />)}
-		</div>
+			<Login />
+			<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+				{events.map((event) => <EventCard key={event.uid} event={event} />)}
+			</div>
 		</div>
 	);
 };

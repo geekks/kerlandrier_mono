@@ -244,14 +244,13 @@ def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_u
     body = eventData
     url = f"{events_api_url}/{eventUid}"
     try:
-        event_creation_response = requests.post(url, json=body , headers=headers)
-        
+        event_creation_response = requests.patch(url, json=body , headers=headers)
         if event_creation_response.status_code != 200:
             print(f"Error pathcing event: Status Code {event_creation_response.status_code}")
             print(f"Response:")
             print(json.dumps(event_creation_response.json(), indent=4))
             return None
-        return  event_creation_response.text['event']['uid']
+        return  event_creation_response.text
 
     except requests.exceptions.RequestException as exc:
         print(f"Error creating event: {exc}")

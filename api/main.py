@@ -132,7 +132,16 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
     try:
         existingKeywords = await get_event_keywords(event.uid)
         if existingKeywords is None or existingKeywords != event.keywords:
-            patched = await patch_event(access_token, event.uid, event.keywords)
+            patched = patch_event(
+                access_token,
+                event.uid,
+                {
+                    "data": 
+                    {"keywords": 
+                        {"fr": event.keywords}
+                    }
+                }
+            )
             print(f"{existingKeywords} >>>> {event.keywords}")
             return {"success": True, "data": patched, "message": "Event successfully updated"}
         else:
