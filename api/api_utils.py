@@ -80,7 +80,7 @@ async def patch_event(access_token: str, event_uid: str | int, data: dict):
 
 def generate_kl_token(user_id: int) -> str:
     paris_tz = pytz.timezone('Europe/Paris')
-    expiration_time = datetime.now(paris_tz) + timedelta(days=30)
+    expiration_time = datetime.now(paris_tz) + timedelta(minutes=30)
     payload = {
         "user_id": user_id,
         "exp": expiration_time

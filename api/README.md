@@ -6,6 +6,21 @@
 
 _Copy the `.env.example` file to `.env` and fill it with your own values._
 
+### init `users` table
+
+```bash
+docker ps
+docker exec -it my_container bash
+python db.py --init
+python db.py --username blabla --password blabla
+```
+
+### `docker`
+```bash
+docker build -t kerlandrierapi . # build docker image
+docker run -d --name kerlandrierapi -p 8001:8001 --env-file .env kerlandrierapi:latest
+```
+
 **Warning**:there are **two** `.env` files, one  in the `api` folder and one in the `api/script` folder.
 
 ## Local dev

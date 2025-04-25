@@ -91,6 +91,7 @@ async def read_root():
             Requires a from manually added users in api DB.",
         response_model=AuthResponse)
 async def authenticate(request: AuthRequest):
+    print(request)
     username = request.username
     password = request.password
 
@@ -128,9 +129,7 @@ async def generates_token(current_user: dict
             description="This endpoint updates the keywords for on OA event\
                 It returns the updated OA event",
             response_model=dict)
-# TODO: Implement auth
-# async def update_event(request: PatchKeywordRequest, current_user: dict = Depends(get_current_user)):
-async def update_event(request: PatchKeywordRequest):
+async def update_event(request: PatchKeywordRequest, current_user: dict = Depends(get_current_user)):
     try:
         access_token = oa.access_token
         # print("access_token", access_token)
@@ -140,8 +139,18 @@ async def update_event(request: PatchKeywordRequest):
     try:
         existingKeywords = await get_event_keywords(event.uid)
         if existingKeywords is None or existingKeywords != event.keywords:
-            patched = await patch_event(access_token, event.uid, event.keywords)
+            patched = patch_event(
+                access_token,
+                event.uid,
+                {
+                    "data": 
+                    {"keywords": 
+                        {"fr": event.keywords}
+                    }
+                }
+            )
             logging.info(f"{existingKeywords} >>>> {event.keywords}")
+
             return {"success": True, "data": patched, "message": "Event successfully updated"}
         else:
             logging.info("Keywords haven't changed")
@@ -150,38 +159,6 @@ async def update_event(request: PatchKeywordRequest):
         logging.error(e)
         return {"success": False, "data": [], "message": str(e)}
 
-@app.patch("/events/keywords",
-            summary="Update events keywords",
-            description="This endpoint updates the keywords for a list of OA events.\
-                It returns a list of updated OA events.",
-            response_model=dict)
-# async def update_events(request: PatchRequest, current_user: dict = Depends(get_current_user)):
-async def update_events(request: PatchRequest):
-    try:
-        access_token = await oa.access_token
-        # print("access_token", access_token)
-    except Exception as e:
-        return {"success": False, "data": [], "message": str(e)}
-
-    updated_events = []
-    for event in request.events:
-        logging.info("updated event", event)
-        try:
-            existingKeywords = await get_event_keywords(event.uid)
-            if existingKeywords is None or existingKeywords != event.keywords:
-                patched = await patch_event(access_token, event.uid, event.keywords)
-                updated_events.append({"uid": event.uid, "slug": patched['event']['slug']})
-                logging.info(f"{existingKeywords} >>>> {event.keywords}")
-            else:
-                logging.info("Keywords haven't changed")
-        except Exception as e:
-            logging.error(e)
-            return {"success": False, "data": [], "message": str(e)}
-
-    if len(updated_events) > 0:
-        return {"success": True, "data": updated_events, "message": f"{len(updated_events)} events updated successfully"}
-    else:
-        return {"success": True, "data": [], "message": "No update"}
 
 @app.post("/image/upload",
         summary="Upload an image file of a poster with event",
