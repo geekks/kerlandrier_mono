@@ -50,7 +50,7 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 	const saveKeywordsMutation = useMutation({
 		mutationFn: patchEvent,
 		onSuccess: (updatedEvent) => {
-			console.log("updatedEvent - ", updatedEvent.keywords);
+			console.log("updatedEvent - ", updatedEvent);
 			queryClient.setQueryData([EVENTS_QUERY_KEY], (oldEvents: OpenAgendaEditoItem[]) =>
 				oldEvents.map((event: OpenAgendaEditoItem) =>
 					event.uid === updatedEvent.id ? updatedEvent : event

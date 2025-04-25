@@ -245,12 +245,13 @@ def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_u
     url = f"{events_api_url}/{eventUid}"
     try:
         event_creation_response = requests.patch(url, json=body , headers=headers)
+        print(event_creation_response.json())
         if event_creation_response.status_code != 200:
             print(f"Error pathcing event: Status Code {event_creation_response.status_code}")
             print(f"Response:")
             print(json.dumps(event_creation_response.json(), indent=4))
             return None
-        return  event_creation_response.text
+        return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:
         print(f"Error creating event: {exc}")
