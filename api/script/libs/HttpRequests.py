@@ -250,7 +250,7 @@ def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_u
             print(f"Error pathcing event: Status Code {event_creation_response.status_code}")
             print(f"Response:")
             print(json.dumps(event_creation_response.json(), indent=4))
-            return None
+            raise Exception(f"Error patching event: {event_creation_response.json().get('message', 'Unknown error')}")
         return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:
