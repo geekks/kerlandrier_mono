@@ -1,3 +1,5 @@
+from libs.HttpRequests import get_locations
+from libs.getOaLocation import get_or_create_oa_location
 from script.configuration import config,oa
 
 from script.import_ics import import_ics
@@ -49,3 +51,40 @@ def testMistralImages():
             msg.good(f"Test passed for all keys !")
         else:
             msg.warn(f"Test failed for {error} of {len(TEST_FILE_ANSWER) + len(TEST_FILE_ANSWER.get("description")) - 1} keys")
+
+#####################
+## Test cases:
+#####################
+
+TBD_LOCATION_UID=config.TBD_LOCATION_UID
+
+locations_examples = [
+    {"input_location": 'MJC Tregunc Le Sterenn, Rue Jacques Prévert, 29910 Trégunc, France', "expectedUID": 89326663},
+    {"input_location": 'Explore', "expectedUID": 5705265},
+    {"input_location": "Bar de Test, 1 Pl. de l'Église, 29100 Pouldergat", "expectedUID": TBD_LOCATION_UID}, # Lieu inexistant mais ville existante
+    {"input_location": 'qsdfg', "expectedUID": TBD_LOCATION_UID}, # Texte aléatoire
+    {"input_location": '30 Rue Edgar Degas, 72000 Le Mans', "expectedUID": TBD_LOCATION_UID}, # HOrs Bretagne
+    {"input_location": '11 Lieu-dit Quilinen 29510 Landrévarzec'}, # Non répertorié sur OA
+    {"input_location": 'La Loco', "expectedUID": 34261153},
+    {"input_location": 'Boulevard de la Gare, Quimperlé', "expectedUID": 34261153},
+    {"input_location": 'La Caserne Concarneau ', "expectedUID": 9308588},
+    {"input_location": '1 avenue Docteur NICOLAS, Concarneau'},
+    {"input_location": 'Intermarché Concarneau (Route de Trégunc, Concarneau)', "expectedUID": 75052765},
+    {"input_location": 'Brasserie Tri Martolod-Officiel', "expectedUID": 16309876},
+    {"input_location": 'Rue de Colguen, 29900 Concarneau', "expectedUID": 24412066},
+    {"input_location": 'Boulevard de la Gare, 29300 Quimperlé, France', "expectedUID": 34261153},
+    
+]
+
+def test_locations(location_array, access_token ):
+    allLocationsOA = get_locations(access_token)
+    allLocationsOA_by_uid = {item['uid']: item for item in allLocationsOA}
+    nbr_locations= len(allLocationsOA)
+    print(f"Number of locations: {nbr_locations}")
+    for loc in location_array:
+        uid = get_or_create_oa_location( loc.get("input_location"),access_token, debug=True)
+        if loc.get("expectedUID") and (loc.get("expectedUID") == uid): 
+            print(" - ✅ Match with Expected location.")
+        elif loc.get("expectedUID"): 
+            print(" - ❌ Does not match with Expected location: '", allLocationsOA_by_uid.get (loc.get("expectedUID")).get("name"),"'")
+        print("--------------\n")

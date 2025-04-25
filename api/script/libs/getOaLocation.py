@@ -34,34 +34,43 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         return None
     
     # 0) Use optimized searched, removing false positives and misleadings patterns
-    locationPatterneRemoved=re.sub(r'\b(?:concarneau|officiel|france |spectacles)\b',
+    searched_location=re.sub(r'\b(?:concarneau|finistère|france|officiel|spectacles)\b',
                                             '',
                                             searched_location,
                                             flags=re.IGNORECASE
                                             )
-    locationPatternToSpace=re.sub(r'[-,():]',
-                                            ' ',
-                                            locationPatterneRemoved,
+    searched_location=re.sub(r'[-,():]',' ',
+                                            searched_location,
                                             flags=re.IGNORECASE
                                             )
+    # Postal code Finistere
+    searched_location=re.sub(r'\b29\d{3}\b','',searched_location)
+    # Remove double spaces
+    searched_location=searched_location.strip()
+    searched_location=re.sub(r'  ',     ' ',searched_location)
+    
     # TO DO: add this specific cases to a config file
     try:
         replacement = [
-        ("Boulevard de la Gare, 29300 Quimperlé", "La Loco Quimperlé"),
+        ("Boulevard de la Gare Quimperlé", "La Loco Quimperlé"),
         ("ZA de Colguen Rue Aimé Césaire", "Brasserie Tri Martolod Concarneau"),
-        ("Rue Jacques Prévert, 29910 Trégunc", "Le Sterenn Trégunc"),
-        ("Brasserie de Bretagne, Le Bek", "Le Bek"),
+        ("Rue Jacques Prévert Trégunc", "Le Sterenn Trégunc"),
+        ("Brasserie de Bretagne Le Bek", "Le Bek"),
         ("Rue de Colguen", "Cinéville, Rue de Colguen"),
         ("LE CAFE LOCAL", "Le Café Local, Combrit"),
-        ("3e lieu - l'Archipel", "l'Archipel, Fouenant"),
-        ('  Finistère  France', "Concarneau (à préciser)")
+        ("3e lieu l'Archipel", "l'Archipel, Fouenant"),
+        ("1 place Jean Jaures","Le livre & la plume"),
+        ("CAC Scènes", "Le CAC")
     ]
         for old, new in replacement:
-            locationPatternToSpace = locationPatternToSpace.replace(old, new)
+            searched_location = searched_location.replace(old, new)
     except Exception as e:
         logger.error(f"Error in Location replacement: {e}")
+        
+    if searched_location in ["", " ", "  ", "None", "Null", "Concarneau", None]:
+        searched_location = "Concarneau (lieu à préciser)" 
     
-    optimized_searched_location = locationPatternToSpace
+    optimized_searched_location = searched_location
     logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
     OaLocationsIndex = {}
@@ -119,40 +128,4 @@ def get_locations_list(searched_location:str, access_token: str)->list:
     else:
         return None
 
-#####################
-## Test cases:
-#####################
 
-locations_examples = [
-    {"input_location": 'MJC Tregunc Le Sterenn, Rue Jacques Prévert, 29910 Trégunc, France', "expectedUID": 89326663},
-    {"input_location": 'Explore', "expectedUID": 5705265},
-    {"input_location": "Bar de Test, 1 Pl. de l'Église, 29100 Pouldergat", "expectedUID": TBD_LOCATION_UID}, # Lieu inexistant mais ville existante
-    {"input_location": 'qsdfg', "expectedUID": TBD_LOCATION_UID}, # Texte aléatoire
-    {"input_location": '30 Rue Edgar Degas, 72000 Le Mans', "expectedUID": TBD_LOCATION_UID}, # HOrs Bretagne
-    {"input_location": '11 Lieu-dit Quilinen 29510 Landrévarzec'}, # Non répertorié sur OA
-    {"input_location": 'La Loco', "expectedUID": 34261153},
-    {"input_location": 'Boulevard de la Gare, Quimperlé', "expectedUID": 34261153},
-    {"input_location": 'La Caserne Concarneau ', "expectedUID": 9308588},
-    {"input_location": '1 avenue Docteur NICOLAS, Concarneau'},
-    {"input_location": 'Intermarché Concarneau (Route de Trégunc, Concarneau)', "expectedUID": 75052765},
-    {"input_location": 'Brasserie Tri Martolod-Officiel', "expectedUID": 16309876},
-    {"input_location": 'Rue de Colguen, 29900 Concarneau', "expectedUID": 24412066},
-    {"input_location": 'Boulevard de la Gare, 29300 Quimperlé, France', "expectedUID": 34261153},
-    
-]
-
-def test_locations(location_array, access_token ):
-    allLocationsOA = get_locations(access_token)
-    allLocationsOA_by_uid = {item['uid']: item for item in allLocationsOA}
-    nbr_locations= len(allLocationsOA)
-    print(f"Number of locations: {nbr_locations}")
-    for loc in location_array:
-        uid = get_or_create_oa_location( loc.get("input_location"),access_token, debug=True)
-        if loc.get("expectedUID") and (loc.get("expectedUID") == uid): 
-            print(" - ✅ Match with Expected location.")
-        elif loc.get("expectedUID"): 
-            print(" - ❌ Does not match with Expected location: '", allLocationsOA_by_uid.get (loc.get("expectedUID")).get("name"),"'")
-        print("--------------\n")
-
-if __name__ == "__main__":
-    test_locations(locations_examples)

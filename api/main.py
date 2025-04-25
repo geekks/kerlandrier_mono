@@ -1,23 +1,22 @@
 from typing import Optional, Union
 
 import os
-from pprint import pprint
-from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password
+from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password, send_url_to_mistral
 from api.script.libs.HttpRequests import patch_event
 from api.script.configuration import config, oa
-from api.script.mistral_images import getMistralImageEvent, postImageToImgbb, postMistralEventToOa, mistralEvent
-from api.script.libs.oa_types import OpenAgendaEvent
+from api.script.mistral_images import postImageToImgbb
 
 from api.db import initialize_database, db_path
-from fastapi import FastAPI, Depends, HTTPException, Header, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile, File
 from pydantic import BaseModel
 from typing import List
+import logging
 
 # Check if the database file exists and initialize it if not
 
 if not os.path.exists(db_path):
     initialize_database(db_path)
-    print("Database initialized.")
+    logging.info("Database initialized.")
 
 app = FastAPI()
 
@@ -57,6 +56,14 @@ class AuthResponse(BaseModel):
     success: bool
     access_token: str = "xxxxx"
     token_type: str = "Bearer"
+    
+class ImageResponse(BaseModel):
+    success: bool
+    message: str = None
+    event: dict = None
+
+class UrlRequest(BaseModel):
+    url: str
 
 def get_token_header(authorization: str 
                         = Header(   default=None,
@@ -104,7 +111,7 @@ async def authenticate(request: AuthRequest):
         response_model=OaToken)
 async def generates_token(current_user: dict 
                         = Depends(get_current_user)):
-    print(current_user)
+    logging.info( f"Token generated for user: ${current_user}")
     try:
         access_token = oa.access_token
         if (access_token == None):
@@ -125,7 +132,7 @@ async def generates_token(current_user: dict
 async def update_event(request: PatchKeywordRequest, current_user: dict = Depends(get_current_user)):
     try:
         access_token = oa.access_token
-        print("access_token", access_token)
+        # print("access_token", access_token)
     except Exception as e:
         return {"success": False, "data": [], "message": str(e)}
     event = request
@@ -142,45 +149,68 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
                     }
                 }
             )
-            print(f"{existingKeywords} >>>> {event.keywords}")
+            logging.info(f"{existingKeywords} >>>> {event.keywords}")
+
             return {"success": True, "data": patched, "message": "Event successfully updated"}
         else:
-            print("Keywords haven't changed")
+            logging.info("Keywords haven't changed")
             return {"success": True, "data": [], "message": "No update"}
     except Exception as e:
-        print(e)
+        logging.error(e)
         return {"success": False, "data": [], "message": str(e)}
 
-@app.post("/upload/image/",
+
+@app.post("/image/upload",
         summary="Upload an image file of a poster with event",
         description="This endpoint allows authenticated users to upload an image file to be anlyze with Mistral to create an OA event.",
-        response_model=dict)
-async def upload_file(file: UploadFile, current_user: dict = Depends(get_current_user)):
+        response_model=ImageResponse)
+async def upload_file(file: UploadFile,
+                    current_user: dict = Depends(get_current_user)
+                    ):
     # Define the directory to save the uploaded file
+    if file is None:
+        return {"success": False, "message": "Please provide a file in a form-data"}
     try:
         upload_dir = "images"
         if not os.path.exists(upload_dir):
             os.makedirs(upload_dir)
-
         # Save the uploaded file to the directory
         file_path = os.path.join(upload_dir, file.filename)
         with open(file_path, "wb") as f:
             f.write(await file.read())
     except Exception as e:
-        print(e)
+        logging.error(e)
         return {"success": False, "message": "Error while saving image file"}
-
     try:
-        image_url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
-        response_mistral:mistralEvent = getMistralImageEvent(config.MISTRAL_PRIVATE_API_KEY.get_secret_value(), image_path=file_path)
-        print("Mistral answer:")
-        pprint(response_mistral.model_dump(mode='json'))
-        OAevent:OpenAgendaEvent = postMistralEventToOa(response_mistral, access_token=oa.access_token, image_url= image_url)
-        if OAevent.uid:
-            event_url= f"https://openagenda.com/fr/{config.AGENDA_SLUG}/events/{OAevent.slug}"
-            print(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
-            return {"success": True, "message": "File uploaded successfully", "OAeventURL": event_url, "OAeventName": OAevent.title.fr}
+        url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
     except Exception as e:
-        print(e)
-        return {"success": False, "message": "Error generating event from image file"}
+        logging.error(e)
+        return {"success": False, "message": "Error while uploading image to imgbb"}
+    try:
+        send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
+                            access_token = oa.access_token,
+                            url=url)
+    except Exception as e:
+        logging.error(e)
+        return {"success": False, "message": "Error while sending url to Mistral"}
+    finally:
+        if file_path and os.path.exists(file_path):
+            os.remove(file_path)
+            logging.info(f"File {file_path} deleted")
 
+@app.post("/image/url",
+        summary="Send an url link an image of a poster with event",
+        description="This endpoint allows authenticated users to send the url of an image to be anlyze with Mistral to create an OA event.",
+        response_model=ImageResponse)
+async def upload_url(request: UrlRequest ,
+                    current_user: dict = Depends(get_current_user)
+                    ):
+    if request.url is None:
+        return {"success": False, "message": "Please provide a valid url"}
+    try:
+        send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
+                            access_token = oa.access_token,
+                            url=request.url)
+    except Exception as e:
+        logging.error(e)
+        return {"success": False, "message": "Error while sending url to Mistral"}

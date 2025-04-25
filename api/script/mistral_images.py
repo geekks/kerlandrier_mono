@@ -9,7 +9,6 @@ python mistral_images.py --test
 import os
 from mistralai import Mistral
 from pydantic import BaseModel
-from pprint import pprint
 import pytz
 from datetime import datetime
 import requests
@@ -19,6 +18,7 @@ import argparse
 from PIL import Image
 from wasabi import color,msg
 from dateparser import parse
+import logging
 
     
 from .libs.oa_types import OpenAgendaEvent
@@ -53,29 +53,32 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
     """
 
     if url is not None and image_path is not None:
-        msg.fail("You can't use both image_path and url")
+        logging.error("You can't use both image_path and url")
         exit(1)
     if url:
+        try:
         # Parse the URL to remove query parameters
-        parsed_url = urlparse(url)
-        clean_url = urlunparse(parsed_url._replace(query=""))
-        file_name = os.path.join(os.path.dirname(__file__) , "images", os.path.basename(clean_url))
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(file_name, 'wb') as file:
-                file.write(response.content)
-            image_path = file_name
-            print(f"Image downloaded and saved to {file_name}")
-        else:
-            print(f"Failed to download image. Status code: {response.status_code}")
-            print(response.text)
+            parsed_url = urlparse(url)
+            clean_url = urlunparse(parsed_url._replace(query=""))
+            file_name = os.path.join(os.path.dirname(__file__) , "images", os.path.basename(clean_url))
+            response = requests.get(url)
+            if response.status_code == 200:
+                with open(file_name, 'wb') as file:
+                    file.write(response.content)
+                image_path = file_name
+                logging.info(f"Image downloaded and saved to {file_name}")
+            else:
+                logging.error(f"Failed to download image. Status code: {response.status_code}",
+                response.text)
+                exit(1)
+        except Exception as e:
+            logging.error(f"Error downloading image from {url}", e)
             exit(1)
-
+                
     try:
         Image.open(image_path).verify()
     except Exception as e:
-        msg.fail(f"Image {image_path} is not valid image file")
-        pprint(f"{e}")
+        logging.error(f"Image {image_path} is not valid image file", e)
         exit(1)
         
     base64_image = encodeImage64(image_path)
@@ -108,7 +111,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
             ]
         }
     ]
-    msg.info("sending image to Mistral with image path: " + image_path)
+    logging.info("sending image to Mistral with image path: " + image_path)
     chat_response = client.chat.parse(
         model=model,
         messages=messages,
@@ -142,18 +145,17 @@ def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str
         with msg.loading("Sending event to OpenAgenda"):
             response = create_event(access_token, eventOA)
         if response['event']['uid']:
-                msg.good("Event created !")
-                msg.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
+                logging.info("Event created !")
+                logging.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
                 oaEvent = OpenAgendaEvent.from_json(response['event'])
                 return  oaEvent
         else:
-            msg.fail( f"Problem for {event.titre}" )
-            msg.fail( f"Response: {response}" )
+            logging.error( f"Problem for {event.titre}", response  )
             return None
     except Exception as e:
-        msg.fail(f"Error sending event to OpenAgenda from Mistral analysis")
-        msg.text( f"URL: {image_url}. Event title '{event.titre}'")
-        pprint(f"Error: {e}")
+        logging.error(f"Error sending event to OpenAgenda from Mistral analysis")
+        logging.error( f"URL: {image_url}. Event title '{event.titre}'")
+        logging.error(e)
         return None
         
 def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) -> str|None:
@@ -185,8 +187,7 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
         return image_url
     except Exception as e:
-        print("Error while uploading image to imgbb")
-        print(e)
+        logging.error("Error while uploading image to imgbb", e)
         return None
 
 def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:str=None, url:str = None, imgbb_api_url:str=None, imgbb_api_key:str=None):
@@ -195,20 +196,20 @@ def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:s
         if image_path: # upload image to imgbb and get url
             image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
             response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
-            msg.info(response_mistral)
+            logging.info(response_mistral)
             OAEvent = postMistralEventToOa(response_mistral, access_token, image_url)
         elif url:
             image_url=url
             response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
-            msg.info(response_mistral)
+            logging.info(response_mistral)
             OAEvent= postMistralEventToOa(response_mistral, image_url)
         else:
-            print("Enter a valid image path or url")
+            logging.error("Enter a valid image path or url")
             exit(1)
         if OAEvent is not None :
                 return OAEvent
         else:
-            msg.fail( f"Problem with posting to Mistral img file ${image_path} or url ${url}" )
+            logging.error( f"Problem with posting to Mistral img file ${image_path} or url ${url}" )
             exit(1)
     
 # if __name__ == "__main__":
