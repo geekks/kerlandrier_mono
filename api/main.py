@@ -91,7 +91,6 @@ async def read_root():
             Requires a from manually added users in api DB.",
         response_model=AuthResponse)
 async def authenticate(request: AuthRequest):
-    print(request)
     username = request.username
     password = request.password
 
@@ -187,9 +186,10 @@ async def upload_file(file: UploadFile,
         logging.error(e)
         return {"success": False, "message": "Error while uploading image to imgbb"}
     try:
-        send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
+        response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
                             url=url)
+        return response
     except Exception as e:
         logging.error(e)
         return {"success": False, "message": "Error while sending url to Mistral"}
@@ -208,9 +208,10 @@ async def upload_url(request: UrlRequest ,
     if request.url is None:
         return {"success": False, "message": "Please provide a valid url"}
     try:
-        send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
+        response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
                             url=request.url)
+        return response
     except Exception as e:
         logging.error(e)
         return {"success": False, "message": "Error while sending url to Mistral"}

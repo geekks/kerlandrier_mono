@@ -120,12 +120,12 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str, access_token: str, url: st
         return {"success": False, "message": "Error generating event on OpenAgenda"}
     try:
         event_url= f"https://openagenda.com/fr/{config.AGENDA_SLUG}/events/{OAevent.slug}"
-        logging.info(f"OA event created: {OAevent.title} at {OAevent.location.name}")
+        logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
         return {"success": True, 
                 "message": "OA event created successfully", 
                 "event":{
                     "url": event_url,
-                    "name": OAevent.title,
+                    "name": OAevent.title.fr,
                     "location": OAevent.location.name,
                     "description": OAevent.description.fr,
                     "start": OAevent.firstTiming.begin, 
