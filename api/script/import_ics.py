@@ -111,8 +111,8 @@ if __name__ == "__main__":
     parser.add_argument("-u", "---URL", "--fileName",help="ICS URL to scan. Default to private Facebook's Kerlandrier page ICS")
     parser.add_argument("-t", "--test", required=False,help="Test command with {TEST_FILE_NAME}")
     args=parser.parse_args()
-    match args.URL:
-        case None | ""|"facebook"|"fb":
+    match args.URL.lower():
+        case None | ""|"facebook"|"fb"|"kerlandrier":
             icsUrl=config.ICS_PRIVATE_URL_KLR_FB
         case "kal"|"konkarlab":
             icsUrl=config.URL_AGENDA_ATELIERS_KAL

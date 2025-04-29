@@ -19,7 +19,10 @@ def main():
     if args.script:
         # Use argparse for command-line arguments
         if args.script == 'import_ics':
-            import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
+            if args.url in ["kal","konkarlab"]:
+                import_ics(config.URL_AGENDA_ATELIERS_KAL)
+            else:
+                import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
         elif args.script == 'updateLocationsDescription':
             udpateLocationsDescription(oa.access_token)
         elif args.script == 'postMistralEvent':
@@ -52,6 +55,10 @@ def main():
             inquirer.List('script',
                         message="Which script would you like to run?",
                         choices=['import_ics', 'updateLocationsDescription', 'postMistralEvent']),
+            inquirer.List('ics_source',
+                        message="Which ICS source would you like to import?",
+                        choices=['Kerlandrier', 'Konkarlab'],
+                        ignore=lambda x: x['script'] != 'import_ics' ),
             inquirer.List('source',
                         message="Do you want to send an URL or a local image To Mistral ?",
                         choices=['URL', 'File'],
@@ -69,7 +76,10 @@ def main():
         answers = inquirer.prompt(questions)
 
         if answers['script'] == 'import_ics':
-            import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
+            if answers['ics_source'] == 'Konkarlab':
+                import_ics(config.URL_AGENDA_ATELIERS_KAL)
+            else:
+                import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
         elif answers['script'] == 'updateLocationsDescription':
             udpateLocationsDescription(oa.access_token)
         elif answers['script'] == 'postMistralEvent':
