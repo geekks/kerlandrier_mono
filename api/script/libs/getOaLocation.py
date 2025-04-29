@@ -60,7 +60,8 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         ("LE CAFE LOCAL", "Le Café Local, Combrit"),
         ("3e lieu l'Archipel", "l'Archipel, Fouenant"),
         ("1 place Jean Jaures","Le livre & la plume"),
-        ("CAC Scènes", "Le CAC")
+        ("CAC Scènes", "Le CAC"),
+        ("Médiathèque de Fouesnant  l'Archipel", "L'Archipel, 1 Rue des Îles, Fouesnant")
     ]
         for old, new in replacement:
             searched_location = searched_location.replace(old, new)
