@@ -3,6 +3,7 @@ from typing import Optional, Union
 import os
 from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password, send_url_to_mistral
 from api.script.libs.HttpRequests import patch_event
+from .configuration import configAPI
 from api.script.configuration import config, oa
 from api.script.mistral_images import postImageToImgbb
 
@@ -76,7 +77,9 @@ def get_token_header(authorization: str
 
 def get_current_user(token: str 
                         = Depends(get_token_header)):
-    payload = verify_kl_token(token)
+    payload = verify_kl_token(token,
+                            JWT_SECRET=configAPI.JWT_SECRET.get_secret_value(),
+                            JWT_ALGORITHM=configAPI.JWT_ALGORITHM)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     return payload
@@ -100,7 +103,9 @@ async def authenticate(request: AuthRequest):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     user_id = result[0]
-    token = generate_kl_token(user_id)
+    token = generate_kl_token(user_id,
+                            JWT_SECRET=configAPI.JWT_SECRET.get_secret_value(),
+                            JWT_ALGORITHM=configAPI.JWT_ALGORITHM)
     return {"success": True, "access_token": token, "token_type": "Bearer"}
 
 @app.get("/auth/oatoken", 
@@ -136,7 +141,9 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
         return {"success": False, "data": [], "message": str(e)}
     event = request
     try:
-        existingKeywords = await get_event_keywords(event.uid)
+        existingKeywords = await get_event_keywords(event.uid,
+                                                    api_url=config.OA_API_URL,
+                                                    oa_public_key=oa.public_key)
         if existingKeywords is None or existingKeywords != event.keywords:
             patched = patch_event(
                 access_token,

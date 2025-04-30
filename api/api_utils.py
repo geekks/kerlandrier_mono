@@ -12,19 +12,10 @@ from api.script.mistral_images import getMistralImageEvent, postMistralEventToOa
 
 
 from api.script.configuration import config
-from api.configuration import configAPI
 from api.db import db_path
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-AGENDA_UID = config.AGENDA_UID
-OA_BASE_URL = config.OA_BASE_URL
-OA_PUBLIC_KEY = config.OA_PUBLIC_KEY
-JWT_SECRET = configAPI.JWT_SECRET.get_secret_value()
-JWT_ALGORITHM = "HS256"
-KAL_LOCATION_UID = config.KAL_LOCATION_UID
-TBD_LOCATION_UID=config.TBD_LOCATION_UID
 
 db: sqlite3.Connection = sqlite3.connect(db_path)
 
@@ -32,9 +23,14 @@ def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
 
-async def get_event_keywords(event_uid: str | int):
+async def get_event_keywords(event_uid: str | int,
+                            api_url: str,
+                            oa_public_key: str ):
     uid = str(event_uid)
-    url = f"{OA_BASE_URL}/agendas/{AGENDA_UID}/events/{uid}?key={OA_PUBLIC_KEY}"
+    if event_uid is None or api_url is None or oa_public_key is None:
+        logging.error("Error event_uid, api_url or oa_public_key is None")
+        return None
+    url = f"{api_url}/events/{uid}?key={oa_public_key}"
     try:
         response = requests.get(url)
         if response.status_code >= 200 and response.status_code <= 299:
@@ -56,8 +52,12 @@ async def get_event_keywords(event_uid: str | int):
 
     return None
 
-async def patch_event(access_token: str, event_uid: str | int, data: dict):
-    uid = str(event_uid)
+async def patch_event(access_token: str,
+                    event_uid: str | int,
+                    data: dict,
+                    api_url: str
+                    ):
+    event_uid = str(event_uid)
     headers = {
         "Content-Type": "application/json",
     }
@@ -66,7 +66,7 @@ async def patch_event(access_token: str, event_uid: str | int, data: dict):
         "nonce": int(time.time() * 1000),  # Milliseconds since epoch
         "data": { "keywords": { "fr": data } },
     }
-    url = f"{OA_BASE_URL}/agendas/{AGENDA_UID}/events/{uid}"
+    url = f"{api_url}/events/{event_uid}"
     try:
         response = requests.patch(url, json=body, headers=headers)
         if response.status_code >= 200 and response.status_code <= 299:
@@ -78,7 +78,9 @@ async def patch_event(access_token: str, event_uid: str | int, data: dict):
 
     return None
 
-def generate_kl_token(user_id: int) -> str:
+def generate_kl_token(user_id: int,
+                    JWT_SECRET: str,
+                    JWT_ALGORITHM: str) -> str:
     paris_tz = pytz.timezone('Europe/Paris')
     expiration_time = datetime.now(paris_tz) + timedelta(minutes=30)
     payload = {
@@ -89,7 +91,9 @@ def generate_kl_token(user_id: int) -> str:
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 
-def verify_kl_token(token: str) -> dict:
+def verify_kl_token(token: str,
+                    JWT_SECRET: str,
+                    JWT_ALGORITHM: str) -> dict:
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         logging.info("Token decoded successfully")
@@ -101,12 +105,17 @@ def verify_kl_token(token: str) -> dict:
         logging.error("Invalid token")
         return None
     
-def get_user_by_username(db: sqlite3.Connection, username:str):
+def get_user_by_username(db: sqlite3.Connection,
+                        username:str):
     cursor = db.cursor()
     cursor.execute("SELECT id, password FROM users WHERE username = ?", (username,))
     return cursor.fetchone()
 
-def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str, access_token: str, url: str) -> dict:
+def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
+                        access_token: str,
+                        url: str,
+                        OA_AGENDA_URL: str
+                        ) -> dict:
     try:
         response_mistral:mistralEvent = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY, url=url)
     except Exception as e:
@@ -119,7 +128,7 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str, access_token: str, url: st
         logging.error("Error generating event on OpenAgenda",e)
         return {"success": False, "message": "Error generating event on OpenAgenda"}
     try:
-        event_url= f"https://openagenda.com/fr/{config.AGENDA_SLUG}/events/{OAevent.slug}"
+        event_url= f"{OA_AGENDA_URL}/events/{OAevent.slug}"
         logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
         return {"success": True, 
                 "message": "OA event created successfully", 

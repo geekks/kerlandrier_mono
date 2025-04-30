@@ -25,11 +25,12 @@ class Configuration(BaseSettings):
     # Open Agenda
     OA_PUBLIC_KEY: str = Field(description="Open Agenda public key")
     OA_SECRET_KEY: SecretStr = Field(description="Open Agenda secret key")
-    OA_BASE_URL: str = Field(description="Open Agenda access token URL", default="https://api.openagenda.com/v2/")
     AGENDA_UID: str = Field(description="Kerlandrier Open Agenda UID", default="44891982")
     TBD_LOCATION_UID: str = Field(description="Open Agenda ToBeDefined location UID", default="11634941")
     KAL_LOCATION_UID: str = Field(description="Open Agenda KAL location UID", default="52856698")
     AGENDA_SLUG: str = Field(description="Kerlandrier Open Agenda slug", default="kerlandrier")
+    OA_AGENDA_URL: str = Field(description="Kerlandrier Open Agenda URL", default="https://openagenda.com/fr/{config.AGENDA_SLUG}/")
+    OA_API_URL: str = Field(description="Open Agenda api URL", default="https://api.openagenda.com/v2/{config.AGENDA_UID}/")
     
     # Facebook events ICS URL
     ICS_PRIVATE_URL_KLR_FB: SecretStr = Field(description="Kerlandrier Facebook events ICS URL")

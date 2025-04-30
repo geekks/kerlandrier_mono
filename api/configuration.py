@@ -11,8 +11,10 @@ env_path= os.path.join(SCRIPT_DIR, '.env' )
 class Configuration(BaseSettings):
     # Common
     ENV_DEV: Literal[ "dev", "preprod", "prod"] = Field(description="Execution environment", default="prod")
-    # API
+
+    # OA Fast API auth
     JWT_SECRET: SecretStr = Field(description="JWT secret key")
+    JWT_ALGORITHM: str = Field(description="JWT algorithm", default="HS256")
 
 configAPI = Configuration(_env_file=env_path)
 
