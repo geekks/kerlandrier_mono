@@ -6,7 +6,7 @@ services:
       dockerfile: ./Dockerfile
     env_file: ".env"
     ports:
-      - 8090:5173
+      - 127.0.0.1:8090:5173
     develop:
       watch:
         - action: sync
