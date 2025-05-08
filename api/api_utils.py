@@ -1,3 +1,4 @@
+import os,sys
 import time
 import requests
 
@@ -7,12 +8,12 @@ import bcrypt
 from datetime import datetime, timedelta
 import pytz
 import logging
-from api.script.libs.oa_types import  OpenAgendaEvent
-from api.script.mistral_images import getMistralImageEvent, postMistralEventToOa, mistralEvent
 
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from api.script.configuration import config
+from script.libs.oa_types import  OpenAgendaEvent
 from script.mistral_images import getMistralImageEvent, postMistralEventToOa, mistralEvent
+import typing
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

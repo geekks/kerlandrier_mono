@@ -1,13 +1,16 @@
 from typing import Optional, Union
 
-import os
-from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password, send_url_to_mistral
-from api.script.libs.HttpRequests import patch_event
-from .configuration import configAPI
-from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, get_user_by_username, verify_password, send_url_to_mistral
-from api.script.mistral_images import postImageToImgbb
+import os, sys
 
-from api.db import initialize_database, DB_Connection
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+from api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, get_user_by_username, verify_password, send_url_to_mistral
+from script.libs.HttpRequests import patch_event
+from configuration import configAPI
+from script.configuration import config, oa
+from script.mistral_images import postImageToImgbb
+
+from db import initialize_database, DB_Connection
 from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile, File
 from pydantic import BaseModel
 from typing import List
@@ -23,7 +26,6 @@ db = DB_Connection(configAPI.DB_PATH)
 app = FastAPI()
 
 from fastapi.middleware.cors import CORSMiddleware
-from api.script.libs.oa_types import OpenAgendaEvent
 
 app.add_middleware(
     CORSMiddleware,
