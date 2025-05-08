@@ -4,10 +4,10 @@ import os
 from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, db, get_user_by_username, verify_password, send_url_to_mistral
 from api.script.libs.HttpRequests import patch_event
 from .configuration import configAPI
-from api.script.configuration import config, oa
+from .api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, get_user_by_username, verify_password, send_url_to_mistral
 from api.script.mistral_images import postImageToImgbb
 
-from api.db import initialize_database, db_path
+from api.db import initialize_database, DB_Connection
 from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile, File
 from pydantic import BaseModel
 from typing import List
@@ -15,9 +15,10 @@ import logging
 
 # Check if the database file exists and initialize it if not
 
-if not os.path.exists(db_path):
-    initialize_database(db_path)
+if not os.path.exists(configAPI.DB_PATH):
+    initialize_database(configAPI.DB_PATH)
     logging.info("Database initialized.")
+db = DB_Connection(configAPI.DB_PATH)
 
 app = FastAPI()
 

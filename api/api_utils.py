@@ -12,12 +12,10 @@ from api.script.mistral_images import getMistralImageEvent, postMistralEventToOa
 
 
 from api.script.configuration import config
-from api.db import db_path
+from script.mistral_images import getMistralImageEvent, postMistralEventToOa, mistralEvent
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-db: sqlite3.Connection = sqlite3.connect(db_path)
 
 def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
