@@ -22,12 +22,28 @@ def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
 
-async def get_event_keywords(event_uid: str | int,
+def get_event_keywords(event_uid: str | int,
                             api_url: str,
-                            oa_public_key: str ):
+                            oa_public_key: str ) -> list[str]:
+    """
+    Retrieves the French keywords associated with a specific event from the OpenAgenda API.
+
+    Args:
+        event_uid (str | int): The unique identifier of the event.
+        api_url (str): The base URL of the OpenAgenda API.
+        oa_public_key (str): The public key for accessing the OpenAgenda API.
+
+    Returns:
+        list[str]: A list of French keywords associated with the event. 
+        Returns an empty list if no keywords are found or if the event does not exist.
+
+    Raises:
+        requests.RequestException: If there is an error making the API request or in input parameters.
+    """
     uid = str(event_uid)
     if event_uid is None or api_url is None or oa_public_key is None:
         logging.error("Error event_uid, api_url or oa_public_key is None")
+        raise ValueError("event_uid, api_url or oa_public_key is None")
         return None
     url = f"{api_url}/events/{uid}?key={oa_public_key}"
     try:

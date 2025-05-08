@@ -144,7 +144,7 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
         return {"success": False, "data": [], "message": str(e)}
     event = request
     try:
-        existingKeywords = await get_event_keywords(event.uid,
+        existingKeywords = get_event_keywords(event.uid,
                                                     api_url=config.OA_API_URL,
                                                     oa_public_key=oa.public_key)
         if existingKeywords is None or existingKeywords != event.keywords:
