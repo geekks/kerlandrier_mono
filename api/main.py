@@ -198,7 +198,8 @@ async def upload_file(file: UploadFile,
     try:
         response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
-                            url=url)
+                            url=url,
+                            OA_AGENDA_URL=config.OA_AGENDA_URL)
         return response
     except Exception as e:
         logging.error(e)
@@ -220,7 +221,8 @@ async def upload_url(request: UrlRequest ,
     try:
         response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
-                            url=request.url)
+                            url=request.url,
+                            OA_AGENDA_URL=config.OA_AGENDA_URL)
         return response
     except Exception as e:
         logging.error(e)
