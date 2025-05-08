@@ -4,7 +4,6 @@ from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
 # Chemin absolu vers le .env du dosseir "script"
-import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 env_path= os.path.join(SCRIPT_DIR, '.env' ) 
 
@@ -16,5 +15,9 @@ class Configuration(BaseSettings):
     JWT_SECRET: SecretStr = Field(description="JWT secret key")
     JWT_ALGORITHM: str = Field(description="JWT algorithm", default="HS256")
     DB_PATH:str = Field(description="relative path of the database auth.db", default="db/auth.db")
-configAPI = Configuration(_env_file=env_path)
 
+    model_config = {
+        "env_file": env_path,
+        "env_file_encoding" : 'utf-8'
+        }
+configAPI = Configuration()

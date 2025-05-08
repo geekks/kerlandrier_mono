@@ -47,6 +47,10 @@ class Configuration(BaseSettings):
     # Scraping
     HEADLESS_PLAYWRIGHT: bool = Field(description="Headless mode for Playwright", default=True)
 
+    model_config = {
+        "extra" : "allow"
+    }
+    
 config = Configuration(_env_file=env_path)
 
 oa = OA_Connection(
