@@ -174,6 +174,27 @@ def delete_location(access_token: str, location_uid: str, locations_api_url: str
         print(f"Error deleting location: {exc}")
         return None
 
+def get_event(public_key: str, event_uid: str, events_api_url: str = EVENTS_API_URL) -> dict:
+    """
+    Retrieve an event from OpenAgenda API with given parameters.
+    Args:
+        access_token (str): The access token for the API call.
+        event_uid (str): The uid of the event to retrieve.
+    Returns:
+        A dict of OA event.
+    """
+    headers = {
+        "Content-Type": 'application/json',
+        "nonce": get_nonce()
+    }
+    url = f"{events_api_url}/{event_uid}?key={public_key}"
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as exc:
+        print(f"Error getting event: {exc}")
+        return None
 
 def get_events( params: dict, oa_public_key:str, events_api_url: str = EVENTS_API_URL) -> list:
     """
