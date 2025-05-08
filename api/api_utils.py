@@ -97,7 +97,7 @@ def generate_kl_token(user_id: int,
                     JWT_SECRET: str,
                     JWT_ALGORITHM: str) -> str:
     paris_tz = pytz.timezone('Europe/Paris')
-    expiration_time = datetime.now(paris_tz) + timedelta(minutes=30)
+    expiration_time = datetime.now(paris_tz) + timedelta(days=30)
     payload = {
         "user_id": user_id,
         "exp": expiration_time
