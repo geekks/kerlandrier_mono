@@ -1,0 +1,119 @@
+name: Test FastAPI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r api/requirements.txt
+
+    - name: files in folder
+      run: |
+        ls -la api
+        ls -la
+    - name: Upload api .env file
+      uses: actions/upload-artifact@v2
+      with:
+        name: api-env-file
+        path: api/.env.test
+
+    - name: Download api .env file
+      uses: actions/download-artifact@v2
+      with:
+        name: api-env-file
+        path: api/.env
+    
+    - name: Upload script .env file
+      uses: actions/upload-artifact@v2
+      with:
+        name: script-env-file
+        path: api/script/.env.test
+  
+    - name: Download script .env file
+      uses: actions/download-artifact@v2
+      with:
+        name: script-env-file
+        path: api/script/.env
+
+    - name: Initialize database
+      run: |
+        python -c "from api.db import initialize_database; initialize_database('auth.db')"
+
+    - name: Create test user
+      run: |
+        python -c "from api.api_utils import db, create_user; create_user(db, 'testuser', 'testpassword')"
+
+    - name: Start FastAPI server
+      run: |
+        uvicorn api.main:app --host 0.0.0.0 --port 8000 &
+
+    - name: Start mock data server
+      run: |
+        uvicorn api.mock_data:app --host 0.0.0.0 --port 8001 &
+
+    - name: Wait for servers to start
+      run: sleep 10
+
+    - name: Test authentication
+      run: |
+        response=$(curl -s -X POST http://localhost:8000/auth -H "Content-Type: application/json" -d '{"username": "testuser", "password": "testpassword"}')
+        echo $response
+        token=$(echo $response | jq -r '.access_token')
+        if [ "$token" == "null" ]; then
+          echo "Authentication failed"
+          exit 1
+        fi
+
+    - name: Test /auth/oatoken endpoint
+      run: |
+        token=$(curl -s -X POST http://localhost:8000/auth -H "Content-Type: application/json" -d '{"username": "testuser", "password": "testpassword"}' | jq -r '.access_token')
+        response=$(curl -s -X GET http://localhost:8000/auth/oatoken -H "Authorization: Bearer $token")
+        echo $response
+        if [ "$(echo $response | jq -r '.success')" != "true" ]; then
+          echo "Failed to get OA token"
+          exit 1
+        fi
+
+    - name: Test PATCH /event/keywords endpoint
+      run: |
+        token=$(curl -s -X POST http://localhost:8000/auth -H "Content-Type: application/json" -d '{"username": "testuser", "password": "testpassword"}' | jq -r '.access_token')
+        response=$(curl -s -X PATCH http://localhost:8000/event/keywords -H "Content-Type: application/json" -H "Authorization: Bearer $token" -d '{"uid": "90435570", "keywords": ["new", "keywords"]}')
+        echo $response
+        if [ "$(echo $response | jq -r '.success')" != "true" ]; then
+          echo "Failed to update event keywords"
+          exit 1
+        fi

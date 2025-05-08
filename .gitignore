@@ -28,3 +28,6 @@ __pycache__
 # Google Cloud Console auth
 association-concarneau*.json
 .goutputstream-*
+
+#Tests
+db_tests
