@@ -142,8 +142,8 @@ def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str
     if image_url:
         eventOA["image"] = {"url": image_url}
     try:
-        with msg.loading("Sending event to OpenAgenda"):
-            response = create_event(access_token, eventOA)
+        logging.info("Sending event to OpenAgenda")
+        response = create_event(access_token, eventOA)
         if response['event']['uid']:
                 logging.info("Event created !")
                 logging.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
