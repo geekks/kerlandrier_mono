@@ -1,0 +1,743 @@
+[
+    {
+        "uid-externe": "Grande_marée_(Basse)_386",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-386",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.59"
+        },
+        "timings": [
+            {
+                "begin": "2025-09-09T00:16:00+0200",
+                "end": "2025-09-09T00:17:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20250909",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20250909"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.101",
+                "0.59m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20250909",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_388",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-388",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.63"
+        },
+        "timings": [
+            {
+                "begin": "2025-09-09T12:33:00+0200",
+                "end": "2025-09-09T12:34:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20250909",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20250909"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.104",
+                "0.63m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20250909",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_390",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-390",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.54"
+        },
+        "timings": [
+            {
+                "begin": "2025-09-10T00:54:00+0200",
+                "end": "2025-09-10T00:55:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20250910",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20250910"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.106",
+                "0.54m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20250910",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_392",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-392",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.62"
+        },
+        "timings": [
+            {
+                "begin": "2025-09-10T13:12:00+0200",
+                "end": "2025-09-10T13:13:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20250910",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20250910"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.106",
+                "0.62m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20250910",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_394",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-394",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.64"
+        },
+        "timings": [
+            {
+                "begin": "2025-09-11T01:34:00+0200",
+                "end": "2025-09-11T01:35:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20250911",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20250911"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.104",
+                "0.64m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20250911",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_396",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-396",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.75"
+        },
+        "timings": [
+            {
+                "begin": "2025-09-11T13:54:00+0200",
+                "end": "2025-09-11T13:55:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20250911",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20250911"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.101",
+                "0.75m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20250911",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_496",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-496",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.67"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-07T11:27:00+0200",
+                "end": "2025-10-07T11:28:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251007",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251007"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.103",
+                "0.67m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251007",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_498",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-498",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.52"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-07T23:47:00+0200",
+                "end": "2025-10-07T23:48:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251007",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251007"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.107",
+                "0.52m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251007",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_500",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-500",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.53"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-08T12:07:00+0200",
+                "end": "2025-10-08T12:08:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251008",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251008"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.109",
+                "0.53m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251008",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_502",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-502",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.52"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-09T00:27:00+0200",
+                "end": "2025-10-09T00:28:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251009",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251009"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.110",
+                "0.52m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251009",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_504",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-504",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.55"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-09T12:50:00+0200",
+                "end": "2025-10-09T12:51:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251009",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251009"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.109",
+                "0.55m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251009",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_506",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-506",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.67"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-10T01:10:00+0200",
+                "end": "2025-10-10T01:11:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251010",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251010"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.106",
+                "0.67m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251010",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_508",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-508",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.73"
+        },
+        "timings": [
+            {
+                "begin": "2025-10-10T13:35:00+0200",
+                "end": "2025-10-10T13:36:00+0200"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251010",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251010"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.102",
+                "0.73m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251010",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_608",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-608",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.75"
+        },
+        "timings": [
+            {
+                "begin": "2025-11-05T10:00:00+0100",
+                "end": "2025-11-05T10:01:00+0100"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251105",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251105"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.101",
+                "0.75m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251105",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_610",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-610",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.66"
+        },
+        "timings": [
+            {
+                "begin": "2025-11-05T22:21:00+0100",
+                "end": "2025-11-05T22:22:00+0100"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251105",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251105"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.104",
+                "0.66m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251105",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_612",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-612",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.63"
+        },
+        "timings": [
+            {
+                "begin": "2025-11-06T10:46:00+0100",
+                "end": "2025-11-06T10:47:00+0100"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251106",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251106"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.106",
+                "0.63m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251106",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_614",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-614",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.68"
+        },
+        "timings": [
+            {
+                "begin": "2025-11-06T23:05:00+0100",
+                "end": "2025-11-06T23:06:00+0100"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251106",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251106"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.106",
+                "0.68m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251106",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_616",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-616",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.65"
+        },
+        "timings": [
+            {
+                "begin": "2025-11-07T11:33:00+0100",
+                "end": "2025-11-07T11:34:00+0100"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251107",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251107"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.105",
+                "0.65m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251107",
+        "attendanceMode": 3
+    },
+    {
+        "uid-externe": "Grande_marée_(Basse)_618",
+        "title": {
+            "fr": "Grande marée (Basse)"
+        },
+        "slug": "grande-maree-basse-618",
+        "description": {
+            "fr": "Basse"
+        },
+        "longDescription": {
+            "fr": "Basse\n0.83"
+        },
+        "timings": [
+            {
+                "begin": "2025-11-07T23:51:00+0100",
+                "end": "2025-11-07T23:52:00+0100"
+            }
+        ],
+        "locationUid": 95821135,
+        "links": [
+            {
+                "link": "https://www.maree.info/93?d=20251107",
+                "data": {
+                    "url": "https://www.maree.info/93?d=20251107"
+                }
+            }
+        ],
+        "image": {
+            "url": ""
+        },
+        "keywords": {
+            "fr": [
+                "Coef.102",
+                "0.83m"
+            ]
+        },
+        "onlineAccessLink": "https://www.maree.info/93?d=20251107",
+        "attendanceMode": 3
+    }
+]
