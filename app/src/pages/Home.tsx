@@ -70,8 +70,8 @@ const Home = () => {
 				.filter((d) => d.dateRange.includes("-"))
 				.filter((d) => {
 					if (selectedAreas.length === 0) return true;
-					return d.location.description.fr
-						? selectedAreas.includes(d.location.description.fr.toLowerCase())
+					return d.location.description
+						? selectedAreas.includes(d.location.description.toLowerCase())
 						: true;
 				})
 				.filter((d) => {
@@ -89,8 +89,8 @@ const Home = () => {
 				.filter((d) => !d.dateRange.includes("-"))
 				.filter((d) => {
 					if (selectedAreas.length === 0) return true;
-					return d.location.description.fr
-						? selectedAreas.includes(d.location.description.fr.toLowerCase())
+					return d.location.description
+						? selectedAreas.includes(d.location.description.toLowerCase())
 						: true;
 				})
 				.filter((d) => {

@@ -13,7 +13,7 @@ export type OpenAgendaEvent = {
   keywords: string[];
   dateRange: string;
   location: {
-    description: { fr?: string };
+    description: string;
     name: string;
     city: string
   }
