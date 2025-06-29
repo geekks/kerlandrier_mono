@@ -7,7 +7,7 @@ import sqlite3
 import bcrypt
 from datetime import datetime, timedelta
 import pytz
-import logging
+import logging, coloredlogs
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -17,7 +17,7 @@ import typing
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
+coloredlogs.install()
 def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 

@@ -6,6 +6,8 @@ from script.mistral_images import postMistralEvent
 
 import argparse
 import inquirer
+import logging,coloredlogs
+coloredlogs.install()
 
 def main():
     parser = argparse.ArgumentParser(description="Run different scripts with arguments.")

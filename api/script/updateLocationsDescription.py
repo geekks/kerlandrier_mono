@@ -10,6 +10,7 @@ Les maigres sources:
 -  http://www.heritaj.bzh/website/image/ir.attachment/4925_2e00c37/datas
 """
 import json
+import logging
 from .libs.HttpRequests import(
         get_locations,
         patch_location,
@@ -36,7 +37,7 @@ def udpateLocationsDescription(access_token: str):
 
     locations = get_locations(access_token)
 
-    print(f"Nombre total de lieux: {len(locations)}")
+    logging.info(f"Nombre total de lieux: {len(locations)}")
 
     if locations and len(locations) > 1:
         for location in locations:
@@ -46,19 +47,19 @@ def udpateLocationsDescription(access_token: str):
             
             if location.get("city") in aven_cities:
                 patch_location( access_token, location["uid"], {"description": {"fr": "AVEN"}, "state": 1 })
-                print(f"Lieu: '{location['name']}' ajouté dans AVEN")
+                logging.info(f"Lieu: '{location['name']}' ajouté dans AVEN")
                 
             elif location.get("city") in cornouaille_cities:
                 patch_location( access_token, location["uid"], {"description": {"fr": "CORNOUAILLE"},"state": 1 })
-                print(f"Lieu: '{location['name']}' ajouté dans CORNOUAILLE")
+                logging.info(f"Lieu: '{location['name']}' ajouté dans CORNOUAILLE")
                 
             elif location.get("postalCode", "")[:2] in breizh_postal:
                 patch_location( access_token, location["uid"], {"description": {"fr": "BRETAGNE"},"state": 1 })
-                print(f"Lieu: '{location['name']}' ajouté dans BRETAGNE")
+                logging.info(f"Lieu: '{location['name']}' ajouté dans BRETAGNE")
                 
             else:
-                print(f"🔴 Pas de catégorie pour lieu : '{location['name']}' . Adresse: {location.get('address')}, {location.get('city')}, {json.dumps(location.get('description'))}")
-                print("  -> Ajouter la ville dans un des territoires dans le script: AVEN, CORNOUAILLE, BRETAGNE")
-        print("Tous les lieux ont été mis à jour.")
+                logging.error(f"🔴 Pas de catégorie pour lieu : '{location['name']}' . Adresse: {location.get('address')}, {location.get('city')}, {json.dumps(location.get('description'))}")
+                logging.info("  -> Ajouter la ville dans un des territoires dans le script: AVEN, CORNOUAILLE, BRETAGNE")
+        logging.info("Tous les lieux ont été mis à jour.")
     else:
-        print("No locations.")
+        logging.error("No locations.")

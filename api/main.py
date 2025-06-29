@@ -14,7 +14,9 @@ from db import initialize_database, DB_Connection
 from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile, File
 from pydantic import BaseModel
 from typing import List
-import logging
+import logging,coloredlogs
+
+coloredlogs.install()
 
 # Check if the database file exists and initialize it if not
 

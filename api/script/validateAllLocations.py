@@ -2,6 +2,7 @@
 Valide tous les lieux ('location') d'OpenAgenda ("state": 1 )
 """
 
+import logging
 from libs.HttpRequests import (  
                             get_locations,
                             patch_location)
@@ -17,13 +18,13 @@ def validate_locations():
         for location in allLocations :
             if location["state"] == 0:
                 try:
-                    response=patch_location(accessToken, str(location["uid"]), { 'state': 1 })
-                    print("Validated location:", location["name"])
+                    patch_location(accessToken, str(location["uid"]), { 'state': 1 })
+                    logging.info("Validated location:", location["name"])
                     validated_count += 1
                 except Exception as e:
-                    print(f"Error validating location: {location["name"]} - {location['uid']}")
-                    print(e)
-        print("Total validated locations:", validated_count)
+                    logging.error(f"Error validating location: {location["name"]} - {location['uid']}")
+                    logging.error(e)
+        logging.info("Total validated locations:", validated_count)
         
 
 if __name__ == "__main__":

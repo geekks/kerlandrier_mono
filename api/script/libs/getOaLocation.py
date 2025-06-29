@@ -72,7 +72,7 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         searched_location = "Concarneau (lieu à préciser)" 
     
     optimized_searched_location = searched_location
-    logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
+    # logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
     OaLocationsIndex = {}
     for location in allOaLocations:
@@ -97,7 +97,7 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         and 47 < float(lat) < 49
         and -5.5 < float(long) < -1 
         ):
-        logger.info(f"-> '\U0001f195' New OA location created : {new_oa_location['name']}, {new_oa_location['address']}, {"https://openagenda.com/kerlandrier/admin/locations/" + str(new_oa_location['uid'])}")
+        logger.warning(f"-> '\U0001f195' New OA location created : {new_oa_location['name']}, {new_oa_location['address']}, {"https://openagenda.com/kerlandrier/admin/locations/" + str(new_oa_location['uid'])}")
         return new_oa_location['uid']
     else:
         delete_location(access_token, new_oa_location['uid'])

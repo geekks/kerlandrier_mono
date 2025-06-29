@@ -2,6 +2,7 @@
 Functions to interact with OpenAgenda API
 """
 
+import logging
 import os
 
 import math, random
@@ -39,8 +40,6 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
                 ):
                     return token_data["access_token"]
         
-        
-    # print("Request a new token and save it in secret_token.json")
     headers = {
         "Content-Type": 'application/json',
     }
@@ -64,7 +63,7 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
         return token_data['access_token']
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error retrieving access token: {exc}")
+        logging.error(f"Error retrieving access token: {exc}")
         return None
 
 def get_locations(access_token: str, locations_api_url: str =LOCATIONS_API_URL):
@@ -86,7 +85,7 @@ def get_locations(access_token: str, locations_api_url: str =LOCATIONS_API_URL):
             after=locations_part.get('after')
 
         except requests.exceptions.RequestException as exc:
-            print(f"Error retrieving locations: {exc}")
+            logging.error(f"Error retrieving locations: {exc}")
             return None
     return all_locations
 
@@ -121,9 +120,7 @@ def post_location(access_token: str, name: str , adresse: str, locations_api_url
     except requests.exceptions.RequestException as exc:
         text_json = json.loads(exc.response.text)
         if  text_json.get('message') != "geocoder didn't find address":
-            print(f"Error Posting location on OA: {exc}")
-        #else:
-            # print("No existing address found by OA API")
+            logging.error(f"Error Posting location on OA: {exc}")
         return None
 
 def patch_location(access_token:str, location_uid: str, body: dict, locations_api_url: str =LOCATIONS_API_URL):
@@ -153,7 +150,7 @@ def patch_location(access_token:str, location_uid: str, body: dict, locations_ap
         return response.json().get('location')
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error Patching location on OA: {exc}")
+        logging.error(f"Error Patching location on OA: {exc}")
         return None
 
 
@@ -171,7 +168,7 @@ def delete_location(access_token: str, location_uid: str, locations_api_url: str
         return response.json()
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error deleting location: {exc}")
+        logging.error(f"Error deleting location: {exc}")
         return None
 
 def get_event(public_key: str, event_uid: str, events_api_url: str = EVENTS_API_URL) -> dict:
@@ -193,7 +190,7 @@ def get_event(public_key: str, event_uid: str, events_api_url: str = EVENTS_API_
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as exc:
-        print(f"Error getting event: {exc}")
+        logging.error(f"Error getting event: {exc}")
         return None
 
 def get_events( params: dict, oa_public_key:str, events_api_url: str = EVENTS_API_URL) -> list:
@@ -225,7 +222,7 @@ def get_events( params: dict, oa_public_key:str, events_api_url: str = EVENTS_AP
             all_events.extend(events_part.get('events'))
             after=events_part.get('after')
         except requests.exceptions.RequestException as exc:
-            print(f"Error getting events: {exc}")
+            logging.error(f"Error getting events: {exc}")
             return None
     return all_events
 
@@ -241,19 +238,18 @@ def create_event(access_token:str, event:dict, events_api_url: str = EVENTS_API_
     try:
         event_creation_response = requests.post(url, json=body , headers=headers)
         if event_creation_response.status_code != 200:
-            print(f"Error creating event {event.get('title').get('fr')}: Status Code {event_creation_response.status_code}")
-            print(f"Response:")
-            print(json.dumps(event_creation_response.json(), indent=4))
+            logging.error(f"Error creating event {event.get('title').get('fr')}: Status Code {event_creation_response.status_code}")
+            logging.error(json.dumps(event_creation_response.json(), indent=4))
             return None
         
         createdEvent= json.loads(event_creation_response.text)['event']
-        print('event "'+ event['title']['fr'] + '" created with uid: ' + str(createdEvent['uid']) )
-        print("and OA event URL: "+ "https://openagenda.com/kerlandrier/contribute/event/"+str(createdEvent['uid']))
+        logging.info('New event: "'+ event['title']['fr'] \
+            + "https://openagenda.com/kerlandrier/contribute/event/")
         
         return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error creating event {event.get('title').get('fr')}: {exc}")
+        logging.error(f"Error creating event {event.get('title').get('fr')}: {exc}")
         return None
 
 def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_url: str = EVENTS_API_URL):
@@ -266,16 +262,15 @@ def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_u
     url = f"{events_api_url}/{eventUid}"
     try:
         event_creation_response = requests.patch(url, json=body , headers=headers)
-        print(event_creation_response.json())
+        logging.info(event_creation_response.json())
         if event_creation_response.status_code != 200:
-            print(f"Error pathcing event: Status Code {event_creation_response.status_code}")
-            print(f"Response:")
-            print(json.dumps(event_creation_response.json(), indent=4))
+            logging.error(f"Error pathcing event: Status Code {event_creation_response.status_code}")
+            logging.error(json.dumps(event_creation_response.json(), indent=4))
             raise Exception(f"Error patching event: {event_creation_response.json().get('message', 'Unknown error')}")
         return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error creating event: {exc}")
+        logging.error(f"Error creating event: {exc}")
         return None
 
 def delete_event(access_token:str, event_uid:str|int, events_api_url: str = EVENTS_API_URL):
@@ -292,7 +287,7 @@ def delete_event(access_token:str, event_uid:str|int, events_api_url: str = EVEN
         return response.json()
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error deleting event: {exc}")
+        logging.error(f"Error deleting event: {exc}")
         return None
 
 def search_events( oa_public_key: str, search_string:str, past_events:bool  = False, other_params:dict = None, events_api_url: str = EVENTS_API_URL ) -> dict | None:
@@ -319,7 +314,7 @@ def search_events( oa_public_key: str, search_string:str, past_events:bool  = Fa
         return response.json()
 
     except requests.exceptions.RequestException as exc:
-        print(f"Error getting events: {exc}")
+        logging.error(f"Error getting events: {exc}")
         return None
 
 def get_uid_from_name_date(oa_public_key:str ,event_name:str, text_date:str = None, uid_externe:bool = False) -> str|None:
@@ -362,16 +357,3 @@ searchParamsTests = [
                     'monolingual': 'fr'},
     
 ]
-
-# if __name__ == "__main__":
-#     for index, paramTest in enumerate(searchParamsTests):
-#         print( "--- parmas test n°" + str(index) + "---" )
-#         events = get_events(paramTest)
-#         print("nombre d'events: ",len(events))
-#         if len(events) == 0: continue
-#         print("Noms: ")
-#         events_title =[]
-#         for event in events:
-#             events_title.append(event.get('uid-externe') if event.get('uid-externe') else event.get('title'))
-#         print(*events_title,  sep="; ")
-            

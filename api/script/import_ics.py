@@ -4,8 +4,7 @@ Script to import events from a private Facebook calendar (ICS file)
 import json
 
 import datetime
-from pprint import pprint
-
+import logging
 from .configuration import config, oa
 
 from .libs.ICS_utils import pull_upcoming_ics_events
@@ -13,7 +12,6 @@ from .libs.getOaLocation import get_or_create_oa_location
 from .libs.HttpRequests import get_events, create_event
 
 import argparse
-
 
 now=datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
@@ -29,7 +27,7 @@ def import_ics(ics_url:str):
     # Unidecode ? https://pypi.org/project/Unidecode/
 
     ics_events = pull_upcoming_ics_events(ics_url)
-    print(f"Total number of events on ICS : {len(ics_events)}\n")
+    logging.info(f"Total number of events on ICS : {len(ics_events)}\n")
     
     eventsOa: list=get_events(params={"relative[0]": "upcoming", "relative[1]": "current",
                                     "detailed": 1,
@@ -37,7 +35,7 @@ def import_ics(ics_url:str):
                                     "state[0]":2, "state[1]":1, "state[2]":0, "state[3]":-1} # get refused/removed events to avoid recreating it,
                             , oa_public_key=config.OA_PUBLIC_KEY
                             )
-    print(f"Total number of future events on Oa : {len(eventsOa)}\n")
+    logging.info(f"Total number of future events on Oa : {len(eventsOa)}\n")
     uidsExterneOa = [event["uid-externe"] for event in eventsOa if "uid-externe" in event]
     
     new_events_nbr=0
@@ -85,12 +83,11 @@ def import_ics(ics_url:str):
                 new_events_nbr += 1
                 eventLog["OaUrl"] = "https://openagenda.com/fr/" + response['event']['originAgenda']['slug'] + "/events/" + response['event']['slug']
             else:
-                print( f"Problem for {event_title}\n" )
+                logging.error( f"Problem for {event_title}\n" )
                 eventLog["import_status"] = "Error posting event on OA"
                 eventLog["error"]= response if response else "No response"
-            print("--------")
         except Exception as e:
-            print(f"Error: {e} \n" )
+            logging.error(f"Error: {e} \n" )
             eventLog["import_status"] = "Error processing event"
             eventLog["error"]=  str(e)
 
@@ -101,9 +98,9 @@ def import_ics(ics_url:str):
         for dic in logContent:
             json.dump(dic, log_file,indent=2, ensure_ascii=False)
             if "error" in dic :
-                pprint(dic)
-    print(f"Checked {i+1} events from ICS URL.")
-    print(f"{new_events_nbr} new events created")
+                logging.error(dic)
+    logging.info(f"Checked {i+1} events from ICS URL.")
+    logging.info(f"{new_events_nbr} new events created")
 
 if __name__ == "__main__":
     
