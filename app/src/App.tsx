@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Layout from './Layout'
-import Home from './pages/Home'
+import Layout from './Layout';
+import Home from './pages/Home';
 import DiwarBenn from './pages/DiwarBenn';
 import Edito from './pages/Edito';
 
@@ -20,4 +20,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

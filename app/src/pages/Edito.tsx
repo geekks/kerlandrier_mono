@@ -114,9 +114,9 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 			<div>
 				{event.nextTiming
 					? DateTime.fromISO(event.nextTiming?.begin).toFormat(
-							"ccc dd LLL HH:mm",
-							{ locale: "fr-FR" },
-						)
+						"ccc dd LLL HH:mm",
+						{ locale: "fr-FR" },
+					)
 					: null}
 			</div>
 			<h3 className="mb-2">⟜ {event.location.name}</h3>

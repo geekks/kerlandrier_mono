@@ -1,13 +1,14 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import "tailwindcss";
 
 @layer base {
-  html {
-    line-height: normal;
-  }
-  a {
-    text-decoration: underline;
-  }
+    html {
+        line-height: normal;
+    }
+
+    a {
+        text-decoration: underline;
+    }
 }
 
 body {
@@ -322,13 +323,13 @@ footer {
         transform: rotate(20deg);
         white-space: nowrap;
     }
-    
-        :root {
+
+    :root {
         --main-color: #008080;
         --lite-bkg: beige;
     }
-    
-        body {
+
+    body {
         margin: 10px 20px;
         background-color: var(--lite-bkg);
         color: var(--main-color);
