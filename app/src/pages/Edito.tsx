@@ -51,6 +51,12 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 	const saveKeywordsMutation = useMutation({
 		mutationFn: patchEvent,
 		onSuccess: (updatedEvent) => {
+			if (updatedEvent.message == "Error patching event: not authorized to edit event") {
+				throw new Error("Evènement non éditable. Surement un évènement importé");
+			}
+			if (!updatedEvent.success) {
+				throw new Error(updatedEvent.message);
+			}
 			console.log("updatedEvent - ", updatedEvent);
 			queryClient.setQueryData(
 				[EVENTS_QUERY_KEY],
