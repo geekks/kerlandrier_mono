@@ -15,8 +15,7 @@ dist-ssr
 *.local
 .yarn
 
-# Yarn 2 PnP
-.pnp.*
+
 
 # Editor directories and files
 .vscode/*
