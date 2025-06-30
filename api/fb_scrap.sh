@@ -16,5 +16,9 @@ fi
 
 # Exécuter le script Python d'import des événements Facebook Kerlandrier
 python manual_scripts.py import_ics
+
+# Exécuter le script Python d'import des événements Facebook Kerlandrier
+python manual_scripts.py updateLocationsDescription
+
 # Désactiver l'environnement virtuel python
 deactivate
