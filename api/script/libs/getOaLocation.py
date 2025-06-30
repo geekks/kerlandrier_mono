@@ -34,7 +34,7 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         return None
     
     # 0) Use optimized searched, removing false positives and misleadings patterns
-    searched_location=re.sub(r'\b(?:concarneau|finistère|france|officiel|spectacles)\b',
+    searched_location=re.sub(r'\b(?:finistère|france|officiel|spectacles)\b',
                                             '',
                                             searched_location,
                                             flags=re.IGNORECASE
@@ -58,8 +58,8 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         ("Brasserie de Bretagne Le Bek", "Le Bek"),
         ("Rue de Colguen", "Cinéville, Rue de Colguen"),
         ("LE CAFE LOCAL", "Le Café Local, Combrit"),
-        ("3e lieu l'Archipel", "l'Archipel, Fouenant"),
-        ("1 place Jean Jaures","Le livre & la plume"),
+        ("3e lieu  l'Archipel", "l'Archipel, Fouenant"),
+        ("1 place Jean Jaures, Concarneau","Le livre & la plume"),
         ("CAC Scènes", "Le CAC"),
         ("Médiathèque de Fouesnant  l'Archipel", "L'Archipel, 1 Rue des Îles, Fouesnant")
     ]
