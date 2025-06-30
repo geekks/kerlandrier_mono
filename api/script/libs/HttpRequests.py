@@ -86,7 +86,7 @@ def get_locations(access_token: str, locations_api_url: str =LOCATIONS_API_URL):
 
         except requests.exceptions.RequestException as exc:
             logging.error(f"Error retrieving locations: {exc}")
-            return None
+            exit(1)
     return all_locations
 
 def post_location(access_token: str, name: str , adresse: str, locations_api_url: str=LOCATIONS_API_URL ):
