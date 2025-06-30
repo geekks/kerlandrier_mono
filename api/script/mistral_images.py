@@ -82,7 +82,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
         exit(1)
         
     base64_image = encodeImage64(image_path)
-    model = "pixtral-large-latest"
+    model = "pixtral-12b"
     client = Mistral(api_key=MISTRAL_PRIVATE_API_KEY)
 
     # Define the messages for the chat
@@ -170,11 +170,6 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
     """
     if not os.path.isfile(image_path):
         raise argparse.ArgumentTypeError(f"Given image path ({image_path}) is not valid")
-
-    # DEBUG
-    # response_mistral_json = response_mistral.model_dump(mode='json')
-    # print("Mistral answer:")
-    # pprint(response_mistral_json)
 
     try:
         payload = {
