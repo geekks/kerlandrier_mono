@@ -29,8 +29,14 @@ class Configuration(BaseSettings):
     TBD_LOCATION_UID: str = Field(description="Open Agenda ToBeDefined location UID", default="11634941")
     KAL_LOCATION_UID: str = Field(description="Open Agenda KAL location UID", default="52856698")
     AGENDA_SLUG: str = Field(description="Kerlandrier Open Agenda slug", default="kerlandrier")
-    OA_AGENDA_URL: str = Field(description="Kerlandrier Open Agenda URL", default="https://openagenda.com/fr/{config.AGENDA_SLUG}/")
-    OA_API_URL: str = Field(description="Open Agenda api URL", default="https://api.openagenda.com/v2/{config.AGENDA_UID}/")
+    
+    @property
+    def OA_AGENDA_URL(self):
+        return f"https://openagenda.com/fr/{self.AGENDA_SLUG}"
+    
+    @property
+    def OA_API_URL(self):
+        return f"https://api.openagenda.com/v2/{self.AGENDA_UID}"
     
     # Facebook events ICS URL
     ICS_PRIVATE_URL_KLR_FB: SecretStr = Field(description="Kerlandrier Facebook events ICS URL")
@@ -46,7 +52,6 @@ class Configuration(BaseSettings):
     
     # Scraping
     HEADLESS_PLAYWRIGHT: bool = Field(description="Headless mode for Playwright", default=True)
-
     model_config = {
         "extra" : "allow"
     }

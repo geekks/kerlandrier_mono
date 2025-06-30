@@ -28,6 +28,7 @@ db = DB_Connection(configAPI.DB_PATH)
 app = FastAPI()
 
 from fastapi.middleware.cors import CORSMiddleware
+from api.script.libs.utils import check_image_file
 
 app.add_middleware(
     CORSMiddleware,
@@ -168,7 +169,7 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
             return {"success": True, "data": [], "message": "No update"}
     except Exception as e:
         logging.error(e)
-        return {"success": False, "data": [], "message": str(e)}
+        raise HTTPException(status_code=400, detail=f"{e}")
 
 
 @app.post("/image/upload",
@@ -178,34 +179,41 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
 async def upload_file(file: UploadFile,
                     current_user: dict = Depends(get_current_user)
                     ):
-    # Define the directory to save the uploaded file
+    # Save file locally
     if file is None:
-        return {"success": False, "message": "Please provide a file in a form-data"}
+        raise Exception("Please provide a file in a form-data")
     try:
         upload_dir = "images"
         if not os.path.exists(upload_dir):
             os.makedirs(upload_dir)
-        # Save the uploaded file to the directory
         file_path = os.path.join(upload_dir, file.filename)
         with open(file_path, "wb") as f:
             f.write(await file.read())
+        if check_image_file(file_path) is False:
+            raise Exception("Please provide a valid image file")
     except Exception as e:
-        logging.error(e)
-        return {"success": False, "message": "Error while saving image file"}
+        logging.error(f"probleme: {e}")
+        raise HTTPException(status_code=400, detail=f"{e}")
+    
+    # Send image to imgbb server to get online image
     try:
         url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
     except Exception as e:
         logging.error(e)
-        return {"success": False, "message": "Error while uploading image to imgbb"}
+        raise HTTPException(status_code=400, detail="Error while uploading image to imgbb")
+    
+    # Send url and request to Mistral API
     try:
         response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
                             url=url,
                             OA_AGENDA_URL=config.OA_AGENDA_URL)
+        if response.get("success") is False:
+            raise HTTPException(status_code=400, detail=response.get("message"))
         return response
     except Exception as e:
         logging.error(e)
-        return {"success": False, "message": "Error while sending url to Mistral"}
+        raise HTTPException(status_code=400, detail=f"{e}")
     finally:
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
@@ -225,7 +233,9 @@ async def upload_url(request: UrlRequest ,
                             access_token = oa.access_token,
                             url=request.url,
                             OA_AGENDA_URL=config.OA_AGENDA_URL)
+        if response.get("success") is False:
+            raise HTTPException(status_code=400, detail=response.get("message"))
         return response
     except Exception as e:
         logging.error(e)
-        return {"success": False, "message": "Error while sending url to Mistral"}
+        raise HTTPException(status_code=400, detail=f"{e}")

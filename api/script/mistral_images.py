@@ -22,7 +22,7 @@ import logging
 
     
 from .libs.oa_types import OpenAgendaEvent
-from .libs.utils import get_end_date, showDiff,encodeImage64
+from .libs.utils import get_end_date, showDiff,encodeImage64, check_image_file
 from .libs.HttpRequests import create_event, retrieve_OA_access_token
 from .libs.getOaLocation import get_or_create_oa_location
 
@@ -74,12 +74,18 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
         except Exception as e:
             logging.error(f"Error downloading image from {url}", e)
             exit(1)
-                
+
+    if not check_image_file(image_path):
+        raise TypeError("Please provide a valid image file")
+
     try:
-        Image.open(image_path).verify()
+        if image_path and os.path.exists(image_path):
+            Image.open(image_path).verify()
+        else:
+            raise FileNotFoundError(f"The image file {image_path} does not exist.")
     except Exception as e:
-        logging.error(f"Image {image_path} is not valid image file", e)
-        exit(1)
+        logging.error(f"Error verifying image: {e}")
+        return None
         
     base64_image = encodeImage64(image_path)
     model = "pixtral-12b"
@@ -168,7 +174,7 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
     Returns:
         str|None: The URL of the uploaded image if successful, otherwise None.
     """
-    if not os.path.isfile(image_path):
+    if not check_image_file(image_path):
         raise argparse.ArgumentTypeError(f"Given image path ({image_path}) is not valid")
 
     try:
@@ -180,10 +186,14 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         }
         response_imgbb = requests.post(imgbb_api_url, data=payload)
         image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
-        return image_url
     except Exception as e:
-        logging.error("Error while uploading image to imgbb", e)
+        logging.error("Error while uploading image to imgbb")
         return None
+    if image_url is None:
+        raise Exception(f"Error while uploading image to imgbb {response_imgbb.text}")
+    logging.info(f"Image uploaded to imgbb: {image_url}")
+    return image_url
+
 
 def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:str=None, url:str = None, imgbb_api_url:str=None, imgbb_api_key:str=None):
         if (url is not None) and (image_path is not None):

@@ -4,6 +4,7 @@ Functions used in different scripts for scraping or interact with OpenAgenda APi
 
 from datetime import datetime, timedelta, date
 import json, csv
+import logging
 import re
 
 import dateparser
@@ -118,3 +119,37 @@ def encodeImage64(image_path):
     except Exception as e:  # Added general exception handling
         print(f"Error: {e}")
         return None
+    
+def check_image_file(image_path: str) -> bool:
+    """
+    Check if the image file exists, has a correct extension, and is an image type.
+
+    Args:
+        image_path (str): The path to the image file.
+
+    Returns:
+        bool: True if the image file is valid, False otherwise.
+    """
+    import os
+    import imghdr
+
+    # Check if the file exists
+    if not os.path.isfile(image_path):
+        logging.error(f"Error: The file {image_path} does not exist.")
+        return False
+
+    # Check if the file has a valid image extension
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff']
+    _, ext = os.path.splitext(image_path)
+    if ext.lower() not in valid_extensions:
+        logging.error(f"Error: The file {image_path} does not have a valid image extension.")
+        return False
+
+    # Check if the file is an image type
+    with open(image_path, 'rb') as f:
+        image_type = imghdr.what(f)
+        if image_type is None:
+            logging.error(f"Error: The file {image_path} is not a valid image.")
+            return False
+
+    return True

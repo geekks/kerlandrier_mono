@@ -10,3 +10,6 @@ auth.db
 
 # Logs
 *.log
+
+# api upload files
+images
