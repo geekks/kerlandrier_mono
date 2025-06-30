@@ -28,7 +28,9 @@ def import_ics(ics_url:str):
 
     ics_events = pull_upcoming_ics_events(ics_url)
     logging.info(f"Total number of events on ICS : {len(ics_events)}\n")
-    
+    if ics_events is None or ics_events == []:
+        logging.info("No import to do.")
+        return None
     eventsOa: list=get_events(params={"relative[0]": "upcoming", "relative[1]": "current",
                                     "detailed": 1,
                                     "monolingual": "fr",
