@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@openagenda/sdk-js": "^2.0.3",
     "autodetect-decoder-stream": "^2.0.2",
     "axios": "^1.7.2",
     "csv-parser": "^3.0.0",
@@ -10,7 +9,7 @@
     "fuse.js": "^7.0.0",
     "inquirer": "^8.2.6",
     "moment-timezone": "^0.5.45",
-    "node-ical": "^0.18.0",
+    "node-ical": "^0.20.0",
     "string-strip-html": "^8.5.0"
   }
 }

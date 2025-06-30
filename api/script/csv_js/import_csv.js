@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { OaSdk } = require('@openagenda/sdk-js') // OpenAgenda Sdk
 const moment = require('moment-timezone');
 const TIMEZONE = 'Europe/Paris';
 const axios = require("axios"); // for http requests
@@ -46,10 +45,6 @@ const csvToJson = async () => {
 const main = async () => {
   const uids = []
   try {
-    const oa = new OaSdk({
-      publicKey,
-      secretKey,
-    });
     // Format csv data into oa events
     const jsonEvents = await csvToJson();
     for (let i = 0; i < jsonEvents.length; i++) {
