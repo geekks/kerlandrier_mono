@@ -202,7 +202,7 @@ def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:s
             image_url=url
             response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
             logging.info(response_mistral)
-            OAEvent= postMistralEventToOa(response_mistral, image_url)
+            OAEvent= postMistralEventToOa(response_mistral,access_token, image_url)
         else:
             logging.error("Enter a valid image path or url")
             exit(1)
