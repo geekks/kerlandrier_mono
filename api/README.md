@@ -15,7 +15,7 @@ python db.py --init
 python db.py --username blabla --password blabla
 ```
 
-### `docker`
+### docker
 ```bash
 docker build -t kerlandrierapi . # build docker image
 docker run -d --name kerlandrierapi -p 8001:8001 --env-file .env kerlandrierapi:latest
