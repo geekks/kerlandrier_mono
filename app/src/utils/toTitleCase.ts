@@ -6,7 +6,6 @@ declare global {
   }
 }
 
-// eslint-disable-next-line no-extend-native
 String.prototype.toTitleCase = function (): string {
   'use strict';
   const smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|or|per|the|to|v\.?|vs\.?|via|le|la|les|du|de|des|un|une|ou|où|or|ni|car|sans|avec|ce|ces|cet|cette|d|l|et|à|dans|nos|vos|notre|votre|mon|ton|ta|ma|tes|mes|son|sa|ses|pour|se|par|sur)$/i;

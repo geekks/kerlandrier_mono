@@ -1,6 +1,6 @@
 import { API_URL, editoQuery, OA_SLUG } from "../config";
 import { DateTime } from "luxon";
-import "../layout.css";
+import "../styles/layout.css";
 import type { OpenAgendaEditoItem } from "../types/OpenAgenda";
 import type React from "react";
 import { useCallback } from "react";
@@ -8,7 +8,6 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Chip, Tooltip } from "@mui/material";
-import Login from "../components/Login";
 import { CgSpinner } from "react-icons/cg";
 
 // react-query key for refetch management
@@ -30,11 +29,14 @@ const patchEvent = async ({
 		method: "PATCH",
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+			Authorization: `Bearer ${localStorage.getItem("kl_token")}`,
 		},
 		body: JSON.stringify({ uid: id, keywords }),
 	});
 
+	if (response.statusText == "Unauthorized" || response.status == 401) {
+		throw new Error("Token error. Please connect first");
+	}
 	if (!response.ok) {
 		throw new Error("Network response was not ok");
 	}
@@ -182,11 +184,6 @@ const EventCard = ({ event }: { event: OpenAgendaEditoItem }) => {
 						<div className="text-red-500 text-sm mt-2">
 							{saveKeywordsMutation.error.message}
 						</div>
-						<div className="text-red-500 text-sm mt-2">
-							You should probably login again
-						</div>
-						<div className="text-red-500 text-sm mt-2">Sorry about that</div>
-						<div className="text-red-500 text-sm mt-2">Really sorry</div>
 					</>
 				) : null}
 			</div>
@@ -208,7 +205,6 @@ const EventList: React.FC = () => {
 
 	return (
 		<div className="text-center">
-			<Login />
 			<div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 				{events.map((event) => (
 					<EventCard key={event.uid} event={event} />

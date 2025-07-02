@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import "./layout.css";
+import './styles/layout.css';
+import Login from './components/Login'; 
 
 type LayoutProps = {
 	children: React.ReactNode;
@@ -17,6 +18,9 @@ const Layout = ({ children }: LayoutProps) => {
 							{" "}
 							<Link to="/">Retour au Kerlandrier</Link>{" "}
 						</span>
+					</div>
+					<div className="flex flex-col items-center mt-12">
+						<Login />
 					</div>
 				</div>
 			</header>

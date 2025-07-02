@@ -33,9 +33,9 @@ export type OpenAgendaEditoItem = OpenAgendaEvent & {
   hasChanged: boolean
 }
 
-export type OpenAgendaEventsRequest = {
-  [key: string]: any
-}
+// export type OpenAgendaEventsRequest = {
+//   [key: string]: any
+// }
 export type OpenAgendaEventsReponse = {
   total: number;
   events: OpenAgendaEvent[];
