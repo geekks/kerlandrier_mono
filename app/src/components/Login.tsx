@@ -44,7 +44,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-12">
+    <div className="flex flex-col items-center mt-4 sm:mt-12">
       {!isAuthenticated ? (
         <form onSubmit={handleSubmit(onSubmit)} className="flex items-center">
           <div className="flex items-center">
@@ -86,7 +86,7 @@ const Login: React.FC = () => {
       ) : (
         <button
           onClick={handleLogout}
-          className="p-2.5 font-size-16 bg-main-color text-lite-bkg border-none rounded cursor-pointer"
+          className="p-1.5 sm:p-2.5 font-size-16 bg-main-color text-lite-bkg border-none rounded cursor-pointer"
         >
           Se déconnecter
         </button>

@@ -7,13 +7,29 @@ const UploadImage: React.FC = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
   const [eventDetails, setEventDetails] = useState<{ url: string, name: string, location: string, description: string, start: string, end: string } | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorDetails(null);
+    setEventDetails(null);
+    setMessage('');
     if (event.target.files && event.target.files[0]) {
       const selectedFile = event.target.files[0];
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      const validExtensions = ['.jpg', '.jpeg', '.png'];
+      const fileName = selectedFile.name.toLowerCase();
+      const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+      if (!validTypes.includes(selectedFile.type) || !hasValidExtension) {
+        setFile(null);
+        setPreview(null);
+        setMessage("Veuillez sélectionner une image au format JPG, JPEG ou PNG.");
+        return;
+      }
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
     }
+    
   };
 
   const handleUpload = async () => {
@@ -22,6 +38,10 @@ const UploadImage: React.FC = () => {
       return;
     }
 
+    setErrorDetails(null);
+    setEventDetails(null);
+    setMessage('');
+    setIsLoading(true);
     const formData = new FormData();
     formData.append('file', file);
 
@@ -37,16 +57,26 @@ const UploadImage: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setMessage('Fichier téléchargé avec succès !');
+        setMessage('Image analysée et envoyée au KL avec succès !');
         setEventDetails(data.event);
-        console.log('Réponse de téléchargement :', data);
       } else {
         const errorData = await response.json();
-        setMessage(`Échec du téléchargement du fichier: ${errorData.message}`);
+        console.error('Erreur lors de l\'envoi du fichier:', JSON.stringify(errorData));
+        const lines = errorData["detail"]["infos"] ?
+          errorData["detail"]["infos"].join('</li><li>') :
+          JSON.stringify(errorData);
+        setErrorDetails(`<p> Échec du téléchargement du fichier:</p> 
+          <ul>
+            <li>
+              ${lines}
+              </li>
+          </ul>`);
       }
     } catch (error) {
-      setMessage('Erreur lors du téléchargement du fichier.');
-      console.error('Erreur :', error);
+      setMessage('Erreur lors de l\'envoi du fichier.');
+      console.error('Erreur :',JSON.stringify( error));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,8 +97,15 @@ const UploadImage: React.FC = () => {
           )}
         </label>
       </div>
-      <button className="upload-button" onClick={handleUpload}>Envoyer</button>
+      {isLoading ? (
+        <div className="loader-container">
+          <img src="/loader.gif" alt="Chargement..." className="loader-image" />
+        </div>
+      ) : (
+        <button className="upload-button" onClick={handleUpload}>Envoyer</button>
+      )}
       {message && <p className="message">{message}</p>}
+      {errorDetails && <p className="error-details" dangerouslySetInnerHTML={{ __html: errorDetails }}></p>}
       {eventDetails && (
         <div className="event-details">
           <h2>Détails de l'événement créé :</h2>
@@ -83,16 +120,30 @@ const UploadImage: React.FC = () => {
                 <td>{eventDetails.location}</td>
               </tr>
               <tr>
-                <td className="event-details-label"><strong>Description :</strong></td>
+                <td className="event-details-label"><strong>Desc. :</strong></td>
                 <td>{eventDetails.description}</td>
               </tr>
               <tr>
-                <td className="event-details-label"><strong>Début :</strong></td>
-                <td>{new Date(eventDetails.start).toLocaleString()}</td>
+                <td className="event-details-label event-date"><strong>Début :</strong></td>
+                <td className="event-date">
+                  {new Date(eventDetails.start).toLocaleDateString('fr-FR', {
+                  weekday: 'long',
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric'
+                  })} - {new Date(eventDetails.start).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'h')}
+                </td>
               </tr>
               <tr>
-                <td className="event-details-label"><strong>Fin :</strong></td>
-                <td>{new Date(eventDetails.end).toLocaleString()}</td>
+                <td className="event-details-label event-date"><strong>Fin :</strong></td>
+                <td className="event-date">
+                  {new Date(eventDetails.end).toLocaleDateString('fr-FR', {
+                  weekday: 'long',
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric'
+                  })} - {new Date(eventDetails.end).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(':', 'h')}
+                </td>
               </tr>
               <tr>
                 <td className="event-details-label"><strong>URL :</strong></td>

@@ -28,7 +28,11 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
     if (searched_location == None ) or (searched_location.lower() in ( "" , "none", "null")):
         logger.warning("InputLocation is null or empty. Returning default Location")
         return TBD_LOCATION_UID
-    allOaLocations = get_locations(access_token)
+    try:
+        allOaLocations = get_locations(access_token)
+    except Exception as e:
+        logger.error(f"Error retrieving locations: {e}")
+        raise Exception(f"Error retrieving locations: {e}")
     if not searched_location or not allOaLocations:
         logger.error("[ERROR] inputLocation is null or OA Locations list is empty")
         return None
@@ -61,7 +65,8 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         ("3e lieu  l'Archipel", "l'Archipel, Fouenant"),
         ("1 place Jean Jaures, Concarneau","Le livre & la plume"),
         ("CAC Scènes", "Le CAC"),
-        ("Médiathèque de Fouesnant  l'Archipel", "L'Archipel, 1 Rue des Îles, Fouesnant")
+        ("Médiathèque de Fouesnant  l'Archipel", "L'Archipel, 1 Rue des Îles, Fouesnant"),
+        ("1 rue vauban Tour du Gouverneur  Ville Close", "Maison du patrimoine"),
     ]
         for old, new in replacement:
             searched_location = searched_location.replace(old, new)
@@ -72,7 +77,7 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         searched_location = "Concarneau (lieu à préciser)" 
     
     optimized_searched_location = searched_location
-    # logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
+    logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
     OaLocationsIndex = {}
     for location in allOaLocations:

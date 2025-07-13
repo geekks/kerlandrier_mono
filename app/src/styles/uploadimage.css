@@ -53,14 +53,20 @@
 }
 
 .message {
-  font-size: 16px;
+  font-size: 22px;
   color: #333;
   margin-bottom: 20px;
 }
 
+.event-details {
+  font-size: 25px;
+  border-collapse: collapse;
+}
+
 .event-details-label {
   text-align: right;
-  padding-right: 10px;
+  padding-right: 14px;
+  column-width: 6rem;
 }
 
 .event-details-label strong {
@@ -69,4 +75,52 @@
 
 .event-details td {
   text-align: left;
+  min-width: 10%;
+}
+.event-date {
+  font-kerning: none; 
+}
+
+.loader-image {
+  width: 30px;
+  height: auto;
+}
+
+table {
+  table-layout: fixed;
+  margin-top: 30px;
+}
+ul {
+  list-style: inside;
+  padding: 0;
+}
+ul li {
+  margin: 5px 20px;
+}
+
+.error-details {
+  text-align: left;
+  color: red;
+  font-size: 18px;
+  margin-top: 20px;
+  max-width: 50rem;
+}
+
+@media screen and (max-width: 800px) {
+  .upload-box {
+    width: 100%;
+    height: 200px;
+  }
+
+  .event-details h2 {
+    font-size: 22px;
+  }
+
+  .upload-label {
+    font-size: 16px;
+  }
+  .event-details {
+    font-size: 16px;
+  }
+  
 }

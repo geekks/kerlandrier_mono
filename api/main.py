@@ -179,9 +179,10 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
 async def upload_file(file: UploadFile,
                     current_user: dict = Depends(get_current_user)
                     ):
+    infos=[]
     # Save file locally
     if file is None:
-        raise Exception("Please provide a file in a form-data")
+        raise HTTPException(status_code=400, detail="Please provide a file in a form-data")
     try:
         upload_dir = "images"
         if not os.path.exists(upload_dir):
@@ -190,34 +191,40 @@ async def upload_file(file: UploadFile,
         with open(file_path, "wb") as f:
             f.write(await file.read())
         if check_image_file(file_path) is False:
-            raise Exception("Please provide a valid image file")
+            infos.append("Error while saving file")
+            raise Exception("Error while saving file")
+        infos.append(f"File {file.filename} saved successfully")
     except Exception as e:
-        logging.error(f"probleme: {e}")
-        raise HTTPException(status_code=400, detail=f"{e}")
+        logging.error(e)
+        infos.append(str(e))
+        raise HTTPException(status_code=500, detail={"infos": infos} )
     
     # Send image to imgbb server to get online image
     try:
         url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
     except Exception as e:
-        logging.error(e)
-        raise HTTPException(status_code=400, detail="Error while uploading image to imgbb")
-    
+        infos.append("Error while uploading image to imgbb")
+        infos.append(str(e))
+        raise HTTPException(status_code=500, detail={"infos": infos} )
+    infos.append(f"Image uploaded to imgbb: {url}")
     # Send url and request to Mistral API
     try:
         response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
                             url=url,
                             OA_AGENDA_URL=config.OA_AGENDA_URL)
-        if response.get("success") is False:
-            raise HTTPException(status_code=400, detail=response.get("message"))
+        infos.append("Image successfully sent to Mistral API")
         return response
     except Exception as e:
         logging.error(e)
-        raise HTTPException(status_code=400, detail=f"{e}")
+        infos.append(str(e))
+        infos.append("Error while sending IMDB image URL to Mistral API")
+        raise HTTPException(status_code=500, detail={"infos": infos} )
     finally:
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
             logging.info(f"File {file_path} deleted")
+
 
 @app.post("/image/url",
         summary="Send an url link an image of a poster with event",
@@ -234,8 +241,8 @@ async def upload_url(request: UrlRequest ,
                             url=request.url,
                             OA_AGENDA_URL=config.OA_AGENDA_URL)
         if response.get("success") is False:
-            raise HTTPException(status_code=400, detail=response.get("message"))
+            raise HTTPException(status_code=400, detail=str(response.get("message")))
         return response
     except Exception as e:
         logging.error(e)
-        raise HTTPException(status_code=400, detail=f"{e}")
+        raise HTTPException(status_code=400, detail=str(f"{e}"))

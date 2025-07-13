@@ -19,7 +19,7 @@ const Layout = ({ children }: LayoutProps) => {
 							<Link to="/">Retour au Kerlandrier</Link>{" "}
 						</span>
 					</div>
-					<div className="flex flex-col items-center mt-12">
+					<div className="flex flex-col items-start mt-4 sm:items-center">
 						<Login />
 					</div>
 				</div>

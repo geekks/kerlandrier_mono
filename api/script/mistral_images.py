@@ -7,7 +7,7 @@ python mistral_images.py --test
 """
 
 import os
-from mistralai import Mistral
+from mistralai import Mistral, SDKError
 from pydantic import BaseModel
 import pytz
 from datetime import datetime
@@ -118,16 +118,27 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
         }
     ]
     logging.info("sending image to Mistral with image path: " + image_path)
-    chat_response = client.chat.parse(
-        model=model,
-        messages=messages,
-        response_format=mistralEvent
-    )
-    return chat_response.choices[0].message.parsed
+    try:
+        chat_response = client.chat.parse(
+            model=model,
+            messages=messages,
+            response_format=mistralEvent
+        )
+        return chat_response.choices[0].message.parsed
+    except SDKError as e:
+        logging.error(f"SDKError while sending image to Mistral: {e.body}, {e.message}, {e.status_code}")
+        raise Exception(f"SDKError while sending image to Mistral: {e.body}, {e.message}, {e.status_code}")
+    except Exception as e:
+        logging.error(f"Error while sending image to Mistral: {e}")
+        raise Exception(f"Error while sending image to Mistral: {e}")
 
 def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str = None) -> OpenAgendaEvent|None:
     
-    OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
+    try:
+        OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
+    except Exception as e:
+        logging.error(f"Error retrieving or creating location for event '{event.titre}': {e}")
+        raise Exception(f"Error retrieving or creating location for event '{event.titre}': {e}")
 
     # Fixe la timezone à Paris pour prendre en compte l'heure d'été/hivert
     timezone_paris = pytz.timezone('Europe/Paris')
@@ -187,10 +198,10 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         response_imgbb = requests.post(imgbb_api_url, data=payload)
         image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
     except Exception as e:
-        logging.error("Error while uploading image to imgbb")
+        logging.error(f"Error while uploading image to imgbb {e}")
         return None
     if image_url is None:
-        raise Exception(f"Error while uploading image to imgbb {response_imgbb.text}")
+        raise Exception(f"Error while uploading image to imgbb : image_url is None{response_imgbb.text}")
     logging.info(f"Image uploaded to imgbb: {image_url}")
     return image_url
 
