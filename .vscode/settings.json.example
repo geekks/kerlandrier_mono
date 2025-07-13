@@ -5,7 +5,8 @@
     ],
     "search.exclude": {
     "**/.yarn": true,
-    "**/.pnp.*": true
+    "**/.pnp.*": true,
+    "**/.venv": true,
     },
     "eslint.nodePath": "app/.yarn/sdks",
     "typescript.tsdk": "app/.yarn/sdks/typescript/lib",

@@ -49,7 +49,9 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
     }
 
     try:
-        oauth_response = requests.post(ACCESS_TOKEN_URL, json=body, headers=headers)
+        oauth_response = requests.post(ACCESS_TOKEN_URL,
+                                    json=body,
+                                    headers=headers)
         oauth_response.raise_for_status()
 
         token_data = {
@@ -66,8 +68,8 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
         logging.error(f"Error retrieving access token: {exc}")
         return None
 
-def get_locations(access_token: str, locations_api_url: str =LOCATIONS_API_URL):
-
+def get_locations(access_token: str,
+                locations_api_url: str =LOCATIONS_API_URL):
     url = locations_api_url
     after =0
     all_locations=[]
@@ -89,7 +91,10 @@ def get_locations(access_token: str, locations_api_url: str =LOCATIONS_API_URL):
             exit(1)
     return all_locations
 
-def post_location(access_token: str, name: str , adresse: str, locations_api_url: str=LOCATIONS_API_URL ):
+def post_location(access_token: str,
+                name: str,
+                adresse: str,
+                locations_api_url: str=LOCATIONS_API_URL ):
     """
     Create a new location in OpenAgenda, using OA Geocoder with 'name' and 'address' as search parameters
     Args:
@@ -123,7 +128,10 @@ def post_location(access_token: str, name: str , adresse: str, locations_api_url
             logging.error(f"Error Posting location on OA: {exc}")
         return None
 
-def patch_location(access_token:str, location_uid: str, body: dict, locations_api_url: str =LOCATIONS_API_URL):
+def patch_location(access_token:str,
+                location_uid: str,
+                body: dict,
+                locations_api_url: str =LOCATIONS_API_URL):
     """
     Modify an  OpenAgenda location using a PATCH call. Only modified parameters are needed.
     Args:
@@ -154,7 +162,9 @@ def patch_location(access_token:str, location_uid: str, body: dict, locations_ap
         return None
 
 
-def delete_location(access_token: str, location_uid: str, locations_api_url: str = LOCATIONS_API_URL): 
+def delete_location(access_token: str,
+                    location_uid: str,
+                    locations_api_url: str = LOCATIONS_API_URL): 
     headers = {
         "Content-Type": 'application/json',
         "access-token": access_token,
@@ -171,7 +181,9 @@ def delete_location(access_token: str, location_uid: str, locations_api_url: str
         logging.error(f"Error deleting location: {exc}")
         return None
 
-def get_event(public_key: str, event_uid: str, events_api_url: str = EVENTS_API_URL) -> dict:
+def get_event(public_key: str,
+            event_uid: str,
+            events_api_url: str = EVENTS_API_URL) -> dict:
     """
     Retrieve an event from OpenAgenda API with given parameters.
     Args:
@@ -193,7 +205,9 @@ def get_event(public_key: str, event_uid: str, events_api_url: str = EVENTS_API_
         logging.error(f"Error getting event: {exc}")
         return None
 
-def get_events( params: dict, oa_public_key:str, events_api_url: str = EVENTS_API_URL) -> list:
+def get_events( params: dict,
+            oa_public_key:str,
+            events_api_url: str = EVENTS_API_URL) -> list:
     """
     Retrieve events from OpenAgenda API with given parameters.
     Args:
@@ -227,7 +241,9 @@ def get_events( params: dict, oa_public_key:str, events_api_url: str = EVENTS_AP
     return all_events
 
 
-def create_event(access_token:str, event:dict, events_api_url: str = EVENTS_API_URL ):
+def create_event(access_token:str,
+                event:dict,
+                events_api_url: str = EVENTS_API_URL ):
     headers = {
         "Content-Type": "application/json",
         "access-token": access_token,
@@ -243,16 +259,18 @@ def create_event(access_token:str, event:dict, events_api_url: str = EVENTS_API_
             return None
         
         createdEvent= json.loads(event_creation_response.text)['event']
-        logging.info('New event: "'+ event['title']['fr'] \
-            + "https://openagenda.com/kerlandrier/contribute/event/")
-        
+        logging.info(f'New event: "{event['title']['fr']}" \
+https://openagenda.com/kerlandrier/contribute/event/{str(createdEvent['uid'])}')
         return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:
         logging.error(f"Error creating event {event.get('title').get('fr')}: {exc}")
         return None
 
-def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_url: str = EVENTS_API_URL):
+def patch_event(access_token:str,
+                eventUid:str|int,
+                eventData:dict,
+                events_api_url: str = EVENTS_API_URL):
     headers = {
         "Content-Type": "application/json",
         "access-token": access_token,
@@ -273,7 +291,9 @@ def patch_event(access_token:str, eventUid:str|int, eventData:dict, events_api_u
         logging.error(f"Error creating event: {exc}")
         return None
 
-def delete_event(access_token:str, event_uid:str|int, events_api_url: str = EVENTS_API_URL):
+def delete_event(access_token:str,
+                event_uid:str|int,
+                events_api_url: str = EVENTS_API_URL):
     headers = {
         "Content-Type": 'application/json',
         "access-token": access_token,
@@ -290,7 +310,11 @@ def delete_event(access_token:str, event_uid:str|int, events_api_url: str = EVEN
         logging.error(f"Error deleting event: {exc}")
         return None
 
-def search_events( oa_public_key: str, search_string:str, past_events:bool  = False, other_params:dict = None, events_api_url: str = EVENTS_API_URL ) -> dict | None:
+def search_events( oa_public_key: str, 
+                search_string:str, 
+                past_events:bool  = False, 
+                other_params:dict = None, 
+                events_api_url: str = EVENTS_API_URL ) -> dict | None:
     """
     Search events in the OpenAgenda API by a given search string.
     """
@@ -317,7 +341,10 @@ def search_events( oa_public_key: str, search_string:str, past_events:bool  = Fa
         logging.error(f"Error getting events: {exc}")
         return None
 
-def get_uid_from_name_date(oa_public_key:str ,event_name:str, text_date:str = None, uid_externe:bool = False) -> str|None:
+def get_uid_from_name_date(oa_public_key:str,
+                        event_name:str, 
+                        text_date:str = None, 
+                        uid_externe:bool = False) -> str|None:
     date = dateparser.parse(text_date)
     paris_zone = pytz.timezone('Europe/Paris')
     if date and date.tzinfo != 'Europe/Paris': date = date.astimezone(paris_zone)
@@ -329,7 +356,10 @@ def get_uid_from_name_date(oa_public_key:str ,event_name:str, text_date:str = No
                         }
                     }
 
-    search_result = search_events( oa_public_key,  event_name, past_events=True, other_params=params)
+    search_result = search_events( oa_public_key,
+                                event_name, 
+                                past_events=True,
+                                other_params=params)
     if search_result and search_result["events"]: 
         uid= search_result["events"][0].get("uid-externe") if uid_externe else search_result["events"][0].get("id")
         return uid
