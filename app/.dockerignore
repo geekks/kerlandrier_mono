@@ -14,3 +14,5 @@ dist
 .local
 LICENSE
 README.md
+.pnp.cjs
+.pnp.loader.mjs
