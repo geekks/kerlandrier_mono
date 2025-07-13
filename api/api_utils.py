@@ -134,10 +134,10 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
     try:
         response_mistral:mistralEvent = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY, url=url)
         if response_mistral is None:
-            raise Exception("Error generating event on Mistral")
+            return {"success": False, "message": "Error generating event on Mistral"}
     except Exception as e:
         logging.error(e)
-        return {"success": False, "message": "Error generating event on Mistral"}
+        raise Exception(e)
     logging.info("Mistral answer:",response_mistral.model_dump(mode='json'))
     
     try:

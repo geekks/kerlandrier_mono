@@ -1,3 +1,5 @@
+import { API_URL } from "../config";
+
 interface AuthResponse {
   success: boolean;
   access_token: string;
@@ -5,7 +7,7 @@ interface AuthResponse {
 }
 
 export const authenticate = async (username: string, password: string): Promise<AuthResponse> => {
-  const response = await fetch('http://localhost:8001/auth', {
+  const response = await fetch(`${API_URL}/auth`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -18,11 +20,14 @@ export const authenticate = async (username: string, password: string): Promise<
   }
 
   const data = await response.json();
-  localStorage.setItem('access_token', data.access_token);
+  localStorage.setItem('kl_token', data.access_token);
   return data;
 };
 
 export const getAccessToken = (): string | null => {
-  return localStorage.getItem('access_token');
+  return localStorage.getItem('kl_token');
 };
 
+export const logout = () => {
+  localStorage.removeItem('kl_token');
+};
