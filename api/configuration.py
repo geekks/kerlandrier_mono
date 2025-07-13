@@ -14,7 +14,7 @@ class Configuration(BaseSettings):
     # OA Fast API auth
     JWT_SECRET: SecretStr = Field(description="JWT secret key")
     JWT_ALGORITHM: str = Field(description="JWT algorithm", default="HS256")
-    DB_PATH:str = Field(description="relative path of the database auth.db", default="db/auth.db")
+    DB_PATH:str = Field(description="relative path of the database auth.db", default="./db/auth.db")
 
     model_config = {
         "env_file": env_path,
