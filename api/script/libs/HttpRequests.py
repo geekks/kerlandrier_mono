@@ -88,7 +88,7 @@ def get_locations(access_token: str,
 
         except requests.exceptions.RequestException as exc:
             logging.error(f"Error retrieving locations: {exc}")
-            exit(1)
+            raise Exception(f"Error retrieving locations: {exc}")
     return all_locations
 
 def post_location(access_token: str,
@@ -126,7 +126,10 @@ def post_location(access_token: str,
         text_json = json.loads(exc.response.text)
         if  text_json.get('message') != "geocoder didn't find address":
             logging.error(f"Error Posting location on OA: {exc}")
-        return None
+            raise Exception(f"Error Posting location on OA: {exc}")
+        else:
+            logging.warning(f"Geocoder didn't find address: {adresse}. Returning None")
+            return None 
 
 def patch_location(access_token:str,
                 location_uid: str,

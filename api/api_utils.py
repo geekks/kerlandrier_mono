@@ -143,8 +143,8 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
     try:
         OAevent:OpenAgendaEvent = postMistralEventToOa(response_mistral, access_token=access_token, image_url= url)
     except Exception as e:
-        logging.error("Error generating event on OpenAgenda",e)
-        return {"success": False, "message": "Error generating event on OpenAgenda"}
+        logging.error(f"Error generating event on OpenAgenda {e}")
+        raise Exception(f"Error generating event on OpenAgenda: {e}")
     try:
         event_url= f"{OA_AGENDA_URL}/events/{OAevent.slug}"
         logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
@@ -161,4 +161,4 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
                 }
     except:
         logging.error("Error generating event on OpenAgenda", OAevent)
-        return {"success": False, "message": "Error generating event on OpenAgenda"}
+        raise Exception(f"Error generating event on OpenAgenda: {e}")
