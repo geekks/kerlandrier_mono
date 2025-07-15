@@ -109,29 +109,4 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         logger.warning(f"-> ❔ Location not in Breizh: returning 'To be defined' location")
         return TBD_LOCATION_UID
 
-def get_locations_list(searched_location:str, access_token: str)->list:
-    """
-    Return list of matching locations in format ('NAME, ADRESS, SCORE [0-100], UID)
-    """
-    allOaLocations = get_locations(access_token)
-    if not searched_location or not allOaLocations:
-        logger.warning("[ERROR] inputLocation is null or OA Locations list is empty")
-        return None
-    
-    # 1) Try to find an existing OALocation
-    OaLocationsIndex = {}
-    for location in allOaLocations:
-        OaLocationsIndex[location["uid"]]=location['name'] + " " + location['address']
-    # returns a list of tuples (name adress , score , OAuid)
-    results = process.extract(searched_location, OaLocationsIndex, scorer=fuzz.token_set_ratio) or []
-    
-    
-    if len(results): 
-        if results[0][1] >= 80:  # Best matching score >85
-            return results[0]
-        # good_results = [item for item in results if item["score"] > 70]
-        return results[:5]
-    else:
-        return None
-
 
