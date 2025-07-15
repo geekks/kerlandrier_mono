@@ -36,7 +36,7 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
                     token_data
                     and token_data.get("access_token")
                     and token_data.get("endate")
-                    and (token_data["endate"] - round(time.time()*1000)) > 0
+                    and (token_data["endate"] - round(time.time())) > 0
                 ):
                     return token_data["access_token"]
         
