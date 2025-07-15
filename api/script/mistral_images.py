@@ -22,8 +22,8 @@ import logging
 
     
 from .libs.oa_types import OpenAgendaEvent
-from .libs.utils import get_end_date, showDiff,encodeImage64, check_image_file
-from .libs.HttpRequests import create_event, retrieve_OA_access_token
+from .libs.utils import get_end_date, encodeImage64, check_image_file
+from .libs.HttpRequests import create_event
 from .libs.getOaLocation import get_or_create_oa_location
 
 # Define a class to contain the Mistral answer to a formatted JSON
@@ -159,7 +159,6 @@ def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str
     if image_url:
         eventOA["image"] = {"url": image_url}
     try:
-        logging.info("Sending event to OpenAgenda")
         response = create_event(access_token, eventOA)
         if response['event']['uid']:
                 logging.info("Event created !")
@@ -198,10 +197,9 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         response_imgbb = requests.post(imgbb_api_url, data=payload)
         image_url = response_imgbb.json()["data"]["image"]["url"] if response_imgbb.status_code == 200 else None
     except Exception as e:
-        logging.error(f"Error while uploading image to imgbb {e}")
-        return None
+        raise Exception(f"Error while uploading image to imgbb {e}")
     if image_url is None:
-        raise Exception(f"Error while uploading image to imgbb : image_url is None{response_imgbb.text}")
+        raise Exception(f"Error while uploading image to imgbb : image_url is None {response_imgbb.text}")
     logging.info(f"Image uploaded to imgbb: {image_url}")
     return image_url
 

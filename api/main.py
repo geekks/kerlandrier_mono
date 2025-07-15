@@ -4,11 +4,11 @@ import os, sys
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from api_utils import  get_event_keywords, generate_kl_token, verify_kl_token, get_user_by_username, verify_password, send_url_to_mistral
+import api_utils
 from script.libs.HttpRequests import patch_event
 from configuration import configAPI
 from script.configuration import config, oa
-from script.mistral_images import postImageToImgbb
+from script.mistral_images import postImageToImgbb, postMistralEventToOa
 
 from db import initialize_database, DB_Connection
 from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile, File
@@ -83,7 +83,7 @@ def get_token_header(authorization: str
 
 def get_current_user(token: str 
                         = Depends(get_token_header)):
-    payload = verify_kl_token(token,
+    payload = api_utils.verify_kl_token(token,
                             JWT_SECRET=configAPI.JWT_SECRET.get_secret_value(),
                             JWT_ALGORITHM=configAPI.JWT_ALGORITHM)
     if payload is None:
@@ -104,12 +104,12 @@ async def authenticate(request: AuthRequest):
     password = request.password
 
     # Check if the username and password are correct
-    result = get_user_by_username(db, username)
-    if result is None or not verify_password(result[1], password):
+    result = api_utils.get_user_by_username(db, username)
+    if result is None or not api_utils.verify_password(result[1], password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     user_id = result[0]
-    token = generate_kl_token(user_id,
+    token = api_utils.generate_kl_token(user_id,
                             JWT_SECRET=configAPI.JWT_SECRET.get_secret_value(),
                             JWT_ALGORITHM=configAPI.JWT_ALGORITHM)
     return {"success": True, "access_token": token, "token_type": "Bearer"}
@@ -147,7 +147,7 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
         return {"success": False, "data": [], "message": str(e)}
     event = request
     try:
-        existingKeywords = get_event_keywords(event.uid,
+        existingKeywords = api_utils.get_event_keywords(event.uid,
                                                     api_url=config.OA_API_URL,
                                                     oa_public_key=oa.public_key)
         if existingKeywords is None or existingKeywords != event.keywords:
@@ -179,47 +179,33 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
 async def upload_file(file: UploadFile,
                     current_user: dict = Depends(get_current_user)
                     ):
-    infos=[]
-    # Save file locally
-    if file is None:
-        raise HTTPException(status_code=400, detail="Please provide a file in a form-data")
-    try:
-        upload_dir = "images"
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
-        file_path = os.path.join(upload_dir, file.filename)
-        with open(file_path, "wb") as f:
-            f.write(await file.read())
-        if check_image_file(file_path) is False:
-            infos.append("Error while saving file")
-            raise Exception("Error while saving file")
-        infos.append(f"File {file.filename} saved successfully")
-    except Exception as e:
-        logging.error(e)
-        infos.append(str(e))
-        raise HTTPException(status_code=500, detail={"infos": infos} )
-    
+
+    # Save file locally. Not async
+    file_path = api_utils.saveImagePost(file)
     # Send image to imgbb server to get online image
     try:
-        url = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
+        ImgUrl = postImageToImgbb(image_path=file_path, imgbb_api_url = config.IMGBB_API_URL, imgbb_api_key = config.IMGBB_PRIVATE_API_KEY.get_secret_value() )
     except Exception as e:
-        infos.append("Error while uploading image to imgbb")
-        infos.append(str(e))
-        raise HTTPException(status_code=500, detail={"infos": infos} )
-    infos.append(f"Image uploaded to imgbb: {url}")
+        raise HTTPException(status_code=500, detail={"infos": e} )
     # Send url and request to Mistral API
     try:
-        response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
-                            access_token = oa.access_token,
-                            url=url,
-                            OA_AGENDA_URL=config.OA_AGENDA_URL)
-        infos.append("Image successfully sent to Mistral API")
-        return response
+        response_mistral =api_utils.send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
+                            url=ImgUrl)
+    except Exception as e:
+        raise Exception(f"Error sending Image URL to Mistral: {e}")
+    try:
+        OAevent = postMistralEventToOa(response_mistral,
+                                    access_token=oa.access_token,
+                                    image_url= ImgUrl)
+        logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
+    except Exception as e:
+        raise Exception(f"Error sending event on OpenAgenda: {e}")
+    try:
+        excerpt_response =api_utils.excerptOAEvent(OAevent)
+        return excerpt_response
     except Exception as e:
         logging.error(e)
-        infos.append(str(e))
-        infos.append("Error while sending IMDB image URL to Mistral API")
-        raise HTTPException(status_code=500, detail={"infos": infos} )
+        raise HTTPException(status_code=500, detail={"infos": e} )
     finally:
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
@@ -236,7 +222,7 @@ async def upload_url(request: UrlRequest ,
     if request.url is None:
         return {"success": False, "message": "Please provide a valid url"}
     try:
-        response =send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
+        response =api_utils.send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
                             access_token = oa.access_token,
                             url=request.url,
                             OA_AGENDA_URL=config.OA_AGENDA_URL)

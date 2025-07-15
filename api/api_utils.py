@@ -1,5 +1,6 @@
 import os,sys
 import time
+from fastapi import UploadFile
 import requests
 
 import jwt
@@ -12,8 +13,8 @@ import logging, coloredlogs
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from script.libs.oa_types import  OpenAgendaEvent
-from script.mistral_images import getMistralImageEvent, postMistralEventToOa, mistralEvent
-import typing
+from script.mistral_images import getMistralImageEvent, mistralEvent
+from script.libs.utils import check_image_file
 
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -127,10 +128,8 @@ def get_user_by_username(db: sqlite3.Connection,
     return cursor.fetchone()
 
 def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
-                        access_token: str,
                         url: str,
-                        OA_AGENDA_URL: str
-                        ) -> dict:
+                        ) -> mistralEvent:
     try:
         response_mistral:mistralEvent = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY, url=url)
         if response_mistral is None:
@@ -139,15 +138,13 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
         logging.error(e)
         raise Exception(e)
     logging.info("Mistral answer:",response_mistral.model_dump(mode='json'))
-    
+    return response_mistral
+
+def excerptOAEvent(OAevent: OpenAgendaEvent,
+                    OA_AGENDA_URL: str = "https://openagenda.com/fr/kerlandrier"
+                        ) -> dict:
+    event_url= f"{OA_AGENDA_URL}/events/{OAevent.slug}"
     try:
-        OAevent:OpenAgendaEvent = postMistralEventToOa(response_mistral, access_token=access_token, image_url= url)
-    except Exception as e:
-        logging.error(f"Error generating event on OpenAgenda {e}")
-        raise Exception(f"Error generating event on OpenAgenda: {e}")
-    try:
-        event_url= f"{OA_AGENDA_URL}/events/{OAevent.slug}"
-        logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
         return {"success": True, 
                 "message": "OA event created successfully", 
                 "event":{
@@ -159,6 +156,38 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
                     "end": OAevent.firstTiming.end
                     }
                 }
-    except:
-        logging.error("Error generating event on OpenAgenda", OAevent)
-        raise Exception(f"Error generating event on OpenAgenda: {e}")
+    except Exception as e:
+        raise Exception(f"Error exctracting info from OAevent: {e}")
+
+def saveImagePost(file: UploadFile,
+            upload_dir = "images"
+            ) -> str:
+    """
+    Save an image from a request to a specified directory.
+    Save the UploadFile type in a blocking (not async) way.
+    
+    Args:
+        file (fastapi.UploadFile): The file to save.
+        dir_path (str): The dir path where the file should be saved.
+        
+    Returns:
+        str: The filepath.
+    """
+    if file is None:
+        raise Exception("Please provide a file in a form-data")
+    if file.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+        raise Exception("File type not supported. Please upload a JPEG, PNG or GIF image.")
+    if file.size > 5 * 1024 * 1024:  # 5 MB limit
+        raise Exception("File size exceeds the limit of 5 MB.")
+    try:
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
+        file_path = os.path.join(upload_dir, file.filename)
+        
+        with open(file_path, "wb") as f:
+            f.write(file.file.read()) # Use not async way 
+        if check_image_file(file_path) is False:
+            raise Exception("Error: file is not an image")
+        return file_path
+    except Exception as e:
+        raise Exception(f"Error saving file {file_path}: {e}")
