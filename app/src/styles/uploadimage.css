@@ -52,12 +52,18 @@
   background-color: #0056b3;
 }
 
-.message {
+.message, .message.info {
   font-size: 22px;
   color: #333;
   margin-bottom: 20px;
 }
 
+.message.error {
+  color: red;
+}
+.message.success {
+  color: green;
+}
 .event-details {
   font-size: 25px;
   border-collapse: collapse;
@@ -105,6 +111,8 @@ ul li {
   margin-top: 20px;
   max-width: 50rem;
 }
+
+
 
 @media screen and (max-width: 800px) {
   .upload-box {

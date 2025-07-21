@@ -5,7 +5,7 @@ import '../styles/uploadimage.css';
 const UploadImage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<{ text: string, type: string }>({ text: '', type: 'info' });
   const [eventDetails, setEventDetails] = useState<{ url: string, name: string, location: string, description: string, start: string, end: string } | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,17 +13,24 @@ const UploadImage: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setErrorDetails(null);
     setEventDetails(null);
-    setMessage('');
+    setMessage({text:'', type:'info'});
     if (event.target.files && event.target.files[0]) {
       const selectedFile = event.target.files[0];
       const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       const validExtensions = ['.jpg', '.jpeg', '.png'];
       const fileName = selectedFile.name.toLowerCase();
       const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+      const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+      if (selectedFile.size > maxSize) {
+        setFile(null);
+        setPreview(null);
+        setMessage({text:"L'image doit faire moins de 5 Mo.", type: 'error'});
+        return;
+      }
       if (!validTypes.includes(selectedFile.type) || !hasValidExtension) {
         setFile(null);
         setPreview(null);
-        setMessage("Veuillez sélectionner une image au format JPG, JPEG ou PNG.");
+        setMessage({ text: "Veuillez sélectionner une image au format JPG, JPEG ou PNG.", type: 'error' });
         return;
       }
       setFile(selectedFile);
@@ -34,13 +41,13 @@ const UploadImage: React.FC = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      setMessage('Veuillez sélectionner un fichier d\'abord.');
+      setMessage({ text: 'Veuillez sélectionner un fichier d\'abord.', type: 'error' });
       return;
     }
 
     setErrorDetails(null);
     setEventDetails(null);
-    setMessage('');
+    setMessage({ text: '', type: 'info' });
     setIsLoading(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -57,7 +64,7 @@ const UploadImage: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setMessage('Image analysée et envoyée au KL avec succès !');
+        setMessage({ text: 'Image analysée et envoyée au KL avec succès !', type: 'success' });
         setEventDetails(data.event);
       } else {
         const errorData = await response.json();
@@ -73,7 +80,7 @@ const UploadImage: React.FC = () => {
           </ul>`);
       }
     } catch (error) {
-      setMessage('Erreur lors de l\'envoi du fichier.');
+      setMessage({ text: 'Erreur lors de l\'envoi du fichier.', type: 'error' });
       console.error('Erreur :',JSON.stringify( error));
     } finally {
       setIsLoading(false);
@@ -104,7 +111,7 @@ const UploadImage: React.FC = () => {
       ) : (
         <button className="upload-button" onClick={handleUpload}>Envoyer</button>
       )}
-      {message && <p className="message">{message}</p>}
+      {message.text && <p className={`message ${message.type}`}>{message.text}</p>}
       {errorDetails && <p className="error-details" dangerouslySetInnerHTML={{ __html: errorDetails }}></p>}
       {eventDetails && (
         <div className="event-details">
