@@ -59,7 +59,9 @@ def import_ics(ics_url:str):
             if uidExterneIcsEvent in uidsExterneOa:
                 continue
             # Get OA location from facebook complete location infos (locationTXT)
-            location_uid = get_or_create_oa_location(ics_event.get('locationTXT'), access_token)
+            location_uid = get_or_create_oa_location(searched_location = ics_event.get('locationTXT'),
+                                                    access_token=access_token,
+                                                    public_key=oa.public_key)
             ics_event.update( {"locationUid": location_uid })
             ics_event.pop( "locationTXT" )
             

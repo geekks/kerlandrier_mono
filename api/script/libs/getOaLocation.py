@@ -19,7 +19,12 @@ logger = logging.getLogger(__name__)
 
 TBD_LOCATION_UID="11634941"
 
-def get_or_create_oa_location(searched_location:str, access_token: str, debug:bool=False, TBD_LOCATION_UID:str=TBD_LOCATION_UID)->str:
+def get_or_create_oa_location(searched_location:str,
+                            access_token: str,
+                            public_key: str,
+                            debug:bool=False,
+                            TBD_LOCATION_UID:str=TBD_LOCATION_UID
+                            )->str:
     """
     Tries to find a matching OpenAgenda location for the given searched location.
     Returns an OALocation UID (found, created or default one.)
@@ -29,7 +34,7 @@ def get_or_create_oa_location(searched_location:str, access_token: str, debug:bo
         logger.warning("InputLocation is null or empty. Returning default Location")
         return TBD_LOCATION_UID
     try:
-        allOaLocations = get_locations(access_token)
+        allOaLocations = get_locations(public_key)
     except Exception as e:
         logger.error(f"Error retrieving locations: {e}")
         raise Exception(f"Error retrieving locations: {e}")

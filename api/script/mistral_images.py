@@ -132,10 +132,17 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
         logging.error(f"Error while sending image to Mistral: {e}")
         raise Exception(f"Error while sending image to Mistral: {e}")
 
-def postMistralEventToOa(event: mistralEvent,access_token: str ,  image_url: str = None) -> OpenAgendaEvent|None:
+def postMistralEventToOa(event: mistralEvent,
+                        access_token: str,
+                        public_key: str = None,
+                        image_url: str = None
+                        ) -> OpenAgendaEvent|None:
     
     try:
-        OaLocationUid = get_or_create_oa_location(event.lieu, access_token)
+        OaLocationUid = get_or_create_oa_location(searched_location = event.lieu,
+                                                access_token = access_token, 
+                                                public_key=public_key)
+        
     except Exception as e:
         logging.error(f"Error retrieving or creating location for event '{event.titre}': {e}")
         raise Exception(f"Error retrieving or creating location for event '{event.titre}': {e}")
@@ -204,19 +211,19 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
     return image_url
 
 
-def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, image_path:str=None, url:str = None, imgbb_api_url:str=None, imgbb_api_key:str=None):
+def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, public_key:str, image_path:str=None, url:str = None, imgbb_api_url:str=None, imgbb_api_key:str=None):
         if (url is not None) and (image_path is not None):
             exit(1)
         if image_path: # upload image to imgbb and get url
             image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
             response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
             logging.info(response_mistral)
-            OAEvent = postMistralEventToOa(response_mistral, access_token, image_url)
+            OAEvent = postMistralEventToOa(response_mistral, access_token, public_key, image_url)
         elif url:
             image_url=url
             response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
             logging.info(response_mistral)
-            OAEvent= postMistralEventToOa(response_mistral,access_token, image_url)
+            OAEvent= postMistralEventToOa(response_mistral,access_token,public_key, image_url)
         else:
             logging.error("Enter a valid image path or url")
             exit(1)

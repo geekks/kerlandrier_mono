@@ -68,7 +68,7 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
         logging.error(f"Error retrieving access token: {exc}")
         return None
 
-def get_locations(access_token: str,
+def get_locations(oa_pubkey: str,
                 locations_api_url: str =LOCATIONS_API_URL):
     url = locations_api_url
     after =0
@@ -77,10 +77,9 @@ def get_locations(access_token: str,
         try:
             headers = {
                     "Content-Type": 'application/json',
-                    "access-token": access_token,
                     "nonce": get_nonce()
                     }
-            response = requests.get(url, headers=headers, params={'after': after, 'detailed': 1})
+            response = requests.get(url, headers=headers, params={'key': oa_pubkey,'after': after, 'detailed': 1})
             response.raise_for_status()
             locations_part=json.loads(response.text)
             all_locations.extend(locations_part.get('locations'))

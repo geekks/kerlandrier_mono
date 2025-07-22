@@ -196,6 +196,7 @@ async def upload_file(file: UploadFile,
     try:
         OAevent = postMistralEventToOa(response_mistral,
                                     access_token=oa.access_token,
+                                    public_key=oa.public_key,
                                     image_url= ImgUrl)
         logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
     except Exception as e:

@@ -16,7 +16,7 @@ from .libs.HttpRequests import(
         patch_location,
         )
 
-def udpateLocationsDescription(access_token: str):
+def udpateLocationsDescription(access_token: str, public_key:str):
 
     aven_cities = [
         "Bannalec", "Beg-Meil", "Concarneau", "Elliant", "LaForêt-Fouesnant", "Pleuven",
@@ -35,7 +35,7 @@ def udpateLocationsDescription(access_token: str):
 
     breizh_postal = ['29', '56', '22', '35', '44']  # Postal codes of Bretagne and more
 
-    locations = get_locations(access_token)
+    locations = get_locations(public_key)
 
     logging.info(f"Nombre total de lieux: {len(locations)}")
 

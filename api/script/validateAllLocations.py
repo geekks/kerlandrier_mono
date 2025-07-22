@@ -7,11 +7,11 @@ from libs.HttpRequests import (
                             get_locations,
                             patch_location)
 
-from configuration import  oa
+from .configuration import oa
 
-def validate_locations():
-    accessToken = oa.access_token
-    allLocations= get_locations(accessToken)
+def validate_locations(access_token: str, public_key: str):
+    accessToken = access_token
+    allLocations= get_locations(public_key)
 
     if allLocations and len(allLocations) > 0:
         validated_count = 0
@@ -28,4 +28,4 @@ def validate_locations():
         
 
 if __name__ == "__main__":
-    validate_locations()
+    validate_locations(oa.access_token, oa.public_key)
