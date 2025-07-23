@@ -25,6 +25,7 @@ class Configuration(BaseSettings):
     # Open Agenda
     OA_PUBLIC_KEY: str = Field(description="Open Agenda public key")
     OA_SECRET_KEY: SecretStr = Field(description="Open Agenda secret key")
+    OA_ACCESS_TOKEN_URL: str = Field(description="Open Agenda access token URL", default="https://api.openagenda.com/v2/requestAccessToken")
     AGENDA_UID: str = Field(description="Kerlandrier Open Agenda UID", default="44891982")
     TBD_LOCATION_UID: str = Field(description="Open Agenda ToBeDefined location UID", default="11634941")
     KAL_LOCATION_UID: str = Field(description="Open Agenda KAL location UID", default="52856698")
@@ -36,7 +37,7 @@ class Configuration(BaseSettings):
     
     @property
     def OA_API_URL(self):
-        return f"https://api.openagenda.com/v2/{self.AGENDA_UID}"
+        return f"https://api.openagenda.com/v2/agendas/{self.AGENDA_UID}"
     
     # Facebook events ICS URL
     ICS_PRIVATE_URL_KLR_FB: SecretStr = Field(description="Kerlandrier Facebook events ICS URL")
@@ -59,11 +60,11 @@ class Configuration(BaseSettings):
 config = Configuration(_env_file=env_path)
 
 oa = OA_Connection(
+    agenda_uid=config.AGENDA_UID,
+    oa_api_url=config.OA_API_URL,
+    access_token_url=config.OA_ACCESS_TOKEN_URL,
+    tbd_location_uid=config.TBD_LOCATION_UID,
     public_key=config.OA_PUBLIC_KEY,
     secret_key=config.OA_SECRET_KEY.get_secret_value(),
 )
 
-oa.access_token = retrieve_OA_access_token(
-                                OA_SECRET_KEY =oa.secret_key,
-                                ACCESS_TOKEN_URL=f"{oa.oa_api_url}requestAccessToken"
-                                )

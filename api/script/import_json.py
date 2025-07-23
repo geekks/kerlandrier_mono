@@ -1,6 +1,6 @@
 from libs.HttpRequests import get_events, create_event
 import json
-from configuration import config, oa
+from .configuration import config, oa
 
 def parse_json(file_path):
   with open(file_path, 'r') as file:
@@ -11,7 +11,7 @@ def parse_json(file_path):
 file_path = 'scraping/2025_maree_info/maree_info_format_heure_hiver_ok.json'
 parsed_data = parse_json(file_path)
 
-access_token = oa.access_token
+access_token = oa.getToken
 print(access_token)
 
 createdEventUids = []

@@ -27,6 +27,7 @@ __pycache__
 *.sqlite3
 *.db
 *.sql
+db
 
 # Jupyter notebooks
 .ipynb_checkpoints

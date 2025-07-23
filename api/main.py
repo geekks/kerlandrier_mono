@@ -123,7 +123,7 @@ async def generates_token(current_user: dict
                         = Depends(get_current_user)):
     logging.info( f"Token generated for user: ${current_user}")
     try:
-        access_token = oa.access_token
+        access_token = oa.getToken
         if (access_token == None):
             return {"success": False, "message": "No access token"}
         else:
@@ -141,7 +141,7 @@ async def generates_token(current_user: dict
             response_model=dict)
 async def update_event(request: PatchKeywordRequest, current_user: dict = Depends(get_current_user)):
     try:
-        access_token = oa.access_token
+        access_token = oa.getToken
         # print("access_token", access_token)
     except Exception as e:
         return {"success": False, "data": [], "message": str(e)}
@@ -195,8 +195,9 @@ async def upload_file(file: UploadFile,
         raise Exception(f"Error sending Image URL to Mistral: {e}")
     try:
         OAevent = postMistralEventToOa(response_mistral,
-                                    access_token=oa.access_token,
+                                    access_token=oa.getToken(),
                                     public_key=oa.public_key,
+                                    locations_api_url= f"{config.OA_API_URL}/locations",
                                     image_url= ImgUrl)
         logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
     except Exception as e:
@@ -224,7 +225,7 @@ async def upload_url(request: UrlRequest ,
         return {"success": False, "message": "Please provide a valid url"}
     try:
         response =api_utils.send_url_to_mistral(MISTRAL_PRIVATE_API_KEY=config.MISTRAL_PRIVATE_API_KEY.get_secret_value(),
-                            access_token = oa.access_token,
+                            access_token = oa.getToken,
                             url=request.url,
                             OA_AGENDA_URL=config.OA_AGENDA_URL)
         if response.get("success") is False:

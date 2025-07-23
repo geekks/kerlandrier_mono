@@ -11,6 +11,8 @@ Classes:
 
 from typing import List, Dict, Optional, TypedDict, Any
 
+from .HttpRequests import retrieve_OA_access_token
+
 class Timing:
     def __init__(self, begin: str, end: str):
         self.begin = begin
@@ -263,22 +265,43 @@ class OA_Connection:
         public_key (str): The public key for the OpenAgenda API.
         secret_key (str): The secret key for the OpenAgenda API.
         access_token_url (str): The URL to obtain the access token.
+        oa_api_url (str): The base URL for the OpenAgenda API.
         agenda_uid (str): The unique identifier for the agenda.
         tbd_location_uid (str): The unique identifier for the location "To Be Defined" (TBD), which is a special location used when the exact location of an event is yet to be determined.
-        access_token (str): The access token obtained from secret_key via the OpenAgenda API. Expires after 1 hour.
-        access_token_expiration (datetime): The expiration date of the access token, in  Unix epoch time format (Ex: 1744211274)
+        token_file_name (str): The name of the file where the access token is stored.
     """
     def __init__(self,
                 public_key: str,
                 secret_key: str,
-                oa_api_url: str = "https://api.openagenda.com/v2/",
-                agenda_uid: str = "44891982",
-                tbd_location_uid: str = "11634941",
+                agenda_uid: str,
+                oa_api_url: str,
+                access_token_url: str,
+                tbd_location_uid: str,
+                token_file_name: str ="secret_token.json"
         ):
         self.public_key = public_key
         self.secret_key = secret_key
+        self.access_token_url = access_token_url
         self.oa_api_url = oa_api_url
         self.agenda_uid = agenda_uid
         self.tbd_location_uid = tbd_location_uid
-        self.access_token = None
-        self.access_token_expiration = None
+        self.token_file_name = token_file_name
+
+    def getToken(self, input_secret_key: Optional[str] = None) -> str:
+        """
+        Retrieves the access token from the OpenAgenda API using the provided public and secret keys.
+        This method uses the `retrieve_OA_access_token` function to obtain the access token.
+        Returns:
+            access_token: An OA access token.
+        """
+        secret_key = input_secret_key if input_secret_key is not None else self.secret_key
+        if secret_key is None:
+            raise ValueError("Private key must be provided in getToken() function or OA_Connection object to retrieve the access token.")
+        if self.access_token_url is None:
+            raise ValueError("access_token_url must be provided in OA_Connection object")
+        access_token = retrieve_OA_access_token(
+            OA_SECRET_KEY=secret_key,
+            TOKEN_FILE_NAME=self.token_file_name,
+            ACCESS_TOKEN_URL=self.access_token_url
+        )
+        return access_token

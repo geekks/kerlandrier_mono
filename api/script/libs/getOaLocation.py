@@ -5,7 +5,7 @@ Functions to manage locations with OA API
 
 from .utils import *
 from .scraping_utils import *
-from .HttpRequests import post_location, retrieve_OA_access_token, delete_location, get_locations
+from .HttpRequests import post_location, delete_location, get_locations
 
 from thefuzz import fuzz
 from thefuzz import process
@@ -22,8 +22,9 @@ TBD_LOCATION_UID="11634941"
 def get_or_create_oa_location(searched_location:str,
                             access_token: str,
                             public_key: str,
+                            locations_api_url: str,
                             debug:bool=False,
-                            TBD_LOCATION_UID:str=TBD_LOCATION_UID
+                            TBD_LOCATION_UID:str=TBD_LOCATION_UID,
                             )->str:
     """
     Tries to find a matching OpenAgenda location for the given searched location.
@@ -34,7 +35,7 @@ def get_or_create_oa_location(searched_location:str,
         logger.warning("InputLocation is null or empty. Returning default Location")
         return TBD_LOCATION_UID
     try:
-        allOaLocations = get_locations(public_key)
+        allOaLocations = get_locations(public_key,locations_api_url)
     except Exception as e:
         logger.error(f"Error retrieving locations: {e}")
         raise Exception(f"Error retrieving locations: {e}")
@@ -94,7 +95,7 @@ def get_or_create_oa_location(searched_location:str,
         return results[0][2]
 
     # 2) Try to create an OALocation
-    response = post_location(access_token,  name = searched_location, adresse=searched_location)
+    response = post_location(access_token, name=searched_location, adresse=searched_location, locations_api_url=locations_api_url)
     if not response or not response.get('location', {}).get('uid'):
         logger.warning("-> ❔ Returning location 'To be defined' (Could not create location on OpenAgenda)")
         return TBD_LOCATION_UID
@@ -110,7 +111,7 @@ def get_or_create_oa_location(searched_location:str,
         logger.warning(f"-> '\U0001f195' New OA location created : {new_oa_location['name']}, {new_oa_location['address']}, {"https://openagenda.com/kerlandrier/admin/locations/" + str(new_oa_location['uid'])}")
         return new_oa_location['uid']
     else:
-        delete_location(access_token, new_oa_location['uid'])
+        delete_location(access_token, new_oa_location['uid'],locations_api_url)
         logger.warning(f"-> ❔ Location not in Breizh: returning 'To be defined' location")
         return TBD_LOCATION_UID
 

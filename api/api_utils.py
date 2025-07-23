@@ -135,9 +135,8 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
         if response_mistral is None:
             return {"success": False, "message": "Error generating event on Mistral"}
     except Exception as e:
-        logging.error(e)
         raise Exception(e)
-    logging.info("Mistral answer:",response_mistral.model_dump(mode='json'))
+    # logging.info(f"Mistral answer: {response_mistral.model_dump(mode='json')}")
     return response_mistral
 
 def excerptOAEvent(OAevent: OpenAgendaEvent,

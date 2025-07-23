@@ -7,12 +7,9 @@ import os
 
 import math, random
 import requests, json
-import time, pytz, dateparser
+import time,dateparser,pytz
 
 
-TOKEN_FILE_NAME = 'secret_token.json'
-ACCESS_TOKEN_URL = "https://api.openagenda.com/v2/requestAccessToken"
-LOCATIONS_API_URL = "https://api.openagenda.com/v2/agendas/44891982/locations"
 EVENTS_API_URL = "https://api.openagenda.com/v2/agendas/44891982/events"
 
 def get_nonce():
@@ -24,8 +21,8 @@ def get_nonce():
     
 
 def retrieve_OA_access_token(OA_SECRET_KEY:str,
-                            TOKEN_FILE_NAME:str = 'secret_token.json',
-                            ACCESS_TOKEN_URL:str = ACCESS_TOKEN_URL
+                            TOKEN_FILE_NAME:str,
+                            ACCESS_TOKEN_URL:str
                             ) -> str:
     # Vérifier si le jeton existe déjà
     token_file_path = os.path.abspath(TOKEN_FILE_NAME)
@@ -69,7 +66,7 @@ def retrieve_OA_access_token(OA_SECRET_KEY:str,
         return None
 
 def get_locations(oa_pubkey: str,
-                locations_api_url: str =LOCATIONS_API_URL):
+                locations_api_url: str):
     url = locations_api_url
     after =0
     all_locations=[]
@@ -93,7 +90,7 @@ def get_locations(oa_pubkey: str,
 def post_location(access_token: str,
                 name: str,
                 adresse: str,
-                locations_api_url: str=LOCATIONS_API_URL ):
+                locations_api_url:str ):
     """
     Create a new location in OpenAgenda, using OA Geocoder with 'name' and 'address' as search parameters
     Args:
@@ -133,7 +130,7 @@ def post_location(access_token: str,
 def patch_location(access_token:str,
                 location_uid: str,
                 body: dict,
-                locations_api_url: str =LOCATIONS_API_URL):
+                locations_api_url: str ):
     """
     Modify an  OpenAgenda location using a PATCH call. Only modified parameters are needed.
     Args:
@@ -166,7 +163,7 @@ def patch_location(access_token:str,
 
 def delete_location(access_token: str,
                     location_uid: str,
-                    locations_api_url: str = LOCATIONS_API_URL): 
+                    locations_api_url:str): 
     headers = {
         "Content-Type": 'application/json',
         "access-token": access_token,
@@ -262,7 +259,7 @@ def create_event(access_token:str,
         
         createdEvent= json.loads(event_creation_response.text)['event']
         logging.info(f'New event: "{event['title']['fr']}" \
-https://openagenda.com/kerlandrier/contribute/event/{str(createdEvent['uid'])}')
+                        https://openagenda.com/kerlandrier/contribute/event/{str(createdEvent['uid'])}')
         return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:

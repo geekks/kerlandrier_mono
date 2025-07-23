@@ -2,14 +2,10 @@ from libs.HttpRequests import get_locations
 from libs.getOaLocation import get_or_create_oa_location
 from script.configuration import config,oa
 
-from script.import_ics import import_ics
-from script.updateLocationsDescription import udpateLocationsDescription
-
 from script.mistral_images import  getMistralImageEvent
 from script.libs.utils import  showDiff
 import os
 from wasabi import color,msg
-from api.script.scraping.archives.2024_cap_danse.update_capdanse import access_token
 
 def testMistralImages():
         TEST_FILE_NAME = "TEST_temps_foret.jpg"
@@ -77,13 +73,21 @@ locations_examples = [
     
 ]
 
-def test_locations(location_array, public_key = oa.public_key, access_token= oa.access_token):
-    allLocationsOA = get_locations(public_key)
+def test_locations(location_array: list,
+                    public_key:str = oa.public_key,
+                    access_token:str= oa.getToken(),
+                    locations_api_url:str = f"{config.OA_API_URL}/locations"
+                    ):
+    allLocationsOA = get_locations(public_key, locations_api_url)
     allLocationsOA_by_uid = {item['uid']: item for item in allLocationsOA}
     nbr_locations= len(allLocationsOA)
     print(f"Number of locations: {nbr_locations}")
     for loc in location_array:
-        uid = get_or_create_oa_location( loc.get("input_location"),public_key,access_token, debug=True)
+        uid = get_or_create_oa_location( searched_location=loc.get("input_location"),
+                                        access_token=access_token,
+                                        public_key=access_token,
+                                        locations_api_url=locations_api_url,
+                                        debug=True)
         if loc.get("expectedUID") and (loc.get("expectedUID") == uid): 
             print(" - ✅ Match with Expected location.")
         elif loc.get("expectedUID"): 

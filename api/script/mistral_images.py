@@ -54,7 +54,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
 
     if url is not None and image_path is not None:
         logging.error("You can't use both image_path and url")
-        exit(1)
+        return None
     if url:
         try:
         # Parse the URL to remove query parameters
@@ -68,12 +68,10 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
                 image_path = file_name
                 logging.info(f"Image downloaded and saved to {file_name}")
             else:
-                logging.error(f"Failed to download image. Status code: {response.status_code}",
+                raise Exception(f"Failed to download image. Status code: {response.status_code}",
                 response.text)
-                exit(1)
         except Exception as e:
-            logging.error(f"Error downloading image from {url}", e)
-            exit(1)
+            raise Exception(f"Error downloading image from {url}", e)
 
     if not check_image_file(image_path):
         raise TypeError("Please provide a valid image file")
@@ -84,8 +82,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
         else:
             raise FileNotFoundError(f"The image file {image_path} does not exist.")
     except Exception as e:
-        logging.error(f"Error verifying image: {e}")
-        return None
+        raise Exception(f"Error verifying image: {e}")
         
     base64_image = encodeImage64(image_path)
     model = "pixtral-12b"
@@ -134,13 +131,15 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
 
 def postMistralEventToOa(event: mistralEvent,
                         access_token: str,
+                        locations_api_url: str,
                         public_key: str = None,
                         image_url: str = None
                         ) -> OpenAgendaEvent|None:
     
     try:
         OaLocationUid = get_or_create_oa_location(searched_location = event.lieu,
-                                                access_token = access_token, 
+                                                access_token = access_token,
+                                                locations_api_url=locations_api_url,
                                                 public_key=public_key)
         
     except Exception as e:
@@ -174,12 +173,10 @@ def postMistralEventToOa(event: mistralEvent,
                 return  oaEvent
         else:
             logging.error( f"Problem for {event.titre}", response  )
-            return None
+            raise Exception(f"Error sending event to OA from Mistral. Response: {response}")
     except Exception as e:
-        logging.error(f"Error sending event to OpenAgenda from Mistral analysis")
-        logging.error( f"URL: {image_url}. Event title '{event.titre}'")
-        logging.error(e)
-        return None
+        logging.error( f"Problem for event: '{event.titre}'")
+        raise Exception(f"Error sending event to OA from Mistral: {e}")
         
 def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) -> str|None:
     """
@@ -211,44 +208,36 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
     return image_url
 
 
-def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str, access_token:str, public_key:str, image_path:str=None, url:str = None, imgbb_api_url:str=None, imgbb_api_key:str=None):
+def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str,
+                    access_token:str,
+                    public_key:str,
+                    locations_api_url:str,
+                    image_path:str=None,
+                    url:str = None,
+                    imgbb_api_url:str=None,
+                    imgbb_api_key:str=None):
         if (url is not None) and (image_path is not None):
-            exit(1)
+            raise Exception(f"You can't use both image_path and url")
         if image_path: # upload image to imgbb and get url
-            image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
-            response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
-            logging.info(response_mistral)
-            OAEvent = postMistralEventToOa(response_mistral, access_token, public_key, image_url)
+            try:
+                image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
+                response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
+                logging.info(response_mistral)
+                OAEvent = postMistralEventToOa(response_mistral, access_token,locations_api_url, public_key, image_url)
+            except Exception as e:
+                raise Exception(f"Error processing image File: {e}")
         elif url:
-            image_url=url
-            response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
-            logging.info(response_mistral)
-            OAEvent= postMistralEventToOa(response_mistral,access_token,public_key, image_url)
+            try:
+                image_url=url
+                response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
+                logging.info(response_mistral)
+                OAEvent= postMistralEventToOa(response_mistral,access_token,locations_api_url,public_key, image_url)
+            except Exception as e:
+                raise Exception(f"Error processing image URL: {e}")
         else:
-            logging.error("Enter a valid image path or url")
-            exit(1)
+            raise Exception(f"Enter a valid image path or url")
         if OAEvent is not None :
                 return OAEvent
         else:
-            logging.error( f"Problem with posting to Mistral img file ${image_path} or url ${url}" )
-            exit(1)
+            raise Exception(f"Error: OAEvent is None. Check the image file {image_path} or url {url}")
     
-# if __name__ == "__main__":
-#     parser=argparse.ArgumentParser()
-#     group = parser.add_mutually_exclusive_group(required=True)
-#     group.add_argument("-f", "--fileName", "--file", "--filename",help="Image file name in images/sources path ")
-#     group.add_argument( "--url", "--URL", "--Url",help="URL of the image to analyse")
-#     group.add_argument( "--test",nargs='?', const=True,help="Test command with {TEST_FILE_NAME}")
-#     args=parser.parse_args()
-
-#     if args.fileName: # upload image to imgbb and get url
-#         image_url = postImageToImgbb(args.filename)
-#         response_mistral = getMistralImageEvent(image_path=args.filename)
-#         msg.info(response_mistral)
-#         postMistralEventToOa(response_mistral, image_url)
-#     elif args.url:
-#         image_url=args.url
-#         response_mistral=getMistralImageEvent(url=image_url)
-#         msg.info(response_mistral)
-#         postMistralEventToOa(response_mistral, image_url)
-

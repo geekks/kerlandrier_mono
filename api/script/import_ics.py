@@ -42,7 +42,7 @@ def import_ics(ics_url:str):
     
     new_events_nbr=0
     logContent=[]
-    access_token = oa.access_token
+    access_token = oa.getToken
     for i, ics_event in enumerate(ics_events):
         try:
             event_title = ics_event.get('title').get('fr')
@@ -61,6 +61,7 @@ def import_ics(ics_url:str):
             # Get OA location from facebook complete location infos (locationTXT)
             location_uid = get_or_create_oa_location(searched_location = ics_event.get('locationTXT'),
                                                     access_token=access_token,
+                                                    locations_api_url=f"{config.OA_API_URL}/locations",
                                                     public_key=oa.public_key)
             ics_event.update( {"locationUid": location_uid })
             ics_event.pop( "locationTXT" )

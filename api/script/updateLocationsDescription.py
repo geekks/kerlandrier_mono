@@ -16,7 +16,7 @@ from .libs.HttpRequests import(
         patch_location,
         )
 
-def udpateLocationsDescription(access_token: str, public_key:str):
+def udpateLocationsDescription(access_token: str, public_key:str, locations_api_url:str):
 
     aven_cities = [
         "Bannalec", "Beg-Meil", "Concarneau", "Elliant", "LaForêt-Fouesnant", "Pleuven",
@@ -35,7 +35,7 @@ def udpateLocationsDescription(access_token: str, public_key:str):
 
     breizh_postal = ['29', '56', '22', '35', '44']  # Postal codes of Bretagne and more
 
-    locations = get_locations(public_key)
+    locations = get_locations(public_key,locations_api_url)
 
     logging.info(f"Nombre total de lieux: {len(locations)}")
 
@@ -46,15 +46,15 @@ def udpateLocationsDescription(access_token: str, public_key:str):
                 continue
             
             if location.get("city") in aven_cities:
-                patch_location( access_token, location["uid"], {"description": {"fr": "AVEN"}, "state": 1 })
+                patch_location( access_token, location["uid"], {"description": {"fr": "AVEN"}, "state": 1 },locations_api_url)
                 logging.info(f"Lieu: '{location['name']}' ajouté dans AVEN")
                 
             elif location.get("city") in cornouaille_cities:
-                patch_location( access_token, location["uid"], {"description": {"fr": "CORNOUAILLE"},"state": 1 })
+                patch_location( access_token, location["uid"], {"description": {"fr": "CORNOUAILLE"},"state": 1 },locations_api_url)
                 logging.info(f"Lieu: '{location['name']}' ajouté dans CORNOUAILLE")
                 
             elif location.get("postalCode", "")[:2] in breizh_postal:
-                patch_location( access_token, location["uid"], {"description": {"fr": "BRETAGNE"},"state": 1 })
+                patch_location( access_token, location["uid"], {"description": {"fr": "BRETAGNE"},"state": 1 },locations_api_url)
                 logging.info(f"Lieu: '{location['name']}' ajouté dans BRETAGNE")
                 
             else:
