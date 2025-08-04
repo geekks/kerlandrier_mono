@@ -11,7 +11,7 @@ Classes:
 
 from typing import List, Dict, Optional, TypedDict, Any
 
-from .HttpRequests import retrieve_OA_access_token
+import script.libs.HttpRequests as HttpRequests
 
 class Timing:
     def __init__(self, begin: str, end: str):
@@ -299,9 +299,48 @@ class OA_Connection:
             raise ValueError("Private key must be provided in getToken() function or OA_Connection object to retrieve the access token.")
         if self.access_token_url is None:
             raise ValueError("access_token_url must be provided in OA_Connection object")
-        access_token = retrieve_OA_access_token(
+        access_token = HttpRequests.retrieve_OA_access_token(
             OA_SECRET_KEY=secret_key,
             TOKEN_FILE_NAME=self.token_file_name,
             ACCESS_TOKEN_URL=self.access_token_url
         )
         return access_token
+    
+    def getEvents(self, params: Dict = None) -> OpenAgendaEvents:
+        """
+        Retrieves events from the OpenAgenda API based on the provided parameters.
+        
+        Args:
+            params (dict): The parameters to pass to the API call.
+                https://developers.openagenda.com/10-lecture/
+                exemple: {'relative[]': 'current',
+                        'search': 'conference',
+                        'detailed': 1,
+                        'monolingual': 'fr'}
+        
+        Returns:
+            events (OpenAgendaEvents): An OpenAgendaEvents object containing the total number of events and a list of OpenAgendaEvent objects.
+        """
+        if not params:
+            params={"relative[0]": "upcoming",
+                    "relative[1]": "current",
+                    "detailed": 1,
+                    "monolingual": "fr",
+                    "state[0]":2, "state[1]":1, "state[2]":0, "state[3]":-1}
+        events = HttpRequests.get_events(
+            params=params,
+            public_key=self.public_key,
+            oa_api_url=self.oa_api_url,
+        )
+        # Converting json response to OpenAgendaEvents object
+        if not isinstance(events, list):
+            raise ValueError("Expected a list of events, got: {}".format(type(events)))
+        if not events:
+            return OpenAgendaEvents(0, [])
+        if not isinstance(events[0], dict):
+            raise ValueError("Expected a list of dictionaries, got: {}".format(type(events[0])))
+        OAevents= [OpenAgendaEvent]
+        for event in events:
+            OAevent = OpenAgendaEvent.from_json(event)
+            OAevents.append(OAevent)
+        return OpenAgendaEvents(len(OAevents), OAevents)
