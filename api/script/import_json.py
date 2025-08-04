@@ -11,7 +11,7 @@ def parse_json(file_path):
 file_path = 'scraping/2025_maree_info/maree_info_format_heure_hiver_ok.json'
 parsed_data = parse_json(file_path)
 
-access_token = oa.getToken
+access_token = oa.getToken()
 print(access_token)
 
 createdEventUids = []

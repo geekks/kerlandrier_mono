@@ -26,12 +26,12 @@ def main():
             else:
                 import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
         elif args.script == 'updateLocationsDescription':
-            udpateLocationsDescription(oa.getToken,
+            udpateLocationsDescription(oa.getToken(),
                                         oa.public_key,
                                         locations_api_url=f"{config.OA_API_URL}/locations")
         elif args.script == 'postMistralEvent':
             MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
-            access_token = oa.getToken
+            access_token = oa.getToken()
             IMGBB_API_URL = config.IMGBB_API_URL
             IMGBB_PRIVATE_API_KEY = config.IMGBB_PRIVATE_API_KEY.get_secret_value()
 
@@ -42,6 +42,7 @@ def main():
                     MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
                     access_token=access_token,
                     locations_api_url=f"{config.OA_API_URL}/locations",
+                    public_key=oa.public_key,
                     image_path=args.file,
                     imgbb_api_url=IMGBB_API_URL,
                     imgbb_api_key=IMGBB_PRIVATE_API_KEY
@@ -50,6 +51,7 @@ def main():
                 postMistralEvent(
                     MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
                     access_token=access_token,
+                    public_key=oa.public_key,
                     locations_api_url=f"{config.OA_API_URL}/locations",
                     url=args.url,
                 )
@@ -87,10 +89,10 @@ def main():
             else:
                 import_ics(config.ICS_PRIVATE_URL_KLR_FB.get_secret_value())
         elif answers['script'] == 'updateLocationsDescription':
-            udpateLocationsDescription(oa.getToken, oa.public_key, locations_api_url=f"{config.OA_API_URL}/locations")
+            udpateLocationsDescription(oa.getToken(), oa.public_key, locations_api_url=f"{config.OA_API_URL}/locations")
         elif answers['script'] == 'postMistralEvent':
             MISTRAL_PRIVATE_API_KEY = config.MISTRAL_PRIVATE_API_KEY.get_secret_value()
-            access_token = oa.getToken
+            access_token = oa.getToken()
             IMGBB_API_URL = config.IMGBB_API_URL
             IMGBB_PRIVATE_API_KEY = config.IMGBB_PRIVATE_API_KEY.get_secret_value()
             if answers['source'] == 'File':

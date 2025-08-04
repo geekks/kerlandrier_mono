@@ -42,7 +42,7 @@ def import_ics(ics_url:str):
     
     new_events_nbr=0
     logContent=[]
-    access_token = oa.getToken
+    access_token = oa.getToken()
     for i, ics_event in enumerate(ics_events):
         try:
             event_title = ics_event.get('title').get('fr')

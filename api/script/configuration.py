@@ -8,7 +8,6 @@ import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 env_path= os.path.join(SCRIPT_DIR, '.env' ) 
 
-from .libs.HttpRequests import retrieve_OA_access_token
 from .libs.oa_types import OA_Connection
 
 class Configuration(BaseSettings):
