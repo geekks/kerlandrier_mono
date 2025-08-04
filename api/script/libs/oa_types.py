@@ -103,8 +103,8 @@ class OpenAgendaEvent:
         title (MultilingualEntry): The title of the event.
         image (dict): Infos about the main image of the event.
         imageCredits (str): The credits for the image.
-        onlineAccessLink (str): The link to access the event online (1=offline, 2=online, 3=hybrid)
-        attendanceMode (int): The attendance mode of the event.
+        onlineAccessLink (str): The link to access the event online.
+        attendanceMode (int): The attendance mode of the event (1=offline, 2=online, 3=hybrid).
         registration (list[str]): Liste des moyens d'inscription : numéros de téléphones, email ou liens hypertextes
         accessibility (dict): Accessibility informations for each handicap.
         age (dict{min: int, max: int}): The age range of the event.
