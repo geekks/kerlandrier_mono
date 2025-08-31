@@ -121,6 +121,8 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
             messages=messages,
             response_format=mistralEvent
         )
+        if chat_response is None or chat_response.choices is None or len(chat_response.choices) == 0:
+            raise Exception(f"Misformatted Mistral response: {chat_response}")
         return chat_response.choices[0].message.parsed
     except SDKError as e:
         logging.error(f"SDKError while sending image to Mistral: {e.body}, {e.message}, {e.status_code}")
