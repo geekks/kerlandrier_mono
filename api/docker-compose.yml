@@ -16,5 +16,6 @@ services:
         - action: rebuild 
           path: ${PWD} 
           target: /api/
+    restart: unless-stopped
 volumes:
   db:

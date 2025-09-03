@@ -13,3 +13,4 @@ services:
           target: /app
           ignore:
             - node_modules
+    restart: unless-stopped
