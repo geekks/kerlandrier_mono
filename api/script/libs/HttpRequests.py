@@ -254,11 +254,11 @@ def create_event(access_token:str,
         event_creation_response = requests.post(url, json=body , headers=headers)
         if event_creation_response.status_code != 200:
             logging.error(f"Error creating event {event.get('title').get('fr')}: Status Code {event_creation_response.status_code}")
-            logging.error(json.dumps(event_creation_response.json(), indent=4))
+            logging.error(event_creation_response.json)
             return None
         
         createdEvent= json.loads(event_creation_response.text)['event']
-        logging.info(f'New event: "{event['title']['fr']}" \
+        logging.info(f'New event: "{createdEvent['title']['fr']}" \
                         https://openagenda.com/kerlandrier/contribute/event/{str(createdEvent['uid'])}')
         return  event_creation_response.json()
 
@@ -306,7 +306,7 @@ def delete_event(access_token:str,
         return response.json()
 
     except requests.exceptions.RequestException as exc:
-        logging.error(f"Error deleting event: {exc}")
+        logging.error(f"Error deleting event on URL:{url}: {exc}")
         return None
 
 def search_events( oa_public_key: str, 
