@@ -131,7 +131,7 @@ async def generates_token(current_user: dict
                     "access_token": access_token,
                     "message": "Access token retrieved successfully"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        return {"success": False, "message": "Error getting OA access token"}
     
 
 @app.patch("/event/keywords",
@@ -144,7 +144,7 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
         access_token = oa.getToken()
         # print("access_token", access_token)
     except Exception as e:
-        return {"success": False, "data": [], "message": str(e)}
+        return {"success": False, "data": [], "message": "Erroir getting OA access token"}
     event = request
     try:
         existingKeywords = api_utils.get_event_keywords(event.uid,
