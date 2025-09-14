@@ -30,7 +30,6 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=latest
-            type=sha
             type=ref,event=branch
             type=ref,event=tag
 
@@ -39,8 +38,8 @@ jobs:
         with:
           context: ./api
           file: ./api/Dockerfile
+          provenance: false
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
 
-          
+
