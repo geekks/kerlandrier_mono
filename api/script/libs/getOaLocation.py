@@ -60,6 +60,8 @@ def get_or_create_oa_location(searched_location:str,
     searched_location=re.sub(r'  ',     ' ',searched_location)
     
     # TO DO: add this specific cases to a config file
+    # manual replacements of known misleading locations
+    # NB : replacement is made AFTER optimization above (removing ponctuation, postal codes, "finistère", "france", etc)
     try:
         replacement = [
         ("Boulevard de la Gare Quimperlé", "La Loco Quimperlé"),
@@ -68,11 +70,13 @@ def get_or_create_oa_location(searched_location:str,
         ("Brasserie de Bretagne Le Bek", "Le Bek"),
         ("Rue de Colguen", "Cinéville, Rue de Colguen"),
         ("LE CAFE LOCAL", "Le Café Local, Combrit"),
-        ("3e lieu  l'Archipel", "l'Archipel, Fouenant"),
+        ("3e lieu  l'Archipel", "l'Archipel, Fouesnant"),
         ("1 place Jean Jaures, Concarneau","Le livre & la plume"),
         ("CAC Scènes", "Le CAC"),
         ("Médiathèque de Fouesnant  l'Archipel", "L'Archipel, 1 Rue des Îles, Fouesnant"),
         ("1 rue vauban Tour du Gouverneur  Ville Close", "Maison du patrimoine"),
+        ("za de Kerlavar ploneour lanvern","Sous l'hangar"),
+        ("le big bang bar route de benodet Quimper","Le BigBang Bar"),
     ]
         for old, new in replacement:
             searched_location = searched_location.replace(old, new)
