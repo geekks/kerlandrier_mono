@@ -258,8 +258,7 @@ def create_event(access_token:str,
             return None
         
         createdEvent= json.loads(event_creation_response.text)['event']
-        logging.info(f'New event: "{createdEvent['title']['fr']}" \
-                        https://openagenda.com/kerlandrier/contribute/event/{str(createdEvent['uid'])}')
+        logging.info(f'📅 New event URL: https://openagenda.com/kerlandrier/contribute/event/{str(createdEvent['uid'])}')
         return  event_creation_response.json()
 
     except requests.exceptions.RequestException as exc:

@@ -58,6 +58,7 @@ def import_ics(ics_url:str):
             # find if event is already imported.
             if uidExterneIcsEvent in uidsExterneOa:
                 continue
+            logging.info(f"-----  Importing event: '{event_title}' -----")
             # Get OA location from facebook complete location infos (locationTXT)
             location_uid = get_or_create_oa_location(searched_location = ics_event.get('locationTXT'),
                                                     access_token=access_token,
@@ -104,6 +105,7 @@ def import_ics(ics_url:str):
             json.dump(dic, log_file,indent=2, ensure_ascii=False)
             if "error" in dic :
                 logging.error(dic)
+    logging.info(f"----- Import finished -----")
     logging.info(f"Checked {i+1} events from ICS URL.")
     logging.info(f"{new_events_nbr} new events created")
 

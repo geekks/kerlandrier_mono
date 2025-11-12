@@ -30,7 +30,7 @@ def get_or_create_oa_location(searched_location:str,
     Tries to find a matching OpenAgenda location for the given searched location.
     Returns an OALocation UID (found, created or default one.)
     """
-    logger.info(f"- searching location for : '{searched_location}'")
+    logger.info(f"📍 Location source name: '{searched_location}'")
     if (searched_location == None ) or (searched_location.lower() in ( "" , "none", "null")):
         logger.warning("InputLocation is null or empty. Returning default Location")
         return TBD_LOCATION_UID
@@ -89,7 +89,7 @@ def get_or_create_oa_location(searched_location:str,
         searched_location = "Concarneau (lieu à préciser)" 
     
     optimized_searched_location = searched_location
-    logger.info(" (optimized name for better matching:  '"+ optimized_searched_location +"')")
+    logger.info("📍 Location optimized name:  '"+ optimized_searched_location +"')")
     # 1) Try to find an existing OALocation
     OaLocationsIndex = {}
     for location in allOaLocations:
@@ -97,7 +97,7 @@ def get_or_create_oa_location(searched_location:str,
     # returns a list of tuples (name adress , score , OAuid)
     results = process.extract(optimized_searched_location, OaLocationsIndex, scorer=fuzz.token_set_ratio) or []
     if results[0] and results[0][1] > 85:  # Best matching score >85
-        logger.info(f"- 🎯 Location found in OA: {results[0] }")
+        logger.info(f"🏠✅ Location found in OA: {results[0] }")
         return results[0][2]
 
     # 2) Try to create an OALocation
