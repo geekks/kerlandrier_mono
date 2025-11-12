@@ -1,6 +1,6 @@
 services:
   kerlandrierfront:
-    image: kerlandrierfront
+    image: ghcr.io/geekks/kerlandrier_mono-app:latest
     build:
       context: .
       dockerfile: ./Dockerfile

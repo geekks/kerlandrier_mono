@@ -27,10 +27,20 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
+        id: meta-app
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository }}-app
+          tags: |
+            type=raw,value=latest
+            type=ref,event=branch
+            type=ref,event=tag
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta-api
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}-api
           tags: |
             type=raw,value=latest
             type=ref,event=branch
@@ -43,7 +53,7 @@ jobs:
           file: ./api/Dockerfile
           provenance: false
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta-api.outputs.tags }}
       
       - name: Build and push Front App
         uses: docker/build-push-action@v4
@@ -52,6 +62,6 @@ jobs:
           file: ./app/Dockerfile
           provenance: false
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta-app.outputs.tags }}
 
 
