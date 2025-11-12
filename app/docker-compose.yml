@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    volumes:
+      - ./config.json:/app/dist/config.json:ro
     ports:
       - 127.0.0.1:8090:4173
     develop:
