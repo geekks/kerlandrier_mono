@@ -8,4 +8,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  preview: {
+    allowedHosts: [
+      'app.kerlandrier.cc',
+      'localhost',
+      '127.0.0.1'
+    ]
+  }
 })
