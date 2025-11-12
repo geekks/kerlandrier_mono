@@ -105,7 +105,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
                     lieu (le nom du lieu ou l'adresse du lieu),\
                     description (les apostrophes sont notées avec le caractère ’ et pas '),\
                     description_courte (un résumé de l'évènement en 1 phrase),\
-                    fiabilité: (un nombre entier entre 0 et 100 indiquant la fiabilité des informations extraites de l'affiche)"
+                    fiabilite (un nombre entier entre 0 et 100 indiquant la fiabilité des informations extraites de l'affiche)"
                 },
                 {
                     "type": "image_url",
