@@ -77,6 +77,8 @@ def get_or_create_oa_location(searched_location:str,
         ("1 rue vauban Tour du Gouverneur  Ville Close", "Maison du patrimoine"),
         ("za de Kerlavar ploneour lanvern","Sous l'hangar"),
         ("le big bang bar route de benodet Quimper","Le BigBang Bar"),
+        ("kériolet","Keriolet"),
+        ("3 rue Vauban  Ville Close","Musée de la Pêche"),
     ]
         for old, new in replacement:
             searched_location = searched_location.replace(old, new)
