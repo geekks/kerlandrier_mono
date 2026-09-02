@@ -15,6 +15,9 @@ import argparse
 
 now=datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def import_ics(ics_url:str):
     """Main function to import ICS events."""
     # Fetch events from ICS
@@ -27,9 +30,9 @@ def import_ics(ics_url:str):
     # Unidecode ? https://pypi.org/project/Unidecode/
 
     ics_events = pull_upcoming_ics_events(ics_url)
-    logging.info(f"Total number of events on ICS : {len(ics_events)}\n")
+    logger.info(f"Total number of events on ICS : {len(ics_events)}\n")
     if ics_events is None or ics_events == []:
-        logging.info("No import to do.")
+        logger.info("No import to do.")
         return None
     eventsOa: list=get_events(params={"relative[0]": "upcoming", "relative[1]": "current",
                                     "detailed": 1,
@@ -37,7 +40,7 @@ def import_ics(ics_url:str):
                                     "state[0]":2, "state[1]":1, "state[2]":0, "state[3]":-1} # get refused/removed events to avoid recreating it,
                             , oa_public_key=config.OA_PUBLIC_KEY
                             )
-    logging.info(f"Total number of future events on Oa : {len(eventsOa)}\n")
+    logger.info(f"Total number of future events on Oa : {len(eventsOa)}\n")
     uidsExterneOa = [event["uid-externe"] for event in eventsOa if "uid-externe" in event]
     
     new_events_nbr=0
@@ -58,7 +61,7 @@ def import_ics(ics_url:str):
             # find if event is already imported.
             if uidExterneIcsEvent in uidsExterneOa:
                 continue
-            logging.info(f"-----  Importing event: '{event_title}' -----")
+            logger.info(f"-----  Importing event: '{event_title}' -----")
             # Get OA location from facebook complete location infos (locationTXT)
             location_uid = get_or_create_oa_location(searched_location = ics_event.get('locationTXT'),
                                                     access_token=access_token,
@@ -89,11 +92,11 @@ def import_ics(ics_url:str):
                 new_events_nbr += 1
                 eventLog["OaUrl"] = "https://openagenda.com/fr/" + response['event']['originAgenda']['slug'] + "/events/" + response['event']['slug']
             else:
-                logging.error( f"Problem for {event_title}\n" )
+                logger.error( f"Problem for {event_title}\n" )
                 eventLog["import_status"] = "Error posting event on OA"
                 eventLog["error"]= response if response else "No response"
         except Exception as e:
-            logging.error(f"Error: {e} \n" )
+            logger.error(f"Error: {e} \n" )
             eventLog["import_status"] = "Error processing event"
             eventLog["error"]=  str(e)
 
@@ -104,10 +107,10 @@ def import_ics(ics_url:str):
         for dic in logContent:
             json.dump(dic, log_file,indent=2, ensure_ascii=False)
             if "error" in dic :
-                logging.error(dic)
-    logging.info(f"----- Import finished -----")
-    logging.info(f"Checked {i+1} events from ICS URL.")
-    logging.info(f"{new_events_nbr} new events created")
+                logger.error(dic)
+    logger.info(f"----- Import finished -----")
+    logger.info(f"Checked {i+1} events from ICS URL.")
+    logger.info(f"{new_events_nbr} new events created")
 
 if __name__ == "__main__":
     

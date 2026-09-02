@@ -9,6 +9,10 @@ from libs.HttpRequests import (
 
 from .configuration import oa, config
 
+# Configurer le logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def validate_locations(access_token: str, public_key: str, locations_api_url:str = f"{config.OA_API_URL}/locations"):
     accessToken = access_token
     allLocations= get_locations(public_key,locations_api_url)
@@ -19,12 +23,12 @@ def validate_locations(access_token: str, public_key: str, locations_api_url:str
             if location["state"] == 0:
                 try:
                     patch_location(accessToken, str(location["uid"]), { 'state': 1 },locations_api_url)
-                    logging.info("Validated location:", location["name"])
+                    logger.info("Validated location:", location["name"])
                     validated_count += 1
                 except Exception as e:
-                    logging.error(f"Error validating location: {location["name"]} - {location['uid']}")
-                    logging.error(e)
-        logging.info("Total validated locations:", validated_count)
+                    logger.error(f"Error validating location: {location["name"]} - {location['uid']}")
+                    logger.error(e)
+        logger.info("Total validated locations:", validated_count)
         
 
 if __name__ == "__main__":

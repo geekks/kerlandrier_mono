@@ -16,13 +16,15 @@ from pydantic import BaseModel
 from typing import List
 import logging,coloredlogs
 
-coloredlogs.install()
+# Configurer le logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Check if the database file exists and initialize it if not
 
 if not os.path.exists(configAPI.DB_PATH):
     initialize_database(configAPI.DB_PATH)
-    logging.info("Database initialized.")
+    logger.info("Database initialized.")
 db = DB_Connection(configAPI.DB_PATH)
 
 app = FastAPI()
@@ -120,7 +122,7 @@ async def authenticate(request: AuthRequest):
         response_model=OaToken)
 async def generates_token(current_user: dict 
                         = Depends(get_current_user)):
-    logging.info( f"Token generated for user: ${current_user}")
+    logger.info( f"Token generated for user: ${current_user}")
     try:
         access_token = oa.getToken()
         if (access_token == None):
@@ -160,14 +162,14 @@ async def update_event(request: PatchKeywordRequest, current_user: dict = Depend
                     }
                 }
             )
-            logging.info(f"{existingKeywords} >>>> {event.keywords}")
+            logger.info(f"{existingKeywords} >>>> {event.keywords}")
 
             return {"success": True, "data": patched, "message": "Event successfully updated"}
         else:
-            logging.info("Keywords haven't changed")
+            logger.info("Keywords haven't changed")
             return {"success": True, "data": [], "message": "No update"}
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         raise HTTPException(status_code=400, detail=f"{e}")
 
 
@@ -198,19 +200,19 @@ async def upload_file(file: UploadFile,
                                     public_key=oa.public_key,
                                     locations_api_url= f"{config.OA_API_URL}/locations",
                                     image_url= ImgUrl)
-        logging.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
+        logger.info(f"OA event created: {OAevent.title.fr} at {OAevent.location.name}")
     except Exception as e:
         raise Exception(f"Error sending event on OpenAgenda: {e}")
     try:
         excerpt_response =api_utils.excerptOAEvent(OAevent)
         return excerpt_response
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         raise HTTPException(status_code=500, detail={"infos": e} )
     finally:
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
-            logging.info(f"File {file_path} deleted")
+            logger.info(f"File {file_path} deleted")
 
 
 @app.post("/image/url",
@@ -231,5 +233,5 @@ async def upload_url(request: UrlRequest ,
             raise HTTPException(status_code=400, detail=str(response.get("message")))
         return response
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         raise HTTPException(status_code=400, detail=str(f"{e}"))

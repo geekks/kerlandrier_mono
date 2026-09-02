@@ -16,6 +16,10 @@ from .libs.HttpRequests import(
         patch_location,
         )
 
+# Configurer le logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def udpateLocationsDescription(access_token: str, public_key:str, locations_api_url:str):
 
     aven_cities = [
@@ -37,7 +41,7 @@ def udpateLocationsDescription(access_token: str, public_key:str, locations_api_
 
     locations = get_locations(public_key,locations_api_url)
 
-    logging.info(f"Nombre total de lieux: {len(locations)}")
+    logger.info(f"Nombre total de lieux: {len(locations)}")
 
     if locations and len(locations) > 1:
         for location in locations:
@@ -47,19 +51,19 @@ def udpateLocationsDescription(access_token: str, public_key:str, locations_api_
             
             if location.get("city") in aven_cities:
                 patch_location( access_token, location["uid"], {"description": {"fr": "AVEN"}, "state": 1 },locations_api_url)
-                logging.info(f"Lieu: '{location['name']}' ajouté dans AVEN")
+                logger.info(f"Lieu: '{location['name']}' ajouté dans AVEN")
                 
             elif location.get("city") in cornouaille_cities:
                 patch_location( access_token, location["uid"], {"description": {"fr": "CORNOUAILLE"},"state": 1 },locations_api_url)
-                logging.info(f"Lieu: '{location['name']}' ajouté dans CORNOUAILLE")
+                logger.info(f"Lieu: '{location['name']}' ajouté dans CORNOUAILLE")
                 
             elif location.get("postalCode", "")[:2] in breizh_postal:
                 patch_location( access_token, location["uid"], {"description": {"fr": "BRETAGNE"},"state": 1 },locations_api_url)
-                logging.info(f"Lieu: '{location['name']}' ajouté dans BRETAGNE")
+                logger.info(f"Lieu: '{location['name']}' ajouté dans BRETAGNE")
                 
             else:
-                logging.error(f"🔴 Pas de catégorie pour lieu : '{location['name']}' . Adresse: {location.get('address')}, {location.get('city')}, {json.dumps(location.get('description'))}")
-                logging.info("  -> Ajouter la ville dans un des territoires dans le script: AVEN, CORNOUAILLE, BRETAGNE")
-        logging.info("Tous les lieux ont été mis à jour.")
+                logger.error(f"🔴 Pas de catégorie pour lieu : '{location['name']}' . Adresse: {location.get('address')}, {location.get('city')}, {json.dumps(location.get('description'))}")
+                logger.info("  -> Ajouter la ville dans un des territoires dans le script: AVEN, CORNOUAILLE, BRETAGNE")
+        logger.info("Tous les lieux ont été mis à jour.")
     else:
-        logging.error("No locations.")
+        logger.error("No locations.")

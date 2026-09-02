@@ -4,6 +4,9 @@ import bcrypt
 import os
 import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def initialize_database(db_path: str):
     # Create the directory if it doesn't exist
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -22,14 +25,14 @@ def initialize_database(db_path: str):
     """)
     db.commit()
     db.close()
-    logging.info(f"Database initialized at {db_path}")
+    logger.info(f"Database initialized at {db_path}")
 
 def DB_Connection(db_path: str) -> sqlite3.Connection:
     try :
         db: sqlite3.Connection = sqlite3.connect(db_path)
         return db
     except Exception as e:
-        logging.error(f"Cannot connect to database {db_path}: {e}")
+        logger.error(f"Cannot connect to database {db_path}: {e}")
         return None
 
 def hash_password(password: str) -> str:
@@ -43,13 +46,13 @@ def create_user(db_path:str, username:str, password:str) -> bool:
         cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
         db.commit()
         db.close()
-        logging.info(f"User {username} created successfully.")
+        logger.info(f"User {username} created successfully.")
         return { "success": True, "message":f"User {username} created successfully." }
     except sqlite3.IntegrityError:
-        logging.error(f"User {username} already exists.")
+        logger.error(f"User {username} already exists.")
         return { "success": False, "message":f"User {username} already exists." }
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
         return { "success": False, "message":f"An error occurred: {e}" }
 
 def main():

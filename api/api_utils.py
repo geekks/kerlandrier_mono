@@ -19,6 +19,8 @@ from script.libs.utils import check_image_file
 # Configurer le logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 coloredlogs.install()
+logger = logging.getLogger(__name__)
+
 def verify_password(stored_password: str, provided_password: str) -> bool:
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
@@ -43,7 +45,7 @@ def get_event_keywords(event_uid: str | int,
     """
     uid = str(event_uid)
     if event_uid is None or api_url is None or oa_public_key is None:
-        logging.error("Error event_uid, api_url or oa_public_key is None")
+        logger.error("Error event_uid, api_url or oa_public_key is None")
         raise ValueError("event_uid, api_url or oa_public_key is None")
         return None
     url = f"{api_url}/events/{uid}?key={oa_public_key}"
@@ -62,9 +64,9 @@ def get_event_keywords(event_uid: str | int,
                 return []
             return []
     except requests.RequestException as exc:
-        logging.error("Error getting event:", exc)
+        logger.error("Error getting event:", exc)
         if exc.response:
-            logging.error("Response:", exc.response)
+            logger.error("Response:", exc.response)
 
     return None
 
@@ -88,9 +90,9 @@ async def patch_event(access_token: str,
         if response.status_code >= 200 and response.status_code <= 299:
             return response.json()
         else:
-            logging.error("Error patching event:", response.json())
+            logger.error("Error patching event:", response.json())
     except requests.RequestException as exc:
-        logging.error(f"Error patching event: {exc}")
+        logger.error(f"Error patching event: {exc}")
 
     return None
 
@@ -103,7 +105,7 @@ def generate_kl_token(user_id: int,
         "user_id": user_id,
         "exp": expiration_time
     }
-    logging.info(f"Token generated. Endate: {expiration_time}")
+    logger.info(f"Token generated. Endate: {expiration_time}")
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
 
@@ -112,13 +114,13 @@ def verify_kl_token(token: str,
                     JWT_ALGORITHM: str) -> dict:
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        logging.info("Token decoded successfully")
+        logger.info("Token decoded successfully")
         return payload
     except jwt.ExpiredSignatureError:
-        logging.error("Token has expired")
+        logger.error("Token has expired")
         return None
     except jwt.InvalidTokenError:
-        logging.error("Invalid token")
+        logger.error("Invalid token")
         return None
     
 def get_user_by_username(db: sqlite3.Connection,
@@ -136,7 +138,7 @@ def send_url_to_mistral(MISTRAL_PRIVATE_API_KEY: str,
             return {"success": False, "message": "Error generating event on Mistral"}
     except Exception as e:
         raise Exception(e)
-    # logging.info(f"Mistral answer: {response_mistral.model_dump(mode='json')}")
+    # logger.info(f"Mistral answer: {response_mistral.model_dump(mode='json')}")
     return response_mistral
 
 def excerptOAEvent(OAevent: OpenAgendaEvent,

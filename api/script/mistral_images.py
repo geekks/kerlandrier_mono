@@ -25,6 +25,9 @@ from .libs.utils import get_end_date, encodeImage64, check_image_file
 from .libs.HttpRequests import create_event
 from .libs.getOaLocation import get_or_create_oa_location
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Define a class to contain the Mistral answer to a formatted JSON
 class mistralEvent(BaseModel):
     titre: str
@@ -52,7 +55,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
     """
 
     if url is not None and image_path is not None:
-        logging.error("You can't use both image_path and url")
+        logger.error("You can't use both image_path and url")
         return None
     if url:
         try:
@@ -65,11 +68,13 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
                 with open(file_name, 'wb') as file:
                     file.write(response.content)
                 image_path = file_name
-                logging.info(f"Image downloaded and saved to {file_name}")
+                logger.info(f"Image downloaded and saved to {file_name}")
             else:
+                logger.error(f"Failed to download image. Status code: {response.status_code}, {response.text}")
                 raise Exception(f"Failed to download image. Status code: {response.status_code}",
                 response.text)
         except Exception as e:
+            logger.error(f"Error downloading image from {url}: {e}")
             raise Exception(f"Error downloading image from {url}", e)
 
     if not check_image_file(image_path):
@@ -105,7 +110,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
             ]
         }
     ]
-    logging.info("sending image to Mistral with image path: " + image_path)
+    logger.info("Sending image to Mistral with image path: " + image_path)
     try:
         chat_response = client.chat.parse(
             model=model,
@@ -114,12 +119,17 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
         )
         if chat_response is None or chat_response.choices is None or len(chat_response.choices) == 0:
             raise Exception(f"Misformatted Mistral response: {chat_response}")
-        return chat_response.choices[0].message.parsed
+        mstr_mess= chat_response.choices[0].message
+        if mstr_mess is None or mstr_mess.parsed is None or len(mstr_mess.parsed.date_debut) == 0:
+                    raise Exception(f"Misformatted Mistral message: {chat_response}")
+        logger.info(f"'date_debut' from Mistral: {mstr_mess.parsed.date_debut}")
+        logger.info(f"'fiabilite' from Mistral: {mstr_mess.parsed.fiabilite}")
+        return mstr_mess.parsed
     except SDKError as e:
-        logging.error(f"SDKError while sending image to Mistral: {e.body}, {e.message}, {e.status_code}")
+        logger.error(f"SDKError while sending image to Mistral: {e.body}, {e.message}, {e.status_code}")
         raise Exception(f"SDKError while sending image to Mistral: {e.body}, {e.message}, {e.status_code}")
     except Exception as e:
-        logging.error(f"Error while sending image to Mistral: {e}")
+        logger.error(f"Error while sending image to Mistral: {e}")
         raise Exception(f"Error while sending image to Mistral: {e}")
 
 def postMistralEventToOa(event: mistralEvent,
@@ -136,7 +146,7 @@ def postMistralEventToOa(event: mistralEvent,
                                                 public_key=public_key)
         
     except Exception as e:
-        logging.error(f"Error retrieving or creating location for event '{event.titre}': {e}")
+        logger.error(f"Error retrieving or creating location for event '{event.titre}': {e}")
         raise Exception(f"Error retrieving or creating location for event '{event.titre}': {e}")
 
     # Fixe la timezone à Paris pour prendre en compte l'heure d'été/hivert
@@ -160,15 +170,15 @@ def postMistralEventToOa(event: mistralEvent,
     try:
         response = create_event(access_token, eventOA)
         if response['event']['uid']:
-                logging.info("Event created !")
-                logging.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
+                logger.info("Event created !")
+                logger.info(f"OaUrl: https://openagenda.com/fr/{response['event']['originAgenda']['slug']}/events/{response['event']['slug']}")
                 oaEvent = OpenAgendaEvent.from_json(response['event'])
                 return  oaEvent
         else:
-            logging.error( f"Problem for {event.titre}", response  )
+            logger.error( f"Problem for {event.titre}", response  )
             raise Exception(f"Error sending event to OA from Mistral. Response: {response}")
     except Exception as e:
-        logging.error( f"Problem for event: '{event.titre}'")
+        logger.error( f"Problem for event: '{event.titre}'")
         raise Exception(f"Error sending event to OA from Mistral: {e}")
         
 def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) -> str|None:
@@ -197,7 +207,7 @@ def postImageToImgbb(image_path: str, imgbb_api_url: str , imgbb_api_key: str ) 
         raise Exception(f"Error while uploading image to imgbb {e}")
     if image_url is None:
         raise Exception(f"Error while uploading image to imgbb : image_url is None {response_imgbb.text}")
-    logging.info(f"Image uploaded to imgbb: {image_url}")
+    logger.info(f"Image uploaded to imgbb: {image_url}")
     return image_url
 
 
@@ -215,7 +225,7 @@ def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str,
             try:
                 image_url = postImageToImgbb(image_path,imgbb_api_url, imgbb_api_key)
                 response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY, image_path=image_path)
-                logging.info(response_mistral)
+                logger.info(response_mistral)
                 OAEvent = postMistralEventToOa(response_mistral, access_token,locations_api_url, public_key, image_url)
             except Exception as e:
                 raise Exception(f"Error processing image File: {e}")
@@ -223,7 +233,7 @@ def postMistralEvent(MISTRAL_PRIVATE_API_KEY:str,
             try:
                 image_url=url
                 response_mistral = getMistralImageEvent(MISTRAL_PRIVATE_API_KEY,url=image_url)
-                logging.info(response_mistral)
+                logger.info(response_mistral)
                 OAEvent= postMistralEventToOa(response_mistral,access_token,locations_api_url,public_key, image_url)
             except Exception as e:
                 raise Exception(f"Error processing image URL: {e}")
