@@ -7,7 +7,8 @@ python mistral_images.py --test
 """
 
 import os
-from mistralai import Mistral, SDKError
+from mistralai.client import Mistral
+from mistralai.client.errors import SDKError
 from pydantic import BaseModel
 import pytz
 from datetime import datetime
@@ -15,8 +16,6 @@ import requests
 from urllib.parse import urlparse, urlunparse
 from slugify import slugify
 import argparse
-from PIL import Image
-from wasabi import color,msg
 from dateparser import parse
 import logging
 
@@ -76,14 +75,6 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
     if not check_image_file(image_path):
         raise TypeError("Please provide a valid image file")
 
-    try:
-        if image_path and os.path.exists(image_path):
-            Image.open(image_path).verify()
-        else:
-            raise FileNotFoundError(f"The image file {image_path} does not exist.")
-    except Exception as e:
-        raise Exception(f"Error verifying image: {e}")
-        
     base64_image = encodeImage64(image_path)
     model = "pixtral-12b"
     client = Mistral(api_key=MISTRAL_PRIVATE_API_KEY)

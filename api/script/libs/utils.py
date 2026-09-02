@@ -131,7 +131,7 @@ def check_image_file(image_path: str) -> bool:
         bool: True if the image file is valid, False otherwise.
     """
     import os
-    import imghdr
+    import puremagic
 
     # Check if the file exists
     if not os.path.isfile(image_path):
@@ -145,11 +145,14 @@ def check_image_file(image_path: str) -> bool:
         logging.error(f"Error: The file {image_path} does not have a valid image extension.")
         return False
 
-    # Check if the file is an image type
-    with open(image_path, 'rb') as f:
-        image_type = imghdr.what(f)
+    # Check if the file content matches a known image signature
+    try:
+        image_type = puremagic.from_file(image_path)
         if image_type is None:
             logging.error(f"Error: The file {image_path} is not a valid image.")
             return False
+    except puremagic.PureError:
+        logging.error(f"Error: The file {image_path} is not a valid image.")
+        return False
 
     return True

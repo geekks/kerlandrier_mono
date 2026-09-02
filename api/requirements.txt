@@ -1,29 +1,30 @@
-beautifulsoup4==4.13.4
-bcrypt==4.3.0
-dateparser==1.2.1
-fastapi==0.115.12
-fastapi[standard] == 0.115.12
-GitPython==3.1.44
-GitPython==3.1.44
-gspread==6.2.0
-icalendar==6.1.3
-inquirer==3.4.0
-InquirerPy==0.3.4
-loguru==0.7.3
-mistralai==1.9.11
-Pillow==11.3.0
-pydantic==2.11.3
-pydantic_settings==2.9.1
-PyJWT==2.10.1
-python-slugify==8.0.4
-pytz==2025.1
-Requests==2.32.4
-thefuzz==0.22.1
-wasabi==1.1.3
-watchdog==6.0.0
-wheel==0.45.1
-coloredlogs==15.0.1
+beautifulsoup4==4.15.0
+bcrypt==5.0.0
+dateparser==1.4.0
+fastapi==0.137.0
+uvicorn==0.49.0
 
-# For local use or test
-# pandas==2.2.3
-# playwright==1.50.0
+
+
+icalendar==7.1.2
+
+
+
+mistralai==2.4.9
+
+pydantic==2.13.4
+pydantic_settings==2.14.1
+PyJWT==2.13.0
+# python-slugify: non maintenu?, à remplacer
+python-slugify==8.0.4
+pytz==2026.2
+requests==2.34.2
+
+# thefuzz: non maintenu?, à remplacer
+thefuzz==0.22.1
+# wasabi: non maintenu?, à remplacer
+wasabi==1.1.3   
+
+puremagic==2.2.0
+python-multipart==0.0.32
+coloredlogs==15.0.1
