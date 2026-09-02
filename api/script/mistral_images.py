@@ -86,6 +86,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
 
     # Define the messages for the chat
     jour= datetime.now().strftime('%d/%m/%Y')
+    annee= int(datetime.now().strftime('%Y'))
     messages = [
         {
             "role": "user",
@@ -95,7 +96,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
                     "text": f"Cette image est une affiche donnant des informations sur un évènement qui a lieu dans les prochains mois de cette année.\
                     Retourne moi un objet JSON contenant les information suivantes:\
                     titre,\
-                    date_debut (date de début de l'évènement, qui sera dans les 12 mois à venir à partir du {jour}; elle sera au format ISO 8601. Le fuseau horaire utilisé sur l'affiche est celle de Paris. Par exemple, s'il est écrit 19h, il faudra mettre T19:00:00+02:00 en heure d'été et T18:00:00+01:00 en heure d'hiver)\
+                    date_debut (date de début de l'évènement, qui sera dans les 12 mois à venir à partir du {jour} (donc de l'année {annee} ou {annee + 1}); elle sera au format ISO 8601. Le fuseau horaire utilisé sur l'affiche est celle de Paris. Par exemple, s'il est écrit 19h, il faudra mettre T19:00:00+02:00 en heure d'été et T18:00:00+01:00 en heure d'hiver)\
                     heure_debut (heure de début au format hh:mm),\
                     duree (durée de l'évenementau format hh:mm, avec 2 en durée par défaut si la durée n'est pas indisquée sur l'affiche),\
                     lieu (le nom du lieu ou l'adresse du lieu),\
