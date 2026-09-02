@@ -99,6 +99,7 @@ def main():
                 postMistralEvent(
                     MISTRAL_PRIVATE_API_KEY=MISTRAL_PRIVATE_API_KEY,
                     locations_api_url=f"{config.OA_API_URL}/locations",
+                    public_key=oa.public_key,
                     access_token=access_token,
                     image_path=answers['file'],
                     imgbb_api_url=IMGBB_API_URL,
