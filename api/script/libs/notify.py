@@ -3,7 +3,7 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from loguru import logger
+import logging
 
 def send_email(sender_email: str,
             sender_email_password: str,
@@ -40,7 +40,7 @@ def send_email(sender_email: str,
                         receiver_email,
                         msg.as_string()
                         )
-    logger.debug(f"Email sent to {receiver_email}")
+    logging.debug(f"Email sent to {receiver_email}")
 
 if __name__ == "__main__":
     send_email("contact@kerlandrier.cc", "Test", "This is a test email.")

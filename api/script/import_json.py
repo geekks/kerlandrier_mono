@@ -1,6 +1,6 @@
-from libs.HttpRequests import get_events, create_event
+from libs.HttpRequests import create_event
 import json
-from .configuration import config, oa
+from .configuration import oa
 
 def parse_json(file_path):
   with open(file_path, 'r') as file:

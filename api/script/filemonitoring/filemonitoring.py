@@ -11,11 +11,9 @@ from mistral_images import getMistralImageEvent, postMistralEventToOa
 
 import logging
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Example log message
 logger.info("Application started")
 current_path = os.getcwd()
 logger.info(f"Current working directory: {current_path}")

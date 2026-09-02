@@ -11,7 +11,7 @@ from script.configuration import config, oa
 from script.mistral_images import postImageToImgbb, postMistralEventToOa
 
 from db import initialize_database, DB_Connection
-from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, Header, UploadFile
 from pydantic import BaseModel
 from typing import List
 import logging,coloredlogs
@@ -28,7 +28,6 @@ db = DB_Connection(configAPI.DB_PATH)
 app = FastAPI()
 
 from fastapi.middleware.cors import CORSMiddleware
-from api.script.libs.utils import check_image_file
 
 app.add_middleware(
     CORSMiddleware,

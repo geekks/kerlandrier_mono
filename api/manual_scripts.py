@@ -6,7 +6,7 @@ from script.mistral_images import postMistralEvent
 
 import argparse
 import inquirer
-import logging,coloredlogs
+import coloredlogs
 coloredlogs.install()
 
 def main():
