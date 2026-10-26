@@ -1,5 +1,5 @@
-from typing import Literal
-import os
+from typing import Literal, Optional
+import os,sys
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
@@ -50,6 +50,9 @@ class Configuration(BaseSettings):
     IMGBB_API_URL: str = Field(description="Temp web image upload service URL", default="https://api.imgbb.com/1/upload")
     IMGBB_PRIVATE_API_KEY: SecretStr = Field(description="Temp web image upload service API token")
     
+    # Gemini API key for text events ingestion
+    GEMINI_API_KEY: Optional[SecretStr] = Field(description="Gemini API key for text events ingestion", default=None)
+
     # Scraping
     HEADLESS_PLAYWRIGHT: bool = Field(description="Headless mode for Playwright", default=True)
     model_config = {
