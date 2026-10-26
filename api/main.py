@@ -5,7 +5,8 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import api_utils
-from script.libs.HttpRequests import patch_event
+import text_events
+from script.libs.HttpRequests import patch_event, create_event
 from configuration import configAPI
 from script.configuration import config, oa
 from script.mistral_images import postImageToImgbb, postMistralEventToOa
@@ -72,6 +73,29 @@ class ImageResponse(BaseModel):
 
 class UrlRequest(BaseModel):
     url: str
+
+class TextInputsRequest(BaseModel):
+    text: str
+
+class TextInputsResponse(BaseModel):
+    success: bool
+    count: int
+    events: List[dict]
+
+class TextPayloadRequest(BaseModel):
+    events: List[text_events.OpenAgendaEventPayload]
+
+class TextPayloadResult(BaseModel):
+    title: str
+    success: bool
+    uid: Optional[int | str] = None
+    url: Optional[str] = None
+    message: Optional[str] = None
+
+class TextPayloadResponse(BaseModel):
+    success: bool
+    created: int
+    results: List[TextPayloadResult]
 
 def get_token_header(authorization: str 
                         = Header(   default=None,
@@ -235,3 +259,67 @@ async def upload_url(request: UrlRequest ,
     except Exception as e:
         logger.error(e)
         raise HTTPException(status_code=400, detail=str(f"{e}"))
+
+
+@app.post("/text/inputs",
+        summary="Convert raw text events into OpenAgenda payloads",
+        description="Takes a text containing events separated by '---' and uses Gemini to generate OpenAgenda event payloads, matching locations of the agenda.",
+        response_model=TextInputsResponse)
+def text_inputs(request: TextInputsRequest,
+                current_user: dict = Depends(get_current_user)):
+    raw_events = text_events.split_raw_events(request.text)
+    if not raw_events:
+        raise HTTPException(status_code=400, detail="No events found in the text")
+    if config.GEMINI_API_KEY is None:
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured")
+    try:
+        locations = text_events.fetch_agenda_locations(oa.getToken(), config.OA_API_URL)
+    except Exception as e:
+        logging.warning(f"Could not fetch locations, proceeding without: {e}")
+        locations = []
+    try:
+        payloads = text_events.process_event_descriptions(
+            raw_events,
+            locations,
+            gemini_api_key=config.GEMINI_API_KEY.get_secret_value(),
+            default_location_uid=int(config.TBD_LOCATION_UID))
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(status_code=500, detail=f"Error processing events: {e}")
+    return {"success": True, "count": len(payloads), "events": payloads}
+
+
+@app.post("/text/payload",
+        summary="Create OpenAgenda events from /text/inputs payloads",
+        description="Takes the payloads returned by /text/inputs (possibly edited) and creates the events in OpenAgenda.",
+        response_model=TextPayloadResponse)
+def text_payload(request: TextPayloadRequest,
+                current_user: dict = Depends(get_current_user)):
+    if not request.events:
+        raise HTTPException(status_code=400, detail="No events provided")
+    try:
+        access_token = oa.getToken()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting OA access token: {e}")
+
+    results = []
+    for payload in request.events:
+        try:
+            response = create_event(access_token,
+                                    text_events.to_openagenda_event(payload),
+                                    events_api_url=f"{config.OA_API_URL}/events")
+            if not response or not response.get("event", {}).get("uid"):
+                results.append({"title": payload.title, "success": False, "message": "OpenAgenda refused the event"})
+                continue
+            created = response["event"]
+            results.append({
+                "title": payload.title,
+                "success": True,
+                "uid": created["uid"],
+                "url": f"{config.OA_AGENDA_URL}/events/{created.get('slug')}",
+            })
+        except Exception as e:
+            logging.error(e)
+            results.append({"title": payload.title, "success": False, "message": str(e)})
+    created_count = sum(1 for r in results if r["success"])
+    return {"success": created_count == len(results), "created": created_count, "results": results}
