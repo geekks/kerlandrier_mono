@@ -265,6 +265,21 @@ def create_event(access_token:str,
         logging.error(f"Error creating event {event.get('title').get('fr')}: {exc}")
         return None
 
+def create_event_with_response(access_token: str,
+                               event: dict,
+                               events_api_url: str = EVENTS_API_URL):
+    headers = {
+        "Content-Type": "application/json",
+        "access-token": access_token,
+        "nonce": get_nonce(),
+    }
+    response = requests.post(events_api_url, json=event, headers=headers)
+    try:
+        body = response.json()
+    except requests.exceptions.JSONDecodeError:
+        body = response.text
+    return {"status_code": response.status_code, "body": body}
+
 def patch_event(access_token:str,
                 eventUid:str|int,
                 eventData:dict,

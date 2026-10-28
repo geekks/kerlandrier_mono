@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import api_utils
 import text_events
-from script.libs.HttpRequests import patch_event, create_event
+from script.libs.HttpRequests import patch_event, create_event_with_response
 from configuration import configAPI
 from script.configuration import config, oa
 from script.mistral_images import postImageToImgbb, postMistralEventToOa
@@ -91,6 +91,7 @@ class TextPayloadResult(BaseModel):
     uid: Optional[int | str] = None
     url: Optional[str] = None
     message: Optional[str] = None
+    openAgendaResponse: Optional[dict] = None
 
 class TextPayloadResponse(BaseModel):
     success: bool
@@ -305,21 +306,39 @@ def text_payload(request: TextPayloadRequest,
     results = []
     for payload in request.events:
         try:
-            response = create_event(access_token,
-                                    text_events.to_openagenda_event(payload),
-                                    events_api_url=f"{config.OA_API_URL}/events")
-            if not response or not response.get("event", {}).get("uid"):
-                results.append({"title": payload.title, "success": False, "message": "OpenAgenda refused the event"})
+            response = create_event_with_response(
+                access_token,
+                text_events.to_openagenda_event(payload),
+                events_api_url=f"{config.OA_API_URL}/events",
+            )
+            open_agenda_body = response["body"]
+            if (
+                response["status_code"] != 200
+                or not isinstance(open_agenda_body, dict)
+                or not open_agenda_body.get("event", {}).get("uid")
+            ):
+                results.append({
+                    "title": payload.title,
+                    "success": False,
+                    "message": "OpenAgenda refused the event",
+                    "openAgendaResponse": response,
+                })
                 continue
-            created = response["event"]
+            created = open_agenda_body["event"]
             results.append({
                 "title": payload.title,
                 "success": True,
                 "uid": created["uid"],
                 "url": f"{config.OA_AGENDA_URL}/events/{created.get('slug')}",
+                "openAgendaResponse": response,
             })
         except Exception as e:
             logging.error(e)
-            results.append({"title": payload.title, "success": False, "message": str(e)})
+            results.append({
+                "title": payload.title,
+                "success": False,
+                "message": str(e),
+                "openAgendaResponse": {"error": str(e)},
+            })
     created_count = sum(1 for r in results if r["success"])
     return {"success": created_count == len(results), "created": created_count, "results": results}

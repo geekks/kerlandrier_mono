@@ -12,7 +12,7 @@ GEMINI_MODEL = "gemini-2.5-flash"
 class OpenAgendaEventPayload(BaseModel):
     title: str = Field(..., description="Event title (string)")
     summary: Optional[str] = Field(None, description="Short summary/catchphrase (string)")
-    description: str = Field(..., description="Short description (string)")
+    description: str = Field(..., max_length=49, description="Short description (maximum 49 characters)")
     longDescription: Optional[str] = Field(None, description="Detailed description (string)")
     keywords: Optional[dict] = Field(None, description="Keywords object, e.g., {'fr': ['tag1', 'tag2']}")
     registration: Optional[List[dict]] = Field(None, description="Registration links, e.g., [{'type': 'link', 'value': 'https://...'}]")
@@ -74,14 +74,15 @@ def process_event_descriptions(descriptions: List[str],
     prompt = f"""
     You are an expert event data ingestion agent for OpenAgenda. 
     Convert the following list of raw event descriptions into structured JSON payloads conforming to OpenAgenda API v2 standards.
-    Current Year context: 2026. Handle relative dates correctly.
-
+    Current Year context: 2026. Handle relative dates correctly. Timezone is Europe/Paris, mind the summer/winter time. Instead of using "Z", use "+0100" in winter or "+0200" in summer, in ISO8601 format.
+    
     Here is the official list of registered locations available in the OpenAgenda database for this agenda:
     {json.dumps(locations, ensure_ascii=False, indent=2)}
 
     For each event description:
     1. Identify the venue/location, match it to the most appropriate location from the official list above, and extract its integer 'uid' into the 'locationUid' field. If no matching location can be determined, set 'locationUid' to null.
     2. Generate 2 or 3 short, funny keywords about the event in French Keywords object with 2-3 short. They should stand slight irony and dark humor from left-oriented lovely jerks, formatted under the 'keywords' object as ` {{"fr": ["tag1", "tag2"]}} `.
+    3. Keep the 'description' field under 50 characters.
 
     You must output a single valid JSON object containing an "events" key which is an array of objects matching this exact structure:
     {{
@@ -89,7 +90,7 @@ def process_event_descriptions(descriptions: List[str],
         {{
           "title": "...",
           "summary": "..." (optional),
-          "description": "...",
+          "description": "... (maximum 49 characters)",
           "longDescription": "..." (optional),
           "keywords": {{"fr": ["funnytag1", "funnytag2"]}},
           "registration": [{{"type": "link", "value": "https://..."}}] (optional),

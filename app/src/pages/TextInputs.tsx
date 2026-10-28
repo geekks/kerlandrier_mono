@@ -2,6 +2,52 @@ import React, { useState } from 'react';
 import { API_URL } from "../config";
 import { getAccessToken } from '../services/authService';
 import '../styles/uploadimage.css';
+import '../styles/textInput.css';
+
+interface DebugModalProps {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+const DebugModal: React.FC<DebugModalProps> = ({ open, title, onClose, children }) => {
+  if (!open) return null;
+
+  return (
+    <div
+      className="debug-modal-backdrop"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        className="debug-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="debug-modal-title"
+        tabIndex={-1}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') onClose();
+        }}
+      >
+        <header className="debug-modal-header">
+          <h2 id="debug-modal-title">{title}</h2>
+          <button
+            type="button"
+            className="debug-modal-close"
+            aria-label="Fermer"
+            autoFocus
+            onClick={onClose}
+          >
+            ×
+          </button>
+        </header>
+        <div className="debug-modal-body">{children}</div>
+      </section>
+    </div>
+  );
+};
 
 interface Timing {
   begin: string;
@@ -31,12 +77,23 @@ interface CreationResult {
   uid?: number | string | null;
   url?: string | null;
   message?: string | null;
+  openAgendaResponse?: {
+    status_code?: number;
+    body?: unknown;
+    error?: string;
+  };
 }
 
 interface TextPayloadResponse {
   success: boolean;
   created: number;
   results: CreationResult[];
+}
+
+interface DebugResponse {
+  status: number | null;
+  statusText: string;
+  body: string;
 }
 
 const formatDate = (iso: string): string =>
@@ -56,9 +113,14 @@ const TextInputs: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [results, setResults] = useState<CreationResult[]>([]);
+  const [debugPayload, setDebugPayload] = useState<OpenAgendaEventPayload | null>(null);
+  const [debugResponse, setDebugResponse] = useState<DebugResponse | null>(null);
+  const [isDebugResponseOpen, setIsDebugResponseOpen] = useState(false);
 
   const handleCreate = async () => {
     setResults([]);
+    setDebugResponse(null);
+    setIsDebugResponseOpen(false);
     setMessage({ text: '', type: 'info' });
     setIsCreating(true);
     try {
@@ -70,16 +132,29 @@ const TextInputs: React.FC = () => {
         },
         body: JSON.stringify({ events }),
       });
+      const rawResponse = await response.text();
+      setDebugResponse({
+        status: response.status,
+        statusText: response.statusText,
+        body: rawResponse,
+      });
+      let responseData: unknown;
+      try {
+        responseData = JSON.parse(rawResponse);
+      } catch {
+        responseData = rawResponse;
+      }
+
       if (response.ok) {
-        const data: TextPayloadResponse = await response.json();
+        const data = responseData as TextPayloadResponse;
         setResults(data.results);
         setMessage({
           text: `${data.created}/${data.results.length} événement(s) créé(s) sur OpenAgenda.`,
           type: data.success ? 'success' : 'error',
         });
       } else {
-        const errorData = await response.json().catch(() => null);
-        const detail = errorData?.detail;
+        const errorData = responseData as { detail?: unknown } | null;
+        const detail = errorData && typeof errorData === 'object' ? errorData.detail : undefined;
         setMessage({
           text: `Échec de la création : ${typeof detail === 'string' ? detail : JSON.stringify(errorData)}`,
           type: 'error',
@@ -87,6 +162,11 @@ const TextInputs: React.FC = () => {
       }
     } catch (error) {
       console.error('Erreur :', error);
+      setDebugResponse({
+        status: null,
+        statusText: 'Erreur réseau',
+        body: error instanceof Error ? error.message : String(error),
+      });
       setMessage({ text: "Erreur lors de la création des événements.", type: 'error' });
     } finally {
       setIsCreating(false);
@@ -178,6 +258,20 @@ const TextInputs: React.FC = () => {
                 </tr>
               )}
             </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={2} className="debug-payload-cell">
+                  <button
+                    type="button"
+                    className="debug-payload-button"
+                    aria-label={`Afficher le payload brut de ${event.title}`}
+                    onClick={() => setDebugPayload(event)}
+                  >
+                    debug
+                  </button>
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       ))}
@@ -202,6 +296,35 @@ const TextInputs: React.FC = () => {
           ))}
         </ul>
       )}
+      {debugResponse && (
+        <button
+          type="button"
+          className="debug-payload-button"
+          onClick={() => setIsDebugResponseOpen(true)}
+        >
+          réponse API
+        </button>
+      )}
+      <DebugModal
+        open={debugPayload !== null}
+        onClose={() => setDebugPayload(null)}
+        title={`Payload brut${debugPayload ? ` — ${debugPayload.title}` : ''}`}
+      >
+        <pre className="debug-payload-content">
+          {debugPayload ? JSON.stringify(debugPayload, null, 2) : ''}
+        </pre>
+      </DebugModal>
+      <DebugModal
+        open={isDebugResponseOpen && debugResponse !== null}
+        onClose={() => setIsDebugResponseOpen(false)}
+        title="Réponse OpenAgenda"
+      >
+        <pre className="debug-payload-content">
+          {debugResponse
+            ? `HTTP ${debugResponse.status ?? '—'} ${debugResponse.statusText}\n\n${debugResponse.body}`
+            : ''}
+        </pre>
+      </DebugModal>
     </div>
   );
 };

@@ -1,0 +1,78 @@
+.debug-payload-cell {
+  text-align: right;
+}
+
+.debug-payload-button {
+  border: 0;
+  padding: 2px 4px;
+  background: transparent;
+  color: #777;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.debug-payload-button:hover {
+  color: #333;
+}
+
+.debug-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.debug-modal {
+  width: min(42rem, 100%);
+  max-height: 85vh;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 25%);
+  text-align: left;
+}
+
+.debug-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.debug-modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.debug-modal-close {
+  border: 0;
+  padding: 0 0.25rem;
+  background: transparent;
+  color: #555;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.debug-modal-body {
+  overflow: auto;
+  max-height: calc(85vh - 4rem);
+  padding: 1rem;
+}
+
+.debug-payload-content {
+  margin: 0;
+  overflow: auto;
+  padding: 12px;
+  border-radius: 4px;
+  background: #f5f5f5;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
