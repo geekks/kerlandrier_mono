@@ -92,16 +92,29 @@ def showDiff(a:str, b:str):
             output.append(color(a[a0:a1], fg=16, bg="red"))
     return "".join(output)
 
+PARIS_TZ = pytz.timezone("Europe/Paris")
+
+def localize_paris(naive_dt: datetime) -> datetime:
+    """Attach Europe/Paris tz (correct DST offset for that date) to a naive datetime.
+    An aware datetime is converted to Paris time."""
+    if naive_dt.tzinfo is not None:
+        return naive_dt.astimezone(PARIS_TZ)
+    return PARIS_TZ.localize(naive_dt)
+
+def naive_str_to_paris_iso(text: str) -> str:
+    """Parse a naive local datetime string (any offset in it is discarded) and return an ISO 8601 string with the Paris offset."""
+    dt = datetime.fromisoformat(text.strip().replace("Z", ""))
+    return localize_paris(dt.replace(tzinfo=None)).isoformat()
+
 def convertDate(date_obj:date|datetime, period:str)->datetime:
     if isinstance(date_obj, datetime):
         return date_obj
     elif isinstance(date_obj, date):
         datetime_obj = datetime.combine(date_obj, datetime.min.time())
-        pytz.timezone("Europe/Paris").localize(datetime_obj)
         if period == "start":
-            return datetime_obj.replace(hour=10, minute=30)
+            return localize_paris(datetime_obj.replace(hour=10, minute=30))
         elif period == "end":
-            return datetime_obj.replace(hour=17, minute=30)
+            return localize_paris(datetime_obj.replace(hour=17, minute=30))
         else:
             raise ValueError(f"period parameter \'{period}\' is not valid or must be defined")
     else:
