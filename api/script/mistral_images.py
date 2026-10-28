@@ -21,7 +21,7 @@ import logging
 
     
 from .libs.oa_types import OpenAgendaEvent
-from .libs.utils import get_end_date, encodeImage64, check_image_file
+from .libs.utils import get_end_date, localize_paris, encodeImage64, check_image_file
 from .libs.HttpRequests import create_event
 from .libs.getOaLocation import get_or_create_oa_location
 
@@ -96,7 +96,7 @@ def getMistralImageEvent(MISTRAL_PRIVATE_API_KEY:str, image_path:str=None, url:s
                     "text": f"Cette image est une affiche donnant des informations sur un évènement qui a lieu dans les prochains mois de cette année.\
                     Retourne moi un objet JSON contenant les information suivantes:\
                     titre,\
-                    date_debut (date de début de l'évènement, qui sera dans les 12 mois à venir à partir du {jour} (donc de l'année {annee} ou {annee + 1}); elle sera au format ISO 8601. Le fuseau horaire utilisé sur l'affiche est celle de Paris. Par exemple, s'il est écrit 19h, il faudra mettre T19:00:00+02:00 en heure d'été et T18:00:00+01:00 en heure d'hiver)\
+                    date_debut (date de début de l'évènement, qui sera dans les 12 mois à venir à partir du {jour} (donc de l'année {annee} ou {annee + 1}); elle sera au format ISO 8601. Donne l'heure locale telle qu'écrite sur l'affiche, SANS fuseau horaire, SANS offset et SANS Z, au format YYYY-MM-DDTHH:MM:SS. Par exemple, s'il est écrit 19h, mets T19:00:00. Ne convertis rien)\
                     heure_debut (heure de début au format hh:mm),\
                     duree (durée de l'évenementau format hh:mm, avec 2 en durée par défaut si la durée n'est pas indisquée sur l'affiche),\
                     lieu (le nom du lieu ou l'adresse du lieu),\
@@ -152,7 +152,8 @@ def postMistralEventToOa(event: mistralEvent,
 
     # Fixe la timezone à Paris pour prendre en compte l'heure d'été/hivert
     timezone_paris = pytz.timezone('Europe/Paris')
-    localizedDateDeb = parse(event.date_debut).astimezone(timezone_paris).isoformat()
+    startDt = localize_paris(datetime.fromisoformat(event.date_debut.strip().replace("Z", "")).replace(tzinfo=None))
+    localizedDateDeb = startDt.isoformat()
     eventOA= {
                 "uid-externe": "mistral-" + slugify(event.titre),
                 "title": { "fr": event.titre } ,
@@ -162,7 +163,7 @@ def postMistralEventToOa(event: mistralEvent,
                 "timings": [
                         {
                         "begin": localizedDateDeb,
-                        "end": get_end_date(parse(localizedDateDeb), event.duree).astimezone(timezone_paris).isoformat()
+                        "end": localize_paris(get_end_date(startDt.replace(tzinfo=None), event.duree)).isoformat()
                         },
                         ]
             }
