@@ -6,6 +6,8 @@ import requests
 from google import genai
 from pydantic import BaseModel, Field
 
+from script.libs.utils import naive_str_to_paris_iso
+
 GEMINI_MODEL = "gemini-2.5-flash"
 
 
@@ -74,7 +76,7 @@ def process_event_descriptions(descriptions: List[str],
     prompt = f"""
     You are an expert event data ingestion agent for OpenAgenda. 
     Convert the following list of raw event descriptions into structured JSON payloads conforming to OpenAgenda API v2 standards.
-    Current Year context: 2026. Handle relative dates correctly. Timezone is Europe/Paris, mind the summer/winter time. Instead of using "Z", use "+0100" in winter or "+0200" in summer, in ISO8601 format.
+    Current Year context: 2026. Handle relative dates correctly. All times are local Paris times: output the naive local time exactly as given in the text, WITHOUT any timezone, offset or "Z" (format YYYY-MM-DDTHH:MM:SS). Do not convert anything; the offset is applied afterwards.
     
     Here is the official list of registered locations available in the OpenAgenda database for this agenda:
     {json.dumps(locations, ensure_ascii=False, indent=2)}
@@ -94,7 +96,7 @@ def process_event_descriptions(descriptions: List[str],
           "longDescription": "..." (optional),
           "keywords": {{"fr": ["funnytag1", "funnytag2"]}},
           "registration": [{{"type": "link", "value": "https://..."}}] (optional),
-          "timings": [{{"begin": "YYYY-MM-DDTHH:MM:SS.000Z", "end": "YYYY-MM-DDTHH:MM:SS.000Z"}}],
+          "timings": [{{"begin": "YYYY-MM-DDTHH:MM:SS", "end": "YYYY-MM-DDTHH:MM:SS"}}],
           "locationUid": integer or null
         }}
       ]
@@ -114,6 +116,10 @@ def process_event_descriptions(descriptions: List[str],
     payloads = []
     for event in result.events:
         data = event.model_dump()
+        data["timings"] = [
+            {"begin": naive_str_to_paris_iso(t["begin"]), "end": naive_str_to_paris_iso(t["end"])}
+            for t in data.get("timings") or []
+        ]
         if data.get("locationUid") is None and default_location_uid is not None:
             data["locationUid"] = default_location_uid
         payloads.append(data)
