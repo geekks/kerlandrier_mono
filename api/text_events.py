@@ -18,6 +18,7 @@ class OpenAgendaEventPayload(BaseModel):
     registration: Optional[List[dict]] = Field(None, description="Registration links, e.g., [{'type': 'link', 'value': 'https://...'}]")
     timings: List[dict] = Field(..., description="List of timings with 'begin' and 'end' in ISO 8601 format")
     locationUid: Optional[int] = Field(None, description="The matched OpenAgenda location UID, or null if not found")
+    locationName: Optional[str] = Field(None, description="Location name (string)")
 
 
 class BatchEventOutput(BaseModel):
@@ -75,15 +76,15 @@ def process_event_descriptions(descriptions: List[str],
     You are an expert event data ingestion agent for OpenAgenda. 
     Convert the following list of raw event descriptions into structured JSON payloads conforming to OpenAgenda API v2 standards.
     Current Year context: 2026. Handle relative dates correctly. Timezone is Europe/Paris, mind the summer/winter time. Instead of using "Z", use "+0100" in winter or "+0200" in summer, in ISO8601 format.
-    
+
     Here is the official list of registered locations available in the OpenAgenda database for this agenda:
     {json.dumps(locations, ensure_ascii=False, indent=2)}
 
     For each event description:
     1. Identify the venue/location, match it to the most appropriate location from the official list above, and extract its integer 'uid' into the 'locationUid' field. If no matching location can be determined, set 'locationUid' to null.
     2. Generate 2 or 3 short, funny keywords about the event in French Keywords object with 2-3 short. They should stand slight irony and dark humor from left-oriented lovely jerks, formatted under the 'keywords' object as ` {{"fr": ["tag1", "tag2"]}} `.
-    3. Keep the 'description' field under 50 characters.
-
+    3. Keep the 'description' field under 50 characters. DO NOT invent anything if description is missing. Description should not be led by dark-humour but should be neutral.
+    4. Dark humor in keywords must not offense kids too much. Keep it subtle. User must read between the lines.
     You must output a single valid JSON object containing an "events" key which is an array of objects matching this exact structure:
     {{
       "events": [
@@ -96,6 +97,7 @@ def process_event_descriptions(descriptions: List[str],
           "registration": [{{"type": "link", "value": "https://..."}}] (optional),
           "timings": [{{"begin": "YYYY-MM-DDTHH:MM:SS.000Z", "end": "YYYY-MM-DDTHH:MM:SS.000Z"}}],
           "locationUid": integer or null
+          "locationName": "..." (optional)
         }}
       ]
     }}

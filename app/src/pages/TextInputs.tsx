@@ -251,6 +251,10 @@ const TextInputs: React.FC = () => {
                 <td className="event-details-label"><strong>Lieu (UID) :</strong></td>
                 <td>{event.locationUid ?? '—'}</td>
               </tr>
+              <tr>
+                <td className="event-details-label"><strong>Lieu :</strong></td>
+                <td>{event.locationName ?? '—'}</td>
+              </tr>
               {event.keywords?.fr && (
                 <tr>
                   <td className="event-details-label"><strong>Mots-clés :</strong></td>
