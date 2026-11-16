@@ -63,6 +63,7 @@ interface OpenAgendaEventPayload {
   registration?: { type: string; value: string }[] | null;
   timings: Timing[];
   locationUid?: number | null;
+  locationName?: string | null;
 }
 
 interface TextInputsResponse {
