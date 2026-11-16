@@ -5,14 +5,7 @@ services:
       context: .
       dockerfile: ./Dockerfile
     volumes:
-      - ./config.json:/app/dist/config.json:ro
+      - ./config.json:/usr/share/nginx/html/config.json:ro
     ports:
       - 127.0.0.1:8090:4173
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /app
-          ignore:
-            - node_modules
     restart: unless-stopped

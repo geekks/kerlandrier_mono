@@ -1,12 +1,13 @@
-FROM node:24-alpine
+FROM node:24-alpine AS build
 WORKDIR /app
 RUN npm install -g corepack && corepack enable
 COPY ["package.json", "yarn.lock", ".yarnrc.yml", "./"]
 RUN yarn install --immutable
 COPY . .
-# Build the app for production
 RUN yarn build
-# Expose the port used by vite preview (default 4173)
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+# SPA fallback for react-router
+RUN printf 'server {\n  listen 4173;\n  root /usr/share/nginx/html;\n  location / { try_files $uri /index.html; }\n}\n' > /etc/nginx/conf.d/default.conf
 EXPOSE 4173
-# Run the production preview server
-CMD ["yarn", "run", "preview", "--host", "0.0.0.0"]
