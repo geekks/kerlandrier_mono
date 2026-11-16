@@ -7,7 +7,7 @@ COPY . .
 RUN yarn build
 
 FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-# SPA fallback for react-router
-RUN printf 'server {\n  listen 4173;\n  root /usr/share/nginx/html;\n  location / { try_files $uri /index.html; }\n}\n' > /etc/nginx/conf.d/default.conf
+# Same path as the former vite preview image, so existing config.json mounts keep working
+COPY --from=build /app/dist /app/dist
+RUN printf 'server {\n  listen 4173;\n  root /app/dist;\n  location = /config.json { try_files $uri =404; }\n  location / { try_files $uri /index.html; }\n}\n' > /etc/nginx/conf.d/default.conf
 EXPOSE 4173
