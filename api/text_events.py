@@ -6,7 +6,7 @@ import requests
 from google import genai
 from pydantic import BaseModel, Field
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"
 
 
 class OpenAgendaEventPayload(BaseModel):
