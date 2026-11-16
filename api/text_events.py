@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 from script.libs.utils import naive_str_to_paris_iso
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"
 
 
 class OpenAgendaEventPayload(BaseModel):
