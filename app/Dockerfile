@@ -1,8 +1,8 @@
-FROM node:22-alpine
+FROM node:24-alpine
 WORKDIR /app
-RUN npm install -g corepack
+RUN npm install -g corepack && corepack enable
 COPY ["package.json", "yarn.lock", ".yarnrc.yml", "./"]
-RUN yarn install --frozen-lockfile
+RUN yarn install --immutable
 COPY . .
 # Build the app for production
 RUN yarn build
