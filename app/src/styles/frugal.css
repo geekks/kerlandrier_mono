@@ -693,7 +693,7 @@ footer {
 /* Local Google fonts */
 @font-face {
     font-family: Almonte;
-    src: url("/fonts/Almonte\ Snow.otf") format("opentype");
+    src: url("/fonts/Almonte_Snow.otf") format("opentype");
 }
 
 /* barlow-condensed-200 - latin */
