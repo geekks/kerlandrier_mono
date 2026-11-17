@@ -1,0 +1,12 @@
+[run]
+source = api
+omit =
+    api/.venv/*
+    api/tests/*
+    api/tests.py
+
+[report]
+include =
+    api/*.py
+    api/script/libs/*.py
+show_missing = True

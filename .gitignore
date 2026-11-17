@@ -19,6 +19,8 @@ secret_token.json
 # Python requests cache
 scrap_cache.sqlite
 __pycache__
+.coverage
+.coverage.*
 *.bak
 *.BAK
 
